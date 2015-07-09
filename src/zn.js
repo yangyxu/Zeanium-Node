@@ -1354,8 +1354,7 @@ if (typeof module !== 'undefined' && module.exports) {
         statics: {
             all: {},
             current: null,
-            counter: 0,
-            context: {}
+            counter: 0
         },
         properties: {
             status: MODULE_STATUS.PENDING,
@@ -1365,26 +1364,6 @@ if (typeof module !== 'undefined' && module.exports) {
             value: null
         },
         methods: {
-            __define__: function (){
-                if(require){
-                    var _currPath = './util';
-                    var _ctor = this;
-                    //require(_currPath);
-                    console.log(_currPath);
-
-                    var _currModule = _ctor.all[_currPath] = new _ctor(_currPath, [], function (util){
-                        console.log('tst');
-                    });
-                    _currModule.sets({
-                        status: MODULE_STATUS.LOADING
-                    });
-                    _currModule.load(function (a){
-                        console.log(a);
-                    });
-
-                    console.log(_currModule.get('value'));
-                }
-            },
             init: function (path, dependencies, factory) {
                 this.sets({
                     path: path,
@@ -1404,7 +1383,6 @@ if (typeof module !== 'undefined' && module.exports) {
                     path: _currPath,
                     status: MODULE_STATUS.LOADING
                 });
-
 
                 return _currModule.load(callback), this;
             },
@@ -1431,7 +1409,6 @@ if (typeof module !== 'undefined' && module.exports) {
 
                         if (_depLength === 0) {
                             _value = _factory.call(_value) || _value;
-
                             this.set('value', _value);
                             this.set('status', MODULE_STATUS.LOADING);
 
@@ -1660,6 +1637,8 @@ if (typeof module !== 'undefined' && module.exports) {
             }
         }
     };
+
+
 
 
 })(zn);
