@@ -1,0 +1,18 @@
+{
+    "core": [
+        "src/core/zn.js",
+        "src/core/builtin.js",
+        "src/core/fix.js",
+        "src/core/class.js",
+        "src/core/require.js"
+    ],
+    "dom": [
+        "src/dom/Element.js"
+    ],
+    "component": [
+
+    ],
+    "view": [
+
+    ]
+}
