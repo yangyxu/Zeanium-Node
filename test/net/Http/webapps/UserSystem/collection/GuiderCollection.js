@@ -1,10 +1,9 @@
-line.module([
+zn.define([
     'db',
-    'util',
     '../model/Guider'
-], function (db, util, Guider) {
+], function (db, Guider) {
 
-    return line.define("GuiderCollection", db.data.Collection, {
+    return zn.class("GuiderCollection", db.data.Collection, {
         methods: {
             init: function (inStore, inModel){
                 this.base(inStore, inModel);
@@ -18,7 +17,7 @@ line.module([
                 });
             },
             login: function (username, pwd){
-                var _defer = util.Async.defer(), _self = this;
+                var _defer = zn.async.defer(), _self = this;
                 try{
                     var _table = this._model.__getTable();
                     var _fields = this._model.__getFields(false);

@@ -1,8 +1,8 @@
-line.module([
+zn.define([
     './BaseModel'
 ], function (BaseModel) {
 
-    return line.define("City", BaseModel, {
+    return zn.class("City", BaseModel, {
         table: 't_sys_global_city',
         properties: {
             pid: {

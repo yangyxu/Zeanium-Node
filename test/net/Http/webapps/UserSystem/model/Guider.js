@@ -1,8 +1,8 @@
-line.module([
+zn.define([
     './BaseModel'
 ], function (BaseModel) {
 
-    return line.define("Guider", BaseModel, {
+    return zn.class("Guider", BaseModel, {
         table: 't_guider',
         properties: {
             userId: {

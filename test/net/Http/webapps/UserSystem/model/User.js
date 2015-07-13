@@ -1,8 +1,8 @@
-line.module([
+zn.define([
     './BaseModel'
 ], function (BaseModel) {
 
-    return line.define("User", BaseModel, {
+    return zn.class("User", BaseModel, {
         table: 't_user',
         properties: {
             username: {

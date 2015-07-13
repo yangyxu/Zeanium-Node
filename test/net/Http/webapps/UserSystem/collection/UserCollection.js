@@ -1,13 +1,12 @@
-line.module([
+zn.define([
     'db',
-    'util',
     '../model/User'
-], function (db, util, User) {
+], function (db, User) {
 
-    return line.define("UserCollection", db.data.Collection, {
+    return zn.class("UserCollection", db.data.Collection, {
         methods: {
             init: function (inStore, inModel){
-                this.base(inStore, inModel);
+                this.super(inStore, inModel);
                 this._model = User;
             },
             register: function (username, pwd, email){
@@ -18,7 +17,7 @@ line.module([
                 });
             },
             login: function (username, pwd){
-                var _defer = util.Async.defer(), _self = this;
+                var _defer = zn.async.defer(), _self = this;
                 try{
                     var _table = this._model.__getTable();
                     var _fields = this._model.__getFields(false);

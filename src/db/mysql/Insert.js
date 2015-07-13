@@ -11,7 +11,7 @@ zn.define([
                 this._fields = [];
                 this._values = [];
                 this._as = null;
-                this.base(args, context);
+                this.super(args, context);
             },
             field: function (){
                 var _len = arguments.length, _field = arguments[0];
@@ -27,7 +27,7 @@ zn.define([
                 var _args = Array.prototype.slice.call(arguments);
                 if(_args.length==1){
                     var _fields = _args[0];
-                    switch (line.type(_fields)){
+                    switch (zn.type(_fields)){
                         case 'string':
                             this._fields.push(_fields);
                             break;
@@ -50,8 +50,8 @@ zn.define([
                 return this;
             },
             __formatArray: function (ary){
-                line.each(ary, function (value, key){
-                    switch(line.type(value)){
+                zn.each(ary, function (value, key){
+                    switch(zn.type(value)){
                         case 'string':
                             ary[key] = "'"+value+"'";
                             break;
@@ -63,7 +63,7 @@ zn.define([
                 return ary;
             },
             into: function (into){
-                switch (line.type(into)){
+                switch (zn.type(into)){
                     case 'string':
                         this._table = into;
                         break;
@@ -80,10 +80,10 @@ zn.define([
             build: function (){
                 var _table = this._table;
                 if(!_table||_table=='()'){
-                    this.base('The query table is null');
+                    this.super('The query table is null');
                 }
                 if(!this._values.length){
-                    this.base('The values is null');
+                    this.super('The values is null');
                 }
                 var _fields = this._fields.join(',');
                 _fields = _fields?' ('+_fields+')':'';

@@ -1,9 +1,9 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-line.module(function () {
+zn.define(function () {
 
-    return line.define('Schema', {
+    return zn.class('Schema', {
         statics: {
             getInstance: function (inArgs, context) {
                 return new this(inArgs, context);

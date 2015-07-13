@@ -38,10 +38,10 @@ zn.define(function () {
                 return _fields;
             },
             __getProperties: function (modelClass) {
-                var _base = modelClass.__base__;
+                var _super = modelClass.__super__;
                 var _properties = modelClass.getMeta('properties');
-                if(_base){
-                    line.extend(_properties, this.__getProperties(_base));
+                if(_super){
+                    zn.extend(_properties, this.__getProperties(_super));
                 }
                 return _properties;
             }
@@ -54,7 +54,7 @@ zn.define(function () {
             },
             toJson: function () {
                 var _self = this, _data = {};
-                line.each(this._fields, function (field, key){
+                zn.each(this._fields, function (field, key){
                     _data[field] = _self.get(field);
                 });
                 return _data;
@@ -81,7 +81,7 @@ zn.define(function () {
                 return _updates;
             },
             __formatAutoUpdate: function (auto_update){
-                switch(line.type(auto_update)){
+                switch(zn.type(auto_update)){
                     case 'date':
                         return auto_update.toString();
                     case 'string':

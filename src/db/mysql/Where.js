@@ -1,9 +1,9 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-line.module(function () {
+zn.define(function () {
 
-    return line.define('Where', {
+    return zn.class('Where', {
         statics: {
             getInstance: function (inArgs, context) {
                 return new this(inArgs, context);
@@ -86,7 +86,7 @@ line.module(function () {
             },
             __in: function(values){
                 var _val = values||'0';
-                switch (line.type(values)){
+                switch (zn.type(values)){
                     case 'string':
                         break;
                     case 'array':
@@ -102,7 +102,7 @@ line.module(function () {
                 var _args = Array.prototype.slice.call(arguments);
                 if (_args.length==1){
                     var _obj = _args[0];
-                    switch (line.type(_obj)){
+                    switch (zn.type(_obj)){
                         case 'int':
                         case 'string':
                             return _obj;
@@ -118,8 +118,8 @@ line.module(function () {
             },
             __dataToWhere: function (data) {
                 var _ands = [], _self = this;
-                line.each(data, function (value, key){
-                    switch(line.type(key)){
+                zn.each(data, function (value, key){
+                    switch(zn.type(key)){
                         case 'number':
 
                             break;
@@ -136,7 +136,7 @@ line.module(function () {
                     _args.splice(1, 0, '=');
                 }
                 var _key = _args.shift(), _operate = _args.shift(), _val = _args[0];
-                if(line.type(_val)=='function'){
+                if(zn.type(_val)=='function'){
                     _val = '('+_val.apply(this._context)+')';
                 }else {
                     switch (_operate.toLowerCase()){
@@ -157,7 +157,7 @@ line.module(function () {
                         case 'between':
                         case 'not between':
                             var _begin = _val, _end = _args[1];
-                            if(line.type(_val)){
+                            if(zn.type(_val)){
                                 _begin = _val[0];
                                 _end = _val[1];
                             }

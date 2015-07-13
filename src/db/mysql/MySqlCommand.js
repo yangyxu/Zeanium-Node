@@ -1,16 +1,16 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-line.module([
+zn.define([
     './Select',
     './Insert',
     './Update',
-    './Delete',
-    '../../util/Async',
-    '../../util/Logger'
-],function (Select, Insert, Update, Delete, Async, Logger) {
+    './Delete'
+],function (Select, Insert, Update, Delete) {
 
-    return line.define('MySqlCommand', {
+    var Async = zn.async;
+
+    return zn.class('MySqlCommand', {
         properties: {
             connection: null
         },
@@ -32,10 +32,10 @@ line.module([
             },
             query: function (queryString) {
                 var _defer = Async.defer();
-                Logger.debug(queryString);
+                zn.debug(queryString);
                 this.get('connection').query(queryString, function(err, rows, fields) {
                     if (err){
-                        Logger.error(err.message);
+                        zn.error(err.message);
                         _defer.reject(err);
                         Async.catch(err);
                     }else {

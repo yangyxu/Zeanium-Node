@@ -5,8 +5,7 @@ zn.define([
     '../connection/Connection',
     './Model'
 ],function (Connection, Model) {
-    var Async = zn.async,
-        Logger = zn;
+    var Async = zn.async;
 
     return zn.class('Collection', {
         methods: {
@@ -45,7 +44,7 @@ zn.define([
                     var _table = _modelClass.__getTable();
                     var _fields = fields||_modelClass.__getFields(false);
                     var _where = inWhere||{1:1};
-                    switch(line.type(_where)){
+                    switch(zn.type(_where)){
                         case 'number':
                             _where = {};
                             _where[_modelClass._primary] = inWhere;
@@ -152,7 +151,7 @@ zn.define([
                 if(true){
                     var _table = _modelClass.__getTable();
                     var _where = inWhere;
-                    switch(line.type(_where)){
+                    switch(zn.type(_where)){
                         case 'number':
                             _where = {};
                             _where[_modelClass._primary] = inWhere;

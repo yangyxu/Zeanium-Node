@@ -6,8 +6,6 @@ zn.define([
     './Where'
 ],function (Schema, Where) {
 
-    var Logger = zn;
-
     return zn.class('Delete', Schema, {
         methods: {
             init: function (args, context){
@@ -16,10 +14,10 @@ zn.define([
                 this._order = [];
                 this._group = [];
                 this._limit = [];
-                this.base(args, context);
+                this.super(args, context);
             },
             from: function (from){
-                switch (line.type(from)){
+                switch (zn.type(from)){
                     case 'string':
                         this._table = from;
                         break;
@@ -97,10 +95,10 @@ zn.define([
             orderBy: function (){
                 var _order = Array.prototype.slice.call(arguments);
                 var _self = this;
-                if(line.type(_order[0])==='string'){
+                if(zn.type(_order[0])==='string'){
                     _self._order.push(_order.join(' '));
                 }else {
-                    line.each(_order[0], function(value, key){
+                    zn.each(_order[0], function(value, key){
                         _self._order.push(key+' '+value);
                     });
                 }
@@ -113,7 +111,7 @@ zn.define([
             build: function (){
                 var _table = this._table;
                 if(!_table||_table=='()'){
-                    this.base('The query table is null');
+                    this.super('The query table is null');
                 }
                 var _where = this._where.build();
                 _where = _where?' where '+_where:_where;

@@ -1,13 +1,12 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-line.module([
+zn.define([
     './Schema',
-    './Where',
-    '../../util/Logger'
-],function (Schema, Where, Logger) {
+    './Where'
+],function (Schema, Where) {
 
-    return line.define('Update', Schema, {
+    return zn.class('Update', Schema, {
         methods: {
             init: function (args, context){
                 this._updates = [];
@@ -15,13 +14,13 @@ line.module([
                 this._order = [];
                 this._group = [];
                 this._limit = [];
-                this.base(args, context);
+                this.super(args, context);
             },
             setValue: function (){
                 var _args = Array.prototype.slice.call(arguments);
                 if (_args.length==1){
                     var _val = _args[0];
-                    switch(line.type(_val)){
+                    switch(zn.type(_val)){
                         case 'string':
                             this._updates.push(_val);
                             break;
@@ -44,7 +43,7 @@ line.module([
                 return this;
             },
             table: function (from){
-                switch (line.type(from)){
+                switch (zn.type(from)){
                     case 'string':
                         this._table = from;
                         break;
@@ -122,10 +121,10 @@ line.module([
             orderBy: function (){
                 var _order = Array.prototype.slice.call(arguments);
                 var _self = this;
-                if(line.type(_order[0])==='string'){
+                if(zn.type(_order[0])==='string'){
                     _self._order.push(_order.join(' '));
                 }else {
-                    line.each(_order[0], function(value, key){
+                    zn.each(_order[0], function(value, key){
                         _self._order.push(key+' '+value);
                     });
                 }
@@ -138,10 +137,10 @@ line.module([
             build: function (){
                 var _table = this._table;
                 if(!_table||_table=='()'){
-                    this.base('The query table is null');
+                    this.super('The query table is null');
                 }
                 if(!this._updates.length){
-                    this.base('The set values is null');
+                    this.super('The set values is null');
                 }
                 var _updates = this._updates.join(',');
                 var _where = this._where.build();

@@ -1,4 +1,4 @@
-line.module([
+zn.define([
     'unit'
 ], function (unit) {
 

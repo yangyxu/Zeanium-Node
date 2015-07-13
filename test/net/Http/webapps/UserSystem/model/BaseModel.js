@@ -1,8 +1,8 @@
-line.module([
+zn.define([
     'db'
 ], function (db) {
 
-    return line.define("BaseModel", db.data.Model, {
+    return zn.class("BaseModel", db.data.Model, {
         properties: {
             id: {
                 value: null,

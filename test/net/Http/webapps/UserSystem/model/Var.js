@@ -1,8 +1,8 @@
-line.module([
+zn.define([
     './BaseModel'
 ], function (BaseModel) {
 
-    return line.define("Var", BaseModel, {
+    return zn.class("Var", BaseModel, {
         table: 't_sys_global_var',
         properties: {
             pid: {

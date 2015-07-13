@@ -21,7 +21,7 @@ zn.define([
         methods: {
             init: function (inArgs){
                 var _args = inArgs||config['default'];
-                if(line.type(inArgs)=='string'){
+                if(zn.type(inArgs)=='string'){
                     _args = config[_args];
                 }
                 this.sets(_args);

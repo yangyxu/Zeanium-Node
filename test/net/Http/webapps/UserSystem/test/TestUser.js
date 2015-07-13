@@ -1,11 +1,11 @@
-line.module([
+zn.define([
     'db',
     '../model/User',
     '../collection/UserCollection',
     '../web_config'
 ],function (db, User, UserCollection, web_config) {
 
-    return line.define('TestUser', {
+    return zn.class('TestUser', {
         properties: {
             
         },

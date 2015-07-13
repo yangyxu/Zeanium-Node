@@ -3,13 +3,10 @@
  */
 zn.define([
     '../connection/Connection',
-    './Collection',
-    '../../util/Async',
-    '../../util/Logger'
+    './Collection'
 ],function (Connection, Collection) {
 
-    var Async = zn.async,
-        Logger = zn;
+    var Async = zn.async
 
     return zn.class('Store', {
         statics: {

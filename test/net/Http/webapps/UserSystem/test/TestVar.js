@@ -1,11 +1,11 @@
-line.module([
+zn.define([
     'db',
     '../model/Var',
     '../collection/VarCollection',
     '../web_config'
 ],function (db, Var, VarCollection, web_config) {
 
-    return line.define('TestVar', {
+    return zn.class('TestVar', {
         properties: {
             
         },

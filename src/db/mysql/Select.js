@@ -1,13 +1,12 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-line.module([
+zn.define([
     './Schema',
-    './Where',
-    '../../util/Logger'
-],function (Schema, Where, Logger) {
+    './Where'
+],function (Schema, Where) {
 
-    return line.define('Select', Schema, {
+    return zn.class('Select', Schema, {
         methods: {
             init: function (args, context){
                 this._fields = [];
@@ -16,7 +15,7 @@ line.module([
                 this._order = [];
                 this._group = [];
                 this._limit = [];
-                this.base(args, context);
+                this.super(args, context);
             },
             field: function (){
                 var _len = arguments.length, _field = arguments[0];
@@ -32,7 +31,7 @@ line.module([
                 var _args = Array.prototype.slice.call(arguments);
                 if(_args.length==1){
                     var _fields = _args[0];
-                    switch (line.type(_fields)){
+                    switch (zn.type(_fields)){
                         case 'string':
                             this._fields.push(_fields);
                             break;
@@ -46,7 +45,7 @@ line.module([
                 return this;
             },
             from: function (from){
-                switch (line.type(from)){
+                switch (zn.type(from)){
                     case 'string':
                         this._table = from;
                         break;
@@ -128,10 +127,10 @@ line.module([
             orderBy: function (){
                 var _order = Array.prototype.slice.call(arguments);
                 var _self = this;
-                if(line.type(_order[0])==='string'){
+                if(zn.type(_order[0])==='string'){
                     _self._order.push(_order.join(' '));
                 }else {
-                    line.each(_order[0], function(value, key){
+                    zn.each(_order[0], function(value, key){
                         _self._order.push(key+' '+value);
                     });
                 }
@@ -144,7 +143,7 @@ line.module([
             build: function (){
                 var _table = this._table;
                 if(!_table||_table=='()'){
-                    this.base('The query table is null');
+                    this.super('The query table is null');
                 }
                 var _fields = this._fields.join(',')||'*';
                 var _where = this._where.build();

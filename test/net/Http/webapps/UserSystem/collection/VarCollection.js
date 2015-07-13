@@ -1,17 +1,16 @@
-line.module([
+zn.define([
     'db',
-    'util',
     '../model/Var'
-], function (db, util, Var) {
+], function (db, Var) {
 
-    return line.define("VarCollection", db.data.Collection, {
+    return zn.class("VarCollection", db.data.Collection, {
         methods: {
             init: function (inStore, inModel){
-                this.base(inStore, inModel);
+                this.super(inStore, inModel);
                 this._model = Var;
             },
             getVars: function (varId){
-                var _defer = util.Async.defer(), _self = this;
+                var _defer = zn.async.defer(), _self = this;
                 try{
                     var _table = this._model.__getTable();
                     var _fields = this._model.__getFields(false);

@@ -1,6 +1,6 @@
 zn.define({
     deploy: 'us',
-    //controllers: '/controller/',
+    controllers: '/controller/',
     mysql: {
         dbType:'mysql',
         host: '115.28.169.90',
