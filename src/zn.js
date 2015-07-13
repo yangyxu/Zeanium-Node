@@ -10,6 +10,8 @@ var zn = {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = zn;
 }
+
+zn.GLOBAL.zn = zn;  //set global zn var
 /**
  * Builtin Functions
  */
@@ -1321,42 +1323,190 @@ if (typeof module !== 'undefined' && module.exports) {
         };
     var _doc = zn.GLOBAL.document;
 
-    function formatPath(path) {
-        var _paths = path.split(SLASH);
-        var _values = [_paths[0]], _path;
+    var __path = {
+        normalizePath: function (path){
+            var _paths = path.split(SLASH);
+            var _values = [_paths[0]], _path;
 
-        for (var i = 1, _len = _paths.length; i < _len; i++) {
-            _path = _paths[i];
-            switch(_path){
-                case DOT:
-                    //ignore
-                    break;
-                case DOUBLE_DOT:
-                    var _last = _values[_values.length - 1];
-                    //console.log('last: '+_last);
-                    if (_last === DOT || _last === DOUBLE_DOT) {
-                        _values.push(DOUBLE_DOT);
-                    }
-                    else {
-                        _values.pop();
-                    }
-                    break;
-                default:
-                    _values.push(_path);
-                    break;
+            for (var i = 1, _len = _paths.length; i < _len; i++) {
+                _path = _paths[i];
+                switch(_path){
+                    case DOT:
+                        //ignore
+                        break;
+                    case DOUBLE_DOT:
+                        var _last = _values[_values.length - 1];
+                        if (_last === DOT || _last === DOUBLE_DOT) {
+                            _values.push(DOUBLE_DOT);
+                        }
+                        else {
+                            _values.pop();
+                        }
+                        break;
+                    default:
+                        _values.push(_path);
+                        break;
+                }
             }
-        }
 
-        return _values.join(SLASH);
-    }
+            return _values.join(SLASH);
+        },
+        formatCurrentPath: function (currPath, parent){
+            var _currPath = currPath,
+                _parentPath = parent ? (parent.get('path')||''): zn.PATH,
+                _slashIndex = _currPath.indexOf(SLASH);
+            if (_slashIndex > 0) {
+                _currPath = _parentPath ? (_parentPath.substring(0, _parentPath.lastIndexOf(SLASH) + 1) + _currPath) : _currPath;
+                _currPath = this.normalizePath(_currPath);
+            }
+            else if (_slashIndex === 0) {
+                _currPath = this.normalizePath(zn.PATH ? (zn.PATH.substring(0, zn.PATH.lastIndexOf(SLASH)) + _currPath) : _currPath);
+            }
+            else {
+                if (_doc) {
+                    var _znPath = zn.ZN_JS_PATH;
+                    if(!_znPath){
+                        var _src = '';
+                        if (!_doc.getElementById('zn-js')) {
+                            zn.each(_doc.getElementsByTagName('script'), function (node) {
+                                if(node.getAttribute){
+                                    _src = node.getAttribute('src') || '';
+                                    if (_src.slice(-5) === 'zn.js') {
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+
+                        if(_src){
+                            _znPath = zn.ZN_JS_PATH =_src;
+                        }else {
+                            throw new Error('zn.js has not been included, please do it first.');
+                        }
+                    }
+
+                    _slashIndex = _znPath.lastIndexOf(SLASH);
+                    _currPath = _znPath.slice(0, _slashIndex >= 0 ? (_slashIndex + 1) : 0) + _currPath; // + '/';
+                }
+                else {
+                    _currPath = './' + _currPath + '/';
+                }
+            }
+
+            return _currPath;
+        }
+    };
 
     var Module = zn.class('zn.Module', {
+        events: [
+            'pending',
+            'loading',
+            'waiting',
+            'loaded'
+        ],
         statics: {
             all: {},
             current: null,
-            counter: 0
+            counter: 0,
+            preLoadedPackage: {},
+            loadModule: function (path, callback, parent){
+                if (path.substring(0, 5) === 'node:') {
+                    return callback(require(path.substring(5)));
+                }
+                var _path = __path.formatCurrentPath(path, parent);
+                if(_path.slice(-1) === '/'){
+                    _path += 'index.js';
+                }
+                var _module = Module.all[_path];
+                if (_module) {
+                    _module.load(callback);
+                }
+                else {
+                    _module = Module.all[_path] = new Module(_path);
+                    Module.counter++;
+                    if (_doc) {
+                        this.__webModule(_path, function (err){
+                            Module.counter--;
+
+                            if (err) {
+                                throw new Error('Failed to load module:' + path);
+                            }
+                            else {
+                                _module.sets({
+                                    parent: parent,
+                                    path: _path,
+                                    dependencies: Module.current.get('dependencies'),
+                                    factory: Module.current.get('factory'),
+                                    status: MODULE_STATUS.LOADING
+                                });
+                                _module.load(callback);
+                            }
+                        });
+                    }
+                    else {
+                        this.__nodeModule(_path, function (mod){
+                            Module.counter--;
+
+                            _module.sets({
+                                parent: parent,
+                                path: _path,
+                                dependencies: Module.current.get('dependencies'),
+                                factory: Module.current.get('factory'),
+                                status: MODULE_STATUS.LOADING
+                            });
+                            _module.load(callback);
+                        });
+                    }
+                }
+            },
+            __nodeModule: function (path, callback){
+                var _path = path,
+                    _callback = callback || zn.idle;
+                _callback(require(_path));
+            },
+            __webModule: function (path, callback){
+                var _head = _doc.head || _doc.getElementsByTagName('head')[0],
+                    _script = _doc.createElement('script'),
+                    _path = path,
+                    _callback = callback || zn.idle;
+
+                var _handler = function (err) {
+                    _script.onload = null;
+                    _script.onerror = null;
+                    _callback(err);
+                };
+
+                _path = _path.slice(-1) === '/' ? _path + 'index.js' : _path;
+                _path = _path.slice(-3).toLowerCase() === '.js' ? _path : _path + '.js';
+                _script.src = _path;
+                //_script.async = false;
+
+                if ('onload' in _script) {
+                    _script.onload = function () {
+                        _handler(null);
+                    };
+                }
+                else {
+                    _script.onreadystatechange = function (e) {
+                        var _state = _script.readyState;
+                        if (_state === 'loaded' || _state === 'complete') {
+                            _handler(null);
+                        }
+                        else {
+                            _handler(e);
+                        }
+                    };
+                }
+
+                _script.onerror = function (e) {
+                    _handler(e);
+                };
+
+                _head.appendChild(_script);
+            }
         },
         properties: {
+            parent: null,
             status: MODULE_STATUS.PENDING,
             path: '',
             dependencies: null,
@@ -1375,77 +1525,93 @@ if (typeof module !== 'undefined' && module.exports) {
                 this._callbacks = [];
             },
             exec: function (callback){
-                var _argv = process.argv;
-                var _currPath = _argv[1];
-                var _currModule = Module.all[_currPath] = Module.current;
+                var _argv = process.argv,
+                    _currPath = _argv[1];
 
-                _currModule.sets({
+                this.sets({
                     path: _currPath,
                     status: MODULE_STATUS.LOADING
                 });
 
-                return _currModule.load(callback), this;
+                return this.load(callback), this;
+            },
+            __pending: function (callback){
+                this._callbacks.push(callback);
+            },
+            __loading: function (callback){
+                var _path = this.get('path'),
+                    _deps = this.get('dependencies'),
+                    _factory = this.get('factory'),
+                    _value = this.get('value');
+
+
+                this.set('status', MODULE_STATUS.WAITING);
+                this._callbacks.push(callback);
+
+                var _depLength = _deps.length;
+                if (_depLength === 0) {
+                    _value = _factory.call(_value) || _value;
+                    this.set('value', _value);
+                    this.set('status', MODULE_STATUS.LOADING);
+
+                    zn.each(this._callbacks, function (cb) {
+                        cb(_value);
+                    });
+                }
+                else {
+                    var _params = [],
+                        _self = this;
+                    zn.each(_deps, function (_dep, _index){
+                        Module.loadModule(_dep, function (_param){
+                            _params[_index] = _param;
+                            _depLength--;
+                            if(_depLength === 0){
+                                _value = _factory.apply(_value, _params) || _value;
+                                _self.set('value', _value);
+                                _self.set('status', MODULE_STATUS.LOADED);
+
+                                zn.each(_self._callbacks, function (cb) {
+                                    cb(_value);
+                                });
+                            }
+                        }, _self);
+
+                    });
+
+                }
+            },
+            __waiting: function (callback){
+                var _self = this;
+                setTimeout(function () {
+                    if (Module.counter === 0) {
+                        _self.set('status', MODULE_STATUS.LOADING);
+                    }
+                    _self.load(callback);
+                });
+            },
+            __loaded: function (callback){
+                callback(this.get('value'));
             },
             load: function (callback) {
                 var _status = this.get('status'),
-                    _callback = callback || zn.idle,
-                    _self = this;
+                    _callback = callback || zn.idle;
 
                 switch(_status){
                     case MODULE_STATUS.PENDING:
-                        this._callbacks.push(_callback);
+                        this.__pending(_callback);
                         break;
                     case MODULE_STATUS.LOADING:
-                        var _path = this.get('path'),
-                            _deps = this.get('dependencies'),
-                            _factory = this.get('factory'),
-                            _value = this.get('value');
-
-                        var _depLength = _deps.length,
-                            _params = [];
-
-                        this.set('status', MODULE_STATUS.WAITING);
-                        this._callbacks.push(_callback);
-
-                        if (_depLength === 0) {
-                            _value = _factory.call(_value) || _value;
-                            this.set('value', _value);
-                            this.set('status', MODULE_STATUS.LOADING);
-
-                            zn.each(this._callbacks, function (cb) {
-                                cb(_value);
-                            });
-                        }
-                        else {
-                            zn.each(_deps, function (dep, index) {
-                                zn.load(dep, function (param) {
-                                    _params[index] = param;
-                                    _depLength--;
-                                    if (_depLength === 0) {
-                                        _value = _factory.apply(_value, _params) || _value;
-                                        _self.set('value', _value);
-                                        _self.set('status', MODULE_STATUS.LOADED);
-
-                                        zn.each(_self._callbacks, function (cb) {
-                                            cb(_value);
-                                        });
-                                    }
-                                }, _self);
-                            });
-                        }
+                        this.__loading(_callback);
                         break;
                     case MODULE_STATUS.WAITING:
-                        setTimeout(function () {
-                            if (Module.counter === 0) {
-                                _self.set('status', MODULE_STATUS.LOADING);
-                            }
-                            _self.load(_callback);
-                        });
+                        this.__waiting(_callback);
                         break;
                     case MODULE_STATUS.LOADED:
-                        _callback(this.get('value'));
+                        this.__loaded(_callback);
                         break;
                 }
+
+                return this;
             }
         }
     });
@@ -1456,7 +1622,7 @@ if (typeof module !== 'undefined' && module.exports) {
      * @param callback
      * @returns {object}
      */
-    zn.module = function () {
+    zn.define = function () {
         var _args = arguments,
             _len = _args.length,
             _arg0 = _args[0],
@@ -1474,17 +1640,17 @@ if (typeof module !== 'undefined' && module.exports) {
             else if (zn.is(_arg0, 'array')) {
                 _deps = _arg0;
                 _factory = function () {
-                     var _values = {};
-                     zn.each(arguments, function (_module) {
-                         if (_module._name_) {
-                             _values[_module._name_] = _module;
-                         }
-                         else {
+                    var _values = {};
+                    zn.each(arguments, function (_module) {
+                        if (_module._name_) {
+                            _values[_module._name_] = _module;
+                        }
+                        else {
                             zn.extend(_values, _module);
-                         }
-                     });
+                        }
+                    });
 
-                     return _values;
+                    return _values;
                 };
             }
             else {
@@ -1497,148 +1663,545 @@ if (typeof module !== 'undefined' && module.exports) {
             throw new Error('Invalid arguments.');
         }
 
-        if(zn.is(_deps, 'string')){
+        if(_deps && zn.is(_deps, 'string')){
             _deps = [_deps];
         }
 
         return Module.current = new Module('', _deps, _factory), Module.current;
     };
 
-
-    zn.load = function (path, callback, parent) {
-        if (zn.is(path, Module)) {
-            path.load(callback);
-        }else if (zn.is(path, 'string')) {
-            var _currPath = path,
-                _currModule,
-                _parentPath,
-                _slashIndex,
-                _src = '';
-
-            if (!zn.PATH) {
-                _slashIndex = path.lastIndexOf(SLASH);
-                //_currPath = './' + path.substring(_slashIndex + 1);
-                //zn.PATH = path.substring(0, _slashIndex + 1);
-            }
-
-            _parentPath = parent ? parent.get('path') : zn.PATH;
-
-            if (_currPath.substring(0, 5) === 'node:') {
-                if (callback) {
-                    callback(require(_currPath.substring(5)));
+    var Loader = zn.class('zn.Loader', {
+        static: true,
+        properties: {
+            preLoadPackages: []
+        },
+        methods: {
+            init: function () {
+                var _packages = this.preLoadPackages;
+                for(var i= 0, _len = _packages.length; i<_len; i++){
+                    this.loadPackage(_packages[i]);
                 }
+            },
+            loadPackage: function (_package){
+                this.load(_package+'index.js', function (value){
+                    zn.extend(Module.preLoadedPackage, value);
+                });
+            },
+            load: function (path, callback, parent) {
+                if (zn.is(path, Module)) {
+                    path.load(callback);
+                }else if (zn.is(path, 'string')) {
+                    var _currPath = path;
 
-                return true;
-            }
-
-            _slashIndex = _currPath.indexOf(SLASH);
-
-            if (_slashIndex > 0) {
-                _currPath = formatPath(_parentPath ? (_parentPath.substring(0, _parentPath.lastIndexOf(SLASH) + 1) + _currPath) : _currPath);
-            }
-            else if (_slashIndex === 0) {
-                _currPath = formatPath(zn.PATH ? (zn.PATH.substring(0, zn.PATH.lastIndexOf(SLASH)) + _currPath) : _currPath);
-            }
-            else {
-                if (_doc) {
-                    var _znjs = _doc.getElementById('zn-js');
-                    if (!_znjs) {
-                        zn.each(_doc.getElementsByTagName('script'), function (node) {
-                            if(node.getAttribute){
-                                _src = node.getAttribute('src') || '';
-                                if (_src.slice(-5) === 'zn.js') {
-                                    _znjs = node;
-                                }
-                            }
-                        });
-                    }
-
-                    if (_znjs) {
-                        _src = _znjs.getAttribute('src');
-                        _slashIndex = _src.lastIndexOf(SLASH);
-                        _currPath = _src.slice(0, _slashIndex >= 0 ? (_slashIndex + 1) : 0) + _currPath; // + '/';
-                    }
-                }
-                else {
-                    _currPath = './' + _currPath + '/';
-                }
-            }
-
-            _currModule = Module.all[_currPath];
-
-            if (_currModule) {
-                _currModule.load(callback);
-            }
-            else {
-                _currModule = Module.all[_currPath] = new Module(_currPath);
-
-                if (_doc) {
-                    var _head = _doc.head || _doc.getElementsByTagName('head')[0];
-                    var _script = _doc.createElement('script');
-                    var _handler = function (err) {
-                        _script.onload = null;
-                        _script.onerror = null;
-                        Module.counter--;
-
-                        if (err) {
-                            throw new Error('Failed to load module:' + _currPath);
+                    if (_currPath.substring(0, 5) === 'node:') {
+                        if (callback) {
+                            callback(require(_currPath.substring(5)));
                         }
-                        else {
-                            _currModule.sets({
-                                path: _currPath,
-                                dependencies: Module.current.get('dependencies'),
-                                factory: Module.current.get('factory'),
-                                status: MODULE_STATUS.LOADING
-                            });
-
-                            _currModule.load(callback);
-                        }
-                    };
-
-                    _src = _currPath.slice(-1) === '/' ? _currPath + 'index.js' : _currPath;
-                    _src = _src.slice(-3).toLowerCase() === '.js' ? _src : _src + '.js';
-                    _script.src = _src;
-//                  script.async = false;
-                    Module.counter++;
-
-                    _head.appendChild(_script);
-
-                    if ('onload' in _script) {
-                        _script.onload = function () {
-                            _handler(null);
-                        };
-                    }
-                    else {
-                        _script.onreadystatechange = function (e) {
-                            var _state = _script.readyState;
-                            if (_state === 'loaded' || _state === 'complete') {
-                                _handler(null);
-                            }
-                            else {
-                                _handler(e);
-                            }
-                        };
+                        return true;
                     }
 
-                    _script.onerror = function (e) {
-                        _handler(e);
-                    };
-                }
-                else {
-                    require(_currPath);
-                    _currModule.sets({
-                        path: _currPath,
-                        dependencies: Module.current.get('dependencies'),
-                        factory: Module.current.get('factory'),
-                        status: MODULE_STATUS.LOADING
-                    });
-                    _currModule.load(callback);
+                    Module.loadModule(_currPath, callback, parent);
                 }
             }
         }
+    });
+
+    zn.load = Loader.load;
+
+})(zn);
+/**
+ * Created by yangyxu on 2014/9/16.
+ * Promise: Promise
+ */
+(function (zn){
+
+    /**
+     * Promise: Promise
+     * @class Async
+     * @namespace zn.util
+     **/
+
+    var PROMISE_STATE = {
+        PENDING: 0,
+        FULFILLED: 1,
+        REJECTED: 2
     };
 
+    var Async = zn.class('Async', {
+        static: true,
+        methods: {
+            init: function (inArgs) {
+                this._exceptions = [];
+                this._finallys = [];
+                this._count = 0;
+                this._currIndex = 0;
+                this._dataArray = [];
+            },
+            exception: function (onException){
+                this._exceptions.push(onException);
+                return this;
+            },
+            catch: function (ex, context){
+                zn.each(this._exceptions, function (exception){
+                    exception.call(context, ex);
+                });
+                return this;
+            },
+            finally: function (onFinally){
+                this._finallys.push(onFinally);
+                return this;
+            },
+            defer: function (inArgs) {
+                var _self = this, _defer = new Defer(inArgs);
+                _defer.on('complete', function (sender, data){
+                    _self._currIndex++;
+                    _self._dataArray.push(data);
+                    if(_self._currIndex==_self._count){
+                        zn.each(_self._finallys, function (_finally){
+                            try{
+                                _finally(_self._dataArray);
+                            }catch(e){
+                                console.log(e.message);
+                            }
+                        });
+                        _self._finallys = [];
+                    }
+                });
+                _self._count++;
+                return _defer;
+            },
+            all: function (promises) {
+                var _deferred = Async.defer();
+                var _n = 0, _result = [];
+                zn.each(promises, function (promise){
+                    promise.then(function (ret){
+                        _result.push(ret);
+                        _n++;
+                        if(_n>=promises.length){
+                            _deferred.resolve(_result);
+                        }
+                    });
+                });
+                return _deferred.promise;
+            },
+            any: function (promises) {
+                var _deferred = Async.defer();
+                zn.each(promises, function (promise){
+                    promise.then(function (ret){
+                        _deferred.resolve(ret);
+                    });
+                });
+                return _deferred.promise;
+            }
+        }
+    });
 
 
+    var Defer = zn.class('Defer', {
+        events: ['complete'],
+        properties: {
+            promise: null
+        },
+        methods: {
+            init: function (inArgs) {
+                this._promise = new Promise();
+            },
+            resolve: function (data) {
+                try{
+                    var _promise = this.get('promise');
+                    if (_promise.get('readyState') != PROMISE_STATE.PENDING){
+                        return;
+                    }
+                    _promise.set('readyState', PROMISE_STATE.FULFILLED);
+                    _promise.set('data', data);
+                    zn.each(_promise.get('resolves'), function (handler){
+                        handler(data);
+                    });
+                }catch(ex){
+                    Async.catch(ex, this);
+                }
+                this.fire('complete', data);
+            },
+            reject: function (reason) {
+                try{
+                    var _promise = this.get('promise');
+                    if (_promise.get('readyState') != PROMISE_STATE.PENDING){
+                        return;
+                    }
+                    _promise.set('readyState', PROMISE_STATE.REJECTED);
+                    _promise.set('reason', reason);
+                    var _handler = _promise.get('rejects')[0];
+                    if (_handler){
+                        _handler(reason);
+                    }
+                }catch(ex){
+                    Async.catch(ex, this);
+                }
+                this.fire('complete', reason);
+            }
+        }
+    });
+
+    var Promise = zn.class('Promise', {
+        statics: {
+            isPromise: function (obj) {
+                return obj !== null && typeof obj.then === 'function';
+            },
+            defer: null
+        },
+        properties: {
+            resolves: null,
+            rejects: null,
+            data: null,
+            reason: null,
+            readyState: null
+        },
+        methods: {
+            init: function (inArgs) {
+                this.set('resolves', []);
+                this.set('rejects', []);
+                this.set('exceptions', []);
+                this.set('readyState',PROMISE_STATE.PENDING);
+            },
+            then: function (onFulfilled, onRejected) {
+                var deferred = new Defer();
+                function fulfill(data){
+                    var _return = onFulfilled?onFulfilled(data):data;
+                    if(Promise.isPromise(_return)){
+                        _return.then(function (data){
+                            deferred.resolve(data);
+                        });
+                    }else {
+                        deferred.resolve(_return);
+                    }
+                    return _return;
+                }
+
+                if(this.get('readyState')===PROMISE_STATE.PENDING){
+                    this.get('resolves').push(fulfill);
+                    if(onRejected){
+                        this.get('rejects').push(onRejected);
+                    }else {
+                        this.get('rejects').push(function (reason) {
+                            deferred.reject(reason);
+                        });
+                    }
+                }else if (this.get('readyState')===PROMISE_STATE.FULFILLED) {
+                    var _self = this;
+                    setTimeout(function (){
+                        fulfill(_self.get('data'));
+                    });
+                }
+
+                return deferred.promise;
+
+            },
+            catch: function (onException){
+                return Async.exception(onException);
+            },
+            finally: function (onFinally){
+                return Async.finally(onFinally);
+            },
+            otherwise: function (onRejected) {
+                return this.then(undefined, onRejected);
+            }
+        }
+    });
+
+    zn.async = Async;
+
+})(zn);
+/**
+ * Created by yangyxu on 8/20/14.
+ */
+(function (zn){
+
+    var DATE_FORMAT = {
+        ISO8601: "yyyy-MM-dd hh:mm:ss.SSS",
+        ISO8601_WITH_TZ_OFFSET: "yyyy-MM-ddThh:mm:ssO",
+        DATETIME: "dd MM yyyy hh:mm:ss.SSS",
+        ABSOLUTETIME: "hh:mm:ss.SSS"
+    };
+
+    /**
+     * Date: Date
+     * @class Date
+     * @namespace zn.util
+     **/
+    var DateUtil = zn.class('DateUtil', {
+        static: true,
+        properties: {
+
+        },
+        methods: {
+            init: function (args){
+
+            },
+            asString: function (date){
+                var format = DATE_FORMAT.ISO8601;
+                if (typeof(date) === "string") {
+                    format = arguments[0];
+                    date = arguments[1];
+                }
+                var vDay = this.__addZero(date.getDate());
+                var vMonth = this.__addZero(date.getMonth()+1);
+                var vYearLong = this.__addZero(date.getFullYear());
+                var vYearShort = this.__addZero(date.getFullYear().toString().substring(2,4));
+                var vYear = (format.indexOf("yyyy") > -1 ? vYearLong : vYearShort);
+                var vHour  = this.__addZero(date.getHours());
+                var vMinute = this.__addZero(date.getMinutes());
+                var vSecond = this.__addZero(date.getSeconds());
+                var vMillisecond = this.__padWithZeros(date.getMilliseconds(), 3);
+                var vTimeZone = this.__offset(date);
+                var formatted = format
+                    .replace(/dd/g, vDay)
+                    .replace(/MM/g, vMonth)
+                    .replace(/y{1,4}/g, vYear)
+                    .replace(/hh/g, vHour)
+                    .replace(/mm/g, vMinute)
+                    .replace(/ss/g, vSecond)
+                    .replace(/SSS/g, vMillisecond)
+                    .replace(/O/g, vTimeZone);
+                return formatted;
+            },
+            __padWithZeros: function (vNumber, width){
+                var numAsString = vNumber + "";
+                while (numAsString.length < width) {
+                    numAsString = "0" + numAsString;
+                }
+                return numAsString;
+            },
+            __addZero: function(vNumber){
+                return this.__padWithZeros(vNumber, 2);
+            },
+            __offset: function (date){
+                // Difference to Greenwich time (GMT) in hours
+                var os = Math.abs(date.getTimezoneOffset());
+                var h = String(Math.floor(os/60));
+                var m = String(os%60);
+                if (h.length == 1) {
+                    h = "0" + h;
+                }
+                if (m.length == 1) {
+                    m = "0" + m;
+                }
+                return date.getTimezoneOffset() < 0 ? "+"+h+m : "-"+h+m;
+            }
+        }
+    });
+
+    var TYPES = ['INFO', 'DEBUG', 'WARNING', 'ERROR', 'TRACE', '', 'INIT'];
+    var COLORS_VALUE = ['#100000', '#2125a0', '#a82c2c', '#c045b7', '1cb131', '', '#100000'];
+    var COLORS = [38, 34, 35, 31, 32, 36, 33];
+    var LEVELS = {
+        INFO: 0,
+        DEBUG: 1,
+        WARNING: 2,
+        ERROR: 3,
+        TRACE: 4,
+        INIT: 6
+    };
+
+    /**
+     * Logger: Logger
+     * @class Logger
+     * @namespace zn.util
+     **/
+    var Logger = zn.class('Logger', {
+        static: true,
+        properties: {
+
+        },
+        methods: {
+            init: function (args){
+
+            },
+            info: function (obj) {
+                this.__log(LEVELS.INFO, obj);
+            },
+            debug: function (obj) {
+                this.__log(LEVELS.DEBUG, obj);
+            },
+            warn: function (obj) {
+                this.__log(LEVELS.WARNING, obj);
+            },
+            trace: function (obj) {
+                this.__log(LEVELS.TRACE, obj);
+            },
+            error: function (obj) {
+                this.__log(LEVELS.ERROR, obj);
+            },
+            __getDateString: function (date) {
+                return DateUtil.asString(date||new Date());
+            },
+            __getPosition: function (){
+                try {
+                    throw new Error();
+                } catch(e) {
+                    var _pos = e.stack.split('\n')[4].replace(/\(/g, '').replace(/\)/g, '').split('/').pop();
+                    return _pos;
+                }
+            },
+            __formatLog4Server: function (log, color) {
+                var _tag = '', _head = '', _foot = '';
+                if (color) {
+                    _head = '\x1B[';
+                    _foot = '\x1B[0m';
+                    _tag = COLORS[5]+'m';
+                    color = COLORS[log.type]+'m';
+                }
+                return [
+                    log.time,
+                    ' [',
+                    _head,
+                    color,
+                    TYPES[log.type],
+                    _foot,
+                    '] [',
+                    _head,
+                    _tag,
+                    log.pos,
+                    _foot,
+                    '] ',
+                    log.message
+                ].join('');
+            },
+            __formatLog4Client: function (log, color) {
+                return [
+                    '%c'+log.time,
+                    ' [',
+                    TYPES[log.type],
+                    '] [',
+                    log.pos,
+                    '] ',
+                    log.message
+                ].join('');
+            },
+            __log: function (type, message) {
+                var _log = {
+                    type: type,
+                    message: typeof message=='object'?JSON.stringify(message): message,
+                    time: this.__getDateString(),
+                    pos: this.__getPosition()
+                };
+                if (zn.GLOBAL.document){
+                    console.log(this.__formatLog4Server(_log, true));
+                }else {
+                    console.log(this.__formatLog4Client(_log, true), 'color:'+COLORS_VALUE[type]);
+                }
+            }
+        }
+    });
+
+    var __console = {
+        info: function (){
+            Logger.info.apply(Logger, arguments);
+        },
+        debug: function (){
+            Logger.debug.apply(Logger, arguments);
+        },
+        warn: function (){
+            Logger.warn.apply(Logger, arguments);
+        },
+        trace: function (){
+            Logger.trace.apply(Logger, arguments);
+        },
+        error: function (){
+            Logger.error.apply(Logger, arguments);
+        },
+    };
+
+    zn.extend(zn, __console);
+
+})(zn);
+(function (zn){
+
+    /**
+     * @class TestCase
+     * @namespace zn.unit
+     * @type {Function}
+     */
+    var TestCase = zn.class('zn.unit.TestCase',{
+        properties: {
+
+        },
+        methods: {
+            init: function () {
+
+            }
+        }
+    });
+
+})(zn);
+(function (zn){
+
+    var TestLoader = zn.class('zn.unit.TestLoader',{
+        static: true,
+        properties: {
+
+        },
+        methods: {
+            init: function (){
+                this._casePaths = [];
+                this._caseMethods = [];
+            },
+            load: function (path){
+                this._casePaths.push(path);
+                return this;
+            },
+            run: function () {
+                this.__testingCase();
+            },
+            __testingCase: function (){
+                var _case = this._casePaths.shift(), _self = this;
+                if(_case){
+                    zn.load(_case, function (testCaseClass){
+                        var _methods = testCaseClass.getMeta('methods')||[];
+                        zn.info('Testing Case: '+ _case);
+                        _self.__testingCaseMethods(_methods);
+                    });
+                }
+            },
+            __testingCaseMethods: function (methods){
+                this._caseMethods = [];
+                for(var name in methods){
+                    var _method = methods[name];
+                    _method.key = name;
+                    this._caseMethods.push(_method);
+                }
+                this.__testingCaseMethod();
+            },
+            __testingCaseMethod: function (){
+                var _method = this._caseMethods.shift(), _self = this;
+                if(_method){
+                    var _beginTime = (new Date()).getTime(), _methodname = _method.key;
+                    var _promise = _method.call(null);
+                    if(_promise&&_promise.then){
+                        _promise.then(function (){
+                            _self.__getDiffSecond(_beginTime, _methodname);
+                            _self.__testingCaseMethod();
+                        });
+                    }else{
+                        _self.__getDiffSecond(_beginTime, _methodname);
+                        _self.__testingCaseMethod();
+                    }
+                }else {
+                    _self.__testingCase();
+                }
+            },
+            __getDiffSecond: function (beginTime, methodname){
+                var _endTime = (new Date()).getTime();
+                var _diff = _endTime - beginTime;
+                var days=Math.floor(_diff/(24*3600*1000));
+                var leave1=_diff%(24*3600*1000);
+                var hours=Math.floor(leave1/(3600*1000));
+                var leave2=leave1%(3600*1000);
+                var minutes=Math.floor(leave2/(60*1000));
+                var leave3=leave2%(60*1000);
+                var seconds=Math.round(leave3/1000);
+                zn.info('Test method '+methodname+' { second: '+seconds+'s, diff: '+_diff+' }');
+            }
+        }
+    });
 
 })(zn);

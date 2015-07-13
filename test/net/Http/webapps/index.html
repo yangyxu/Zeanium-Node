@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>File Upload</title>
+</head>
+<body>
+    <form target="img" method="post" action="http://115.28.169.90:8888/fs/file/upload?catalog=avatar" enctype="multipart/form-data">
+        <input type="file" name="file1" multiple="multiple" />
+        <input type="text" name="reurl" value="http://localhost:8888/" style="display:none;" />
+        <input type="submit" value="submit" />
+    </form>
+    <img src="" id="imgObj">
+    <iframe name="img" id="imgIFrame" ></iframe>
+</body>
+<script type="application/javascript" >
+
+    var _eIFrame = document.getElementById('imgIFrame');
+    function uploadCallback(){
+        var _str = _eIFrame.contentWindow.location.search.substring(1);
+
+        document.getElementById('imgObj').src = _str;
+        console.log(_str);
+    }
+
+
+    if (window.attachEvent) {
+        _eIFrame.attachEvent('onload', uploadCallback);
+    } else {
+        _eIFrame.addEventListener('load', uploadCallback, false);
+    }
+
+
+
+</script>
+</html>

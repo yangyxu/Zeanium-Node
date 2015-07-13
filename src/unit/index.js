@@ -1,4 +1,0 @@
-zn.module([
-    './TestCase',
-    './TestLoader'
-]);
