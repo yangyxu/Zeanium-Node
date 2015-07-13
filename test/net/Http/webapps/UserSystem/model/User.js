@@ -23,13 +23,13 @@ zn.define([
             state: {
                 value: null,
                 type: ['int', 11],
-                convert: 'SYS_TRANS_GT({})',
+                //convert: 'SYS_TRANS_GT({})',
                 default: 19
             },
             sex: {
                 value: null,
                 type: ['int', 11],
-                convert: 'SYS_TRANS_GT({})',
+                //convert: 'SYS_TRANS_GT({})',
                 default: 12
             },
             age: {

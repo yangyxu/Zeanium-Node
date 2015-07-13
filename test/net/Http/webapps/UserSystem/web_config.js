@@ -3,9 +3,9 @@ zn.define({
     controllers: '/controller/',
     mysql: {
         dbType:'mysql',
-        host: '115.28.169.90',
+        host: '127.0.0.1',
         user: 'root',
-        password: 'yangyxu',
+        password: '123456',
         database:'jpdy',
         port: 3306
     }
