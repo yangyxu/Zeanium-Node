@@ -1,6 +1,11 @@
 zn.define({
     deploy: 'us',
     controllers: '/controller/',
+    views: '/views/',
+    session: {
+        name: '',
+        timeout: ''
+    },
     mysql: {
         dbType:'mysql',
         host: '127.0.0.1',
