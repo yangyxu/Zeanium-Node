@@ -1,5 +1,5 @@
 zn.define([
-    './html/exports'
+    './html/exports.js'
 ],function (html){
 
     return {

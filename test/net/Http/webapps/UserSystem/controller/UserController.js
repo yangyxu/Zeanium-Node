@@ -5,8 +5,7 @@ zn.define([
     '../web_config'
 ],function (db, User, UserCollection, web_config) {
 
-    return zn.class({
-        controller:'user',
+    return zn.controller('user',{
         properties: {
             
         },
@@ -20,13 +19,17 @@ zn.define([
 
                 };
 
+                var _self = this;
+
                 request.checkArgs(_args, response);
                 this._collection.find()
                     .then(function (data){
                         if(!data){
                             response.error('query no data');
                         }else {
-                            response.success(data);
+                            //console.log(data.response);
+                            _self.viewModel('user-list', { users: data }, response);
+                            //response.success(data);
                         }
                     });
             },

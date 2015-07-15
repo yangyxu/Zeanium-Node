@@ -1,0 +1,15 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+    <head>
+        <meta charset="UTF-8">
+        <title>Templete t1</title>
+    </head>
+    <body>
+        <div class="user-name">总用户数：<%=users.length%></div>
+        <ul title="<%=users.length%>">
+            <% for (var i = 0, _len = users.length; i < _len; i ++) { var user = users[i];%>
+                <li><span>用户名： <%=user.username%></span> | <span>密码：<%=user.pwd%></span></li>
+            <% } %>
+        </ul>
+    </body>
+</html>

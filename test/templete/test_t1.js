@@ -5,9 +5,19 @@ zn.define([
 ], function (templete) {
     var Render = templete.html.Render;
     var _render = new Render({
-        templete: './t1.html',
-        context: {
-            user: 'test'
+        templete: './t3.html',
+        data: {
+            name: 'cisco',
+            list: [
+                {
+                    name: 'yangyxu',
+                    age: 25
+                },
+                {
+                    name: 'wangyuan',
+                    age: 24
+                }
+            ]
         }
     });
 
