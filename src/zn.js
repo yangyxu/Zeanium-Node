@@ -1747,7 +1747,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
         REJECTED: 2
     };
 
-    var Async = zn.class('Async', {
+    var Async = zn.class('zn.util.Async', {
         static: true,
         methods: {
             init: function (inArgs) {
@@ -1948,7 +1948,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
      * @class Date
      * @namespace zn.util
      **/
-    var DateUtil = zn.class('DateUtil', {
+    var DateUtil = zn.class('zn.util.DateUtil', {
         static: true,
         properties: {
 
@@ -2220,6 +2220,107 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 var leave3=leave2%(60*1000);
                 var seconds=Math.round(leave3/1000);
                 zn.info('Test method '+methodname+' { second: '+seconds+'s, diff: '+_diff+' }');
+            }
+        }
+    });
+
+})(zn);
+/**
+ * Created by yangyxu on 2014/9/16.
+ * List
+ */
+(function (zn){
+
+    /**
+     * List
+     * @class List
+     * @namespace zn.util
+     **/
+
+    zn.class('zn.data.List', {
+        statics: {
+            getInstance: function (args){
+                return new this(args);
+            }
+        },
+        properties: {
+            min: 0,
+            max: 100,
+            T: null,
+            TArgs: {}
+        },
+        methods: {
+            init: function (inArgs) {
+                this.sets(inArgs);
+                this.reset();
+            },
+            reset: function (){
+                this._data = [];
+                for(var i= 0; i < (this.min||0); i++){
+                    this.push(this.TArgs);
+                }
+            },
+            push: function (tArgs){
+                if(this.T){
+                    var _t = new this.T(tArgs);
+                    return this._data.push(_t), _t;
+                }
+            },
+            findOneT: function (filter){
+                var _one = null,
+                    _filter = filter || zn.idle;
+                zn.each(this._data, function (one, index){
+                    if(_filter(one, index)){
+                        _one = one;
+                        return -1;
+                    }
+                });
+
+                return _one;
+            },
+            findAllT: function (filter){
+                var _ones = [],
+                    _filter = filter || zn.idle;
+                zn.each(this._data, function (one, index){
+                    if(_filter(one, index)){
+                        _ones.push(one);
+                    }
+                });
+
+                return _ones;
+            }
+        }
+    });
+
+})(zn);
+/**
+ * Created by yangyxu on 2014/9/16.
+ * Task
+ */
+(function (zn){
+
+    /**
+     * Task
+     * @class Task
+     * @namespace zn.util
+     **/
+
+    zn.class('zn.data.Task', {
+        statics: {
+            getInstance: function (args){
+                return new this(args);
+            },
+            PANDING: 0,
+            WAITING: 1,
+            DOING: 2,
+            DONE: 3
+        },
+        properties: {
+            statue: 0
+        },
+        methods: {
+            init: function (inArgs) {
+                this.sets(inArgs);
             }
         }
     });

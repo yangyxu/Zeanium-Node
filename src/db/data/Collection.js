@@ -7,7 +7,7 @@ zn.define([
 ],function (Connection, Model) {
     var Async = zn.async;
 
-    return zn.class('Collection', {
+    var Collection = zn.class('Collection', {
         methods: {
             init: function (inStore, inModel){
                 this._store = inStore;
@@ -184,5 +184,7 @@ zn.define([
             }
         }
     });
+
+    return Collection;
 
 });

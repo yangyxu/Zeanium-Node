@@ -1,13 +1,13 @@
 zn.define([
     'db',
-    '../model/User'
-], function (db, User) {
+    '../model/Guider'
+], function (db, Guider) {
 
-    return zn.class("UserCollection", db.data.Collection, {
+    return zn.class("GuiderCollection", db.data.Collection, {
         methods: {
             init: function (inStore, inModel){
-                this.super(inStore, inModel);
-                this._model = User;
+                this.base(inStore, inModel);
+                this._model = Guider;
             },
             register: function (username, pwd, email){
                 return this.add({
@@ -41,7 +41,6 @@ zn.define([
                 }catch(e){
                     throw new Error(e.message);
                 }
-
                 return _defer.promise;
             },
             logout: function (){

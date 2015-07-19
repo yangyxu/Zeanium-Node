@@ -5,10 +5,10 @@ zn.define([
 ], function (templete) {
     var Render = templete.html.Render;
     var _render = new Render({
-        templete: './t3.html',
+        templete: './t1.html',
         data: {
             name: 'cisco',
-            list: [
+            users: [
                 {
                     name: 'yangyxu',
                     age: 25
@@ -21,9 +21,8 @@ zn.define([
         }
     });
 
-    _render.toHtml().then(function (data){
-        console.log(data);
+    _render.toRender(function (value){
+        console.log(value);
     });
-    //console.log(Render);
 
 }).exec();

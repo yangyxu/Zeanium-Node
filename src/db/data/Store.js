@@ -6,9 +6,7 @@ zn.define([
     './Collection'
 ],function (Connection, Collection) {
 
-    var Async = zn.async
-
-    return zn.class('Store', {
+    var Store = zn.class('Store', {
         statics: {
             getStore: function (config) {
                 return new this(config);
@@ -28,8 +26,10 @@ zn.define([
                 return new (inCollection||Collection)(this, inModelClass);
             },
             createCollection: function (inModelClass) {
-                var _defer = Async.defer(), _self = this;
-                var _modelClass = inModelClass;
+                var _defer = zn.async.defer(),
+                    _self = this,
+                    _modelClass = inModelClass;
+
                 if(true){
                     var _createSql = this.__propertiesToCreateSql(_modelClass);
                     var _connection = this.getConnection();
@@ -47,13 +47,16 @@ zn.define([
                 }else {
                     throw new Error('The type of input model is not db.data.Model.');
                 }
+
                 return _defer.promise;
             },
             createCollections: function (modelAry) {
                 this.__createTable(modelAry, this.getConnection());
             },
             __createTable: function (modelAry, _connection){
-                var _modelClass = modelAry.shift(), _self = this;
+                var _modelClass = modelAry.shift(),
+                    _self = this;
+
                 if(_modelClass){
                     var _createSql = this.__propertiesToCreateSql(_modelClass);
                     var _result = _connection.command
@@ -71,10 +74,13 @@ zn.define([
 
             },
             __propertiesToCreateSql: function (_modelClass){
-                var _table = _modelClass.__getTable();
-                var _fieldsSql = [], _self = this;
+                var _table = _modelClass.__getTable(),
+                    _fieldsSql = [],
+                    _self = this;
+
                 _modelClass.__getFields(false, function (property, key){
                     var _propertySql = _self.__propertyToCreateSql(property, key);
+
                     if(key=='id'){
                         _fieldsSql.unshift(_propertySql);
                     }else {
@@ -89,20 +95,37 @@ zn.define([
                 return _sql;
             },
             __propertyToCreateSql: function (property, key){
-                var _keys = [key], _typeAry = property.type;
-                var _t1 = _typeAry[0], _t2 = _typeAry[1];
+                var _keys = [key],
+                    _typeAry = property.type,
+                    _t1 = _typeAry[0],
+                    _t2 = _typeAry[1];
+
                 _keys.push(_t1+(_t2?'('+_t2+')':''));
-                if(property.primary){ property.notNull = true;_keys.push("PRIMARY KEY");}
+
+                if(property.primary){
+                    property.notNull = true;
+                    _keys.push("PRIMARY KEY");
+                }
                 var _isnull = property.notNull?'NOT NULL':'';
-                if(_isnull){ _keys.push(_isnull); }
+
+                if(_isnull){
+                    _keys.push(_isnull);
+                }
                 var _default = this.__getDefaultValue(property);
-                if(_default){ _keys.push(_default); }
+
+                if(_default){
+                    _keys.push(_default);
+                }
                 var _autoIncrement = property.primary?'AUTO_INCREMENT':'';
-                if(_autoIncrement){ _keys.push(_autoIncrement); }
+
+                if(_autoIncrement){
+                    _keys.push(_autoIncrement);
+                }
+
                 return _keys.join(' ');
             },
             __getDefaultValue: function (property) {
-                if(property.default!==undefined){
+                if(property.default !== undefined){
                     var _type = property.type[0], _value = property.default;
                     switch(_type){
                         case 'nvarchar':
@@ -116,6 +139,7 @@ zn.define([
 
                             break;
                     }
+
                     return 'DEFAULT '+_value;
                 }else {
                     return null;
@@ -123,5 +147,22 @@ zn.define([
             }
         }
     });
+
+    return Store;
+
+    /*
+
+    zn.store = function (){
+        var _args = arguments,
+            _name = _args[0],
+            _meta = _args[1];
+
+        _meta.table = _name;
+
+        return zn.class(_name, Store, _meta);
+    }
+
+    return zn.store;
+    */
 
 });

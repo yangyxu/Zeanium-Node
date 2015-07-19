@@ -1,7 +1,6 @@
 zn.define(function () {
 
-    return zn.class('DefaultController',{
-        controller:'_default',
+    return zn.controller('_default',{
         properties: {
             
         },

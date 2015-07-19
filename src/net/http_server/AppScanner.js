@@ -35,9 +35,10 @@ zn.define([
                                     _appPath[file] = _path;
                                     zn.load(_path+config.controllers, function (controllers){
                                         zn.info('Loading Project: '+config.deploy);
+                                        config.root = _path;
                                         var _app = {
-                                            _deploy: config.deploy,
-                                            _controllers: _self.__convertController(controllers, _path)
+                                            _deploy: config.deploy || file,
+                                            _controllers: _self.__convertController(controllers, config)
                                         };
                                         _apps.push(_app);
                                         _onLoadApp(_app);
@@ -50,16 +51,17 @@ zn.define([
 
                     _defer.resolve(_apps);
                 });
+
                 return _defer.promise;
             },
-            __convertController: function (controllers, path) {
+            __convertController: function (controllers, config) {
                 var __controllers = {},
                     _key, _controller;
 
                 zn.each(controllers, function (controller, name){
                     _key = controller.getMeta('controller')||name;
                     _controller = new controller();
-                    _controller.path = path;
+                    _controller.config = config;
                     __controllers[_key] = _controller;
                 });
 

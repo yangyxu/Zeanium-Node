@@ -1,20 +1,28 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define([
-    './constants'
-],function (constants) {
+zn.define(function () {
+
+    var CONTENT_TYPE = {
+        DEFAULT: 'text/plain;charset=UTF-8',
+        HTML:'text/html;charset=UTF-8',
+        XML: 'text/xml;charset=UTF-8',
+        JSON:'application/json;charset=UTF-8',
+        JAVASCRIPT: 'text/javascript;charset=UTF-8'
+    };
+
+    var _slice = Array.prototype.slice;
 
     return zn.class('Response', {
+        events: ['end'],
         properties: {
             request: null,
-            serverResponse: null,
-            contentType: null
+            contentType: null,
+            serverResponse: null
         },
         methods: {
-            init: function (request, res){
+            init: function (request){
                 this.set('request', request);
-                this.set('serverResponse', res);
             },
             writeHead: function (httpState, inArgs){
                 var _inArgs = inArgs||{};
@@ -30,13 +38,14 @@ zn.define([
 
                 if(_callback){
                     _data = _callback+'('+_data+')';
-                    this._contentType = constants.CONTENT_TYPE.JAVASCRIPT;
+                    this._contentType = CONTENT_TYPE.JAVASCRIPT;
                 }
                 this.writeHead(200);
                 this.get('serverResponse').write(_data, inEncode);
             },
             end: function (inData, inEncode) {
                 this.get('serverResponse').end(inData, inEncode);
+                this.fire('end', this);
             },
             writeEnd: function (inData, inEncode){
                 this.write(inData, inEncode);
@@ -60,18 +69,21 @@ zn.define([
                 var _sr = this.get('serverResponse');
                 _sr.statusCode = 302;
                 _sr.setHeader("Location", url);
-                _sr.end();
+                this.end();
             },
             __writeJson: function (inData, inEncode){
                 inData.version = this.__getServerVersion();
-                this._contentType = constants.CONTENT_TYPE.JSON;
+                this._contentType = CONTENT_TYPE.JSON;
                 this.writeEnd(inData, inEncode);
             },
             __getContentType: function (){
-                return constants.CONTENT_TYPE.DEFAULT;
+                return CONTENT_TYPE.DEFAULT;
             },
             __getServerVersion: function (){
                 return 'v1.0.0';
+            },
+            __setResponse: function (response){
+                this.serverResponse = response;
             }
         }
     });

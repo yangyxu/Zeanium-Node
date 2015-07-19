@@ -2,24 +2,11 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    './index',
-    './constants',
-    './config',
-    './MvcRequestHandler',
-    './ResourceRequestHandler',
-    './AppScanner',
-    'node:http'
-],function (
-    controllers,
-    constants,
-    config,
-    MvcRequestHandler,
-    ResourceRequestHandler,
-    AppScanner
-    ) {
-
-    var http = require('http'),
-        url = require('url');
+    './config/server',
+    './RequestAcceptor',
+    'node:http',
+    'node:url',
+],function (config, RequestAcceptor, http, url) {
 
     return zn.class('HttpServer', {
         statics: {
@@ -29,53 +16,44 @@ zn.define([
         },
         events: ['request','connection','close'],
         properties: {
-
+            config: {}
         },
         methods: {
             init: function (args){
-                var _config = args||config;
-                var _requestHandler = this._requestHandler = new (args.handler||MvcRequestHandler)(_config);
-                this._resourceRequestHandler = new (args.resourceHandler||ResourceRequestHandler)(_config);
+                var _config = zn.overwrite(args, config);
+                RequestAcceptor.initHandlerManager(_config);
+                this.config = _config;
+                this.__createServer(_config);
+                this.__initRequestHandlers(_config);
+            },
+            __createServer: function (config){
                 var _httpServer = new http.Server();
                 _httpServer.addListener('request', this.__onRequest.bind(this));
                 _httpServer.addListener("connection", this.__onConnection.bind(this));
                 _httpServer.addListener("close", this.__onClose.bind(this));
-                _httpServer.listen(_config.port, _config.host);
+                _httpServer.listen(config.port, config.host);
 
-                if(_requestHandler instanceof MvcRequestHandler){
-                    var _appScanner = new AppScanner(),
-                        _catalog = (_config.catalog||config.catalog);
-                    /************load system default controllers************/
-                    _requestHandler.__registerApp({
-                        _controllers: _appScanner.__convertController(controllers)
-                    });
-                    /************load apps controllers************/
-                    _appScanner.scan(_config.__dirname+_catalog, _catalog, function (app){
-                        _requestHandler.__registerApp(app);
-                    }).then(function (apps){
+                return _httpServer;
+            },
+            __initRequestHandlers: function (config){
+                //console.log(config);
+                /*
 
-                    }).finally(function (){
-                        zn.info('http://'+_config.host+":"+_config.port+"/[project]/[controller]/[action]");
-                    });
-                }else {
-                    zn.info('http://'+_config.host+":"+_config.port);
-                }
+                var _requestHandler =  = new args.handler(config);
+
+                this._requestHandler = _requestHandler;
+                this._resourceRequestHandler = new args.resourceHandler(config);*/
+
             },
             __onRequest: function(request, response){
                 this.fire('request',request, response);
-                if(this._requestHandler instanceof MvcRequestHandler){
-                    var _pathname = url.parse(request.url, true).pathname;
-                    var _extAry = /\.[^\.]+/.exec(_pathname);
-                    if(_extAry){
-                        request['EXT'] = _extAry[0];
-                        request['PATH'] = _extAry['input'];
-                        this._resourceRequestHandler.doRequest(request, response);
-                    }else {
-                        this._requestHandler.doRequest(request, response);
-                    }
-                }else {
-                    this._requestHandler.doRequest(request, response);
-                }
+                RequestAcceptor.accept(request, response);
+            },
+            __staticRequest: function (request, response){
+
+            },
+            __dynamicRequest: function (request, response){
+
             },
             __onConnection: function (socket) {
                 this.fire('connection', socket);

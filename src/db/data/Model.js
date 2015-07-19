@@ -3,7 +3,7 @@
  */
 zn.define(function () {
 
-    return zn.class('Model', {
+    var Model = zn.class('Model', {
         statics: {
             __getTable: function (){
                 return this.getMeta('table');
@@ -90,5 +90,23 @@ zn.define(function () {
             }
         }
     });
+
+    return Model;
+
+    /*
+
+    zn.model = function (){
+        var _args = arguments,
+            _name = _args[0],
+            _meta = _args[1];
+
+        _meta.table = _name;
+
+        return zn.class(_name, Model, _meta);
+    }
+
+    return zn.model;
+
+    */
 
 });

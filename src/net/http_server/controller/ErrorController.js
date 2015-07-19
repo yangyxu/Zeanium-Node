@@ -1,7 +1,6 @@
 zn.define(function () {
 
-    return zn.class({
-        controller:'_error',
+    return zn.controller('_error', {
         properties: {
             
         },
