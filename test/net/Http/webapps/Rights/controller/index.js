@@ -1,11 +1,9 @@
 zn.define([
-    '../controller/UserController',
-    '../controller/VarController'
-], function (UserController, VarController) {
+
+], function () {
 
     return {
-        UserController: UserController,
-        VarController: VarController
+
     }
 
 });

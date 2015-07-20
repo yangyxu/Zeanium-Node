@@ -12,6 +12,9 @@ zn.define(function (fs) {
         methods: {
             init: function (args){
                 this.sets(args);
+                zn.extend(this.TArgs, {
+                    root: args.serverRoot
+                });
                 this.super(args);
             },
             match: function (path){

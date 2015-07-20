@@ -13,12 +13,29 @@ zn.define({
         timeout: ''
     },
     mysql: {
-        dbType:'mysql',
+        dbType: 'mysql',
         host: '127.0.0.1',
         user: 'root',
         password: '123456',
-        password: '123456',
         database:'jpdy',
         port: 3306
+    },
+    databases: {
+        'local_mysql': {
+            type: 'mysql',
+            host: '127.0.0.1',
+            user: 'root',
+            password: '123456',
+            database:'jpdy',
+            port: 3306
+        },
+        'local_mongo': {
+            type: 'mongo',
+            host: '127.0.0.1',
+            user: 'root',
+            password: '123456',
+            database:'mongo',
+            port: 27017
+        }
     }
 });

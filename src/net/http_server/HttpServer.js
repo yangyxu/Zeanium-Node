@@ -20,11 +20,20 @@ zn.define([
         },
         methods: {
             init: function (args){
-                var _config = zn.overwrite(args, config);
+                var _config = zn.overwrite(args, config),
+                    _uuid = zn.uuid(),
+                    _root = 'http://' + _config.host + ":" + _config.port,
+                    _global_var_prefix = '@';
+
+                _config.__context__ = {
+                    'prefix': _global_var_prefix,
+                    'uuid': _uuid,
+                    'root': _root
+                };
+
                 RequestAcceptor.initHandlerManager(_config);
                 this.config = _config;
                 this.__createServer(_config);
-                this.__initRequestHandlers(_config);
             },
             __createServer: function (config){
                 var _httpServer = new http.Server();
@@ -35,25 +44,9 @@ zn.define([
 
                 return _httpServer;
             },
-            __initRequestHandlers: function (config){
-                //console.log(config);
-                /*
-
-                var _requestHandler =  = new args.handler(config);
-
-                this._requestHandler = _requestHandler;
-                this._resourceRequestHandler = new args.resourceHandler(config);*/
-
-            },
             __onRequest: function(request, response){
                 this.fire('request',request, response);
                 RequestAcceptor.accept(request, response);
-            },
-            __staticRequest: function (request, response){
-
-            },
-            __dynamicRequest: function (request, response){
-
             },
             __onConnection: function (socket) {
                 this.fire('connection', socket);

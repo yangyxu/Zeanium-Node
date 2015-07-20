@@ -1,4 +1,4 @@
-var zn = require('../../../src/zn.minx');
+var zn = require('../../../src/zn');
 
 zn.define([
     'net',

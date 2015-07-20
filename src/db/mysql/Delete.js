@@ -6,6 +6,9 @@ zn.define([
     './Where'
 ],function (Schema, Where) {
 
+    var _slice = Array.prototype.slice,
+        _concat = Array.prototype.concat;
+
     return zn.class('Delete', Schema, {
         methods: {
             init: function (args, context){
@@ -85,15 +88,15 @@ zn.define([
                 return this._where.orNotBetween.apply(this._where, arguments), this;
             },
             groupBy: function (){
-                var _group = Array.prototype.slice.call(arguments);
-                this._group = Array.prototype.concat(this._group, _group);
+                var _group = _slice.call(arguments);
+                this._group = _concat(this._group, _group);
                 return this;
             },
             having: function (){
 
             },
             orderBy: function (){
-                var _order = Array.prototype.slice.call(arguments);
+                var _order = _slice.call(arguments);
                 var _self = this;
                 if(zn.type(_order[0])==='string'){
                     _self._order.push(_order.join(' '));
@@ -105,7 +108,7 @@ zn.define([
                 return this;
             },
             limit: function (){
-                this._limit = Array.prototype.slice.call(arguments);
+                this._limit = _slice.call(arguments);
                 return this;
             },
             build: function (){

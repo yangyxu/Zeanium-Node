@@ -1,5 +1,5 @@
 zn.define({
-    deploy: 'us',
+    deploy: 'rights',
     controllers: '/controller/',
     views: {
         path: '/view/',

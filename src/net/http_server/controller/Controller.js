@@ -7,10 +7,26 @@ zn.define([
 
     var BaseController = zn.class('BaseController', {
         properties: {
-            config: {}
+            config: null,
+            stores: null
         },
         methods: {
+            init: function (args){
+                this.sets(args);
+            },
+            getStore: function (name){
+                var _store = this.stores[name];
+                if(!_store){
+                    throw new Error('The database '+name+' is not exist.');
+                }
+
+                return _store;
+            },
             viewModel: function (view, model, response){
+                var _context = this.getContext();
+                _context['contextPath'] = _context['root']+'/'+this.config.deploy;
+                zn.extend(model, _context);
+
                 _htmlRender.sets({
                     templete: view,
                     templeteConvert: this.__getTempletePath.bind(this),
@@ -42,6 +58,6 @@ zn.define([
         return zn.class(_name, BaseController, _meta);
     }
 
-    return zn.controller;
+    return BaseController;
 
 });

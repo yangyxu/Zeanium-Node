@@ -5,6 +5,7 @@ zn.define([
 ], function (Controller, DefaultController, ErrorController) {
 
     return {
+        BaseController: BaseController,
         DefaultController: DefaultController,
         ErrorController: ErrorController
     }

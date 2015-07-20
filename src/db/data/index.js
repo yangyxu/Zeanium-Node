@@ -1,13 +1,13 @@
 zn.define([
-    './Store',
+    './Model',
     './Collection',
-    './Model'
-], function (Store, Collection, Model) {
+    './Store'
+], function (Model, Collection, Store) {
 
     this.data = {
-        Store: Store,
+        Model: Model,
         Collection: Collection,
-        Model: Model
+        Store: Store
     }
 
 });

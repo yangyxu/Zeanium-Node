@@ -1,47 +1,21 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define([
-    './config',
-    '../mysql/MySqlCommand',
-    'node:mysql'
-],function (config, MySqlCommand, mysql) {
+zn.define(function () {
 
-    return zn.class('SqlConnection', {
-        statics:{
-            getConnection: function (inArgs){
-                return new this(inArgs);
-            }
-        },
-        events: ['connection','close'],
+    return zn.class('ConnectionPool', {
+        static: true,
         properties: {
-            dbType: null,
-            command: null
+
         },
         methods: {
-            init: function (inArgs){
-                var _args = inArgs||config['default'], _connection;
-                if(zn.type(inArgs)=='string'){
-                    _args = config[_args];
-                }
-                this.sets(_args);
-                switch(this.get('dbType').toLowerCase()){
-                    case 'mysql':
-                        _connection = mysql.createConnection(_args);
-                        _connection.connect();
-                        this.set('command', new MySqlCommand({connection: _connection}));
-                        break;
-                    case 'mssql':
+            init: function (){
+                this._mysql = {};
+                this._nosql = {};
+                this._mssql = {};
+            },
+            getConnection: function(){
 
-                        break;
-                }
-                this._connection = _connection;
-            },
-            reconnect: function(){
-                return this._connection.connect(), this;
-            },
-            close: function () {
-                return this._connection.end(), this;
             }
         }
     });

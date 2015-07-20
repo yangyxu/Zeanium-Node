@@ -2,11 +2,12 @@
  * Created by yangyxu on 9/17/14.
  */
 zn.define([
-    '../connection/Connection',
-    './Collection'
-],function (Connection, Collection) {
+    '../connection/Connection'
+],function (Connection) {
 
-    var Store = zn.class('Store', {
+    var Collection = zn.db.data.Collection;
+
+    var Store = zn.class('zn.db.data.Store', {
         statics: {
             getStore: function (config) {
                 return new this(config);
@@ -17,7 +18,7 @@ zn.define([
         },
         methods: {
             init: function (inConfig){
-                this._config = inConfig||'default';
+                this._config = inConfig || 'default';
             },
             getConnection: function (){
                 return Connection.getConnection(this._config);
@@ -148,21 +149,8 @@ zn.define([
         }
     });
 
+    zn.store = Store;
+
     return Store;
-
-    /*
-
-    zn.store = function (){
-        var _args = arguments,
-            _name = _args[0],
-            _meta = _args[1];
-
-        _meta.table = _name;
-
-        return zn.class(_name, Store, _meta);
-    }
-
-    return zn.store;
-    */
 
 });

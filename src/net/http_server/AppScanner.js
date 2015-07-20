@@ -2,9 +2,11 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    'node:fs'
-],function (fs) {
-    var Async = zn.async;
+    'node:fs',
+    'db'
+],function (fs, db) {
+    var Async = zn.async,
+        Store = db.data.Store;
 
     return zn.class('AppScanner', {
         properties: {
@@ -37,15 +39,16 @@ zn.define([
                                         zn.info('Loading Project: '+config.deploy);
                                         config.root = _path;
                                         var _app = {
+                                            _folder: file,
                                             _deploy: config.deploy || file,
                                             _controllers: _self.__convertController(controllers, config)
                                         };
+                                        //console.log(_app);
                                         _apps.push(_app);
                                         _onLoadApp(_app);
                                     });
                                 }
                             });
-
                         }
                     });
 
@@ -55,17 +58,32 @@ zn.define([
                 return _defer.promise;
             },
             __convertController: function (controllers, config) {
-                var __controllers = {},
-                    _key, _controller;
+                var _controllers = {},
+                    _config = config || {},
+                    _key,
+                    _controller,
+                    _stores = this.__initDBStore(_config.databases);
 
                 zn.each(controllers, function (controller, name){
-                    _key = controller.getMeta('controller')||name;
-                    _controller = new controller();
-                    _controller.config = config;
-                    __controllers[_key] = _controller;
+                    _key = controller.getMeta('controller') || name;
+                    _controller = new controller({
+                        config: _config,
+                        stores: _stores
+                    });
+                    _controllers[_key] = _controller;
                 });
 
-                return __controllers;
+                return _controllers;
+            },
+            __initDBStore: function (databaseSetting){
+                var _configs = databaseSetting || [],
+                    _stores = {};
+
+                zn.each(_configs, function (config, index){
+                    _stores[index] = Store.getStore(config);
+                });
+
+                return _stores;
             }
         }
     });

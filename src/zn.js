@@ -2104,7 +2104,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                     time: this.__getDateString(),
                     pos: this.__getPosition()
                 };
-                if (zn.GLOBAL.document){
+                if (!zn.GLOBAL.document){
                     console.log(this.__formatLog4Server(_log, true));
                 }else {
                     console.log(this.__formatLog4Client(_log, true), 'color:'+COLORS_VALUE[type]);
@@ -2262,7 +2262,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
             },
             push: function (tArgs){
                 if(this.T){
-                    var _t = new this.T(tArgs);
+                    var _t = new this.T(tArgs||this.TArgs);
                     return this._data.push(_t), _t;
                 }
             },

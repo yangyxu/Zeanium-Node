@@ -1,20 +1,20 @@
 /**
  * Created by yangyxu on 9/17/14.
  */
-zn.define([
-    '../connection/Connection',
-    './Model'
-],function (Connection, Model) {
-    var Async = zn.async;
+zn.define(function () {
+    var Async = zn.async,
+        Model = zn.db.data.Model;
 
-    var Collection = zn.class('Collection', {
+    var Collection = zn.class('zn.db.data.Collection', {
         methods: {
             init: function (inStore, inModel){
                 this._store = inStore;
                 this._model = inModel||Model;
             },
             add: function (inModel){
-                var _defer = Async.defer(), _self = this;
+                var _defer = Async.defer(),
+                    _self = this;
+
                 inModel = this.__getModel(inModel);
                 if(inModel instanceof this._model){
                     var _table = inModel.constructor.__getTable();
@@ -35,15 +35,17 @@ zn.define([
                 }else {
                     throw new Error('The type of input model is not db.data.Model.');
                 }
+
                 return _defer.promise;
             },
             find: function (inWhere, fields, inModelClass){
-                var _defer = Async.defer(), _self = this;
-                var _modelClass = inModelClass||this._model;
+                var _defer = Async.defer(),
+                    _modelClass = inModelClass || this._model,
+                    _self = this;
                 if(true){
                     var _table = _modelClass.__getTable();
-                    var _fields = fields||_modelClass.__getFields(false);
-                    var _where = inWhere||{1:1};
+                    var _fields = fields || _modelClass.__getFields(false);
+                    var _where = inWhere || {1:1};
                     switch(zn.type(_where)){
                         case 'number':
                             _where = {};
@@ -59,9 +61,11 @@ zn.define([
                         }).finally(function (){
                             _connection.close();
                         });
-                }else {
+                }
+                else {
                     throw new Error('The type of input model is not db.data.Model.');
                 }
+
                 return _defer.promise;
             },
             findOne: function (inWhere, fields, inModelClass){
@@ -70,6 +74,7 @@ zn.define([
                     .then(function (rows){
                         _defer.resolve(rows[0]);
                     });
+
                 return _defer.promise;
             },
             save: function (inModel){
@@ -94,15 +99,19 @@ zn.define([
                         }).finally(function (){
                             _connection.close();
                         });
-                }else {
+                }
+                else {
                     throw new Error('The type of input model is not db.data.Model.');
                 }
+
                 return _defer.promise;
             },
             update: function (inUpdates, inWhere){
-                var _defer = Async.defer(), _self = this;
+                var _defer = Async.defer(),
+                    _self = this;
                 try{
-                    var _updates = inUpdates||{}, _where = inWhere||{};
+                    var _updates = inUpdates||{},
+                        _where = inWhere||{};
                     var _table = this._model.__getTable();
                     var _connection = this._store.getConnection();
                     var _result = _connection.command
@@ -117,9 +126,11 @@ zn.define([
                         }).finally(function (){
                             _connection.close();
                         });
-                }catch(e){
+                }
+                catch(e){
                     throw new Error(e.message);
                 }
+
                 return _defer.promise;
             },
             remove: function (inModel){
@@ -184,6 +195,16 @@ zn.define([
             }
         }
     });
+
+    zn.collection = function (){
+        var _args = arguments,
+            _name = _args[0],
+            _meta = _args[1];
+
+        //_meta.table = _name;
+
+        return zn.class(_name, Collection, _meta);
+    }
 
     return Collection;
 

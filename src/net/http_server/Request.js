@@ -39,11 +39,13 @@ zn.define([
                 return new Boolean(this.getValue(inName)).valueOf();
             },
             checkArgs: function (args, response){
-                var _dv = null, _rv = null;
+                var _dv = null,
+                    _rv = null;
+
                 for(var k in args){
                     _dv = args[k];
                     _rv = this.getValue(k);
-                    if (_rv){
+                    if (!_rv){
                         response.error('The value of '+k+' is Required.');
                         return false;
                     }
@@ -54,6 +56,9 @@ zn.define([
                             return false;
                         }
                     }
+
+                    args[k] = args[k] || _rv;
+
                 }
 
                 return true;

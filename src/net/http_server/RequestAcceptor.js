@@ -19,9 +19,19 @@ zn.define([
                 this._accepts = [];
             },
             initHandlerManager: function (config){
-                this._dynamicManager = new RequestHandlerManager(config.dynamicHandlerManager||{});
-                this._staticManager = new RequestHandlerManager(config.staticHandlerManager||{});
+                var _root = config.__dirname + config.catalog,
+                    _common = {
+                        serverRoot: _root
+                    },
+                    _dynamic = zn.extend(config.dynamicHandlerManager||{}, _common),
+                    _static = zn.extend(config.staticHandlerManager||{}, _common);
+
+                this._dynamicManager = new RequestHandlerManager(_dynamic);
+                this._staticManager = new RequestHandlerManager(_static);
                 /**scanProject for dynamicManager**/
+
+
+                this.__initGlobalContext(config);
                 this.__scanProject(config, this._dynamicManager);
             },
             accept: function (request, response){
@@ -35,9 +45,18 @@ zn.define([
 
                 }
             },
+            __initGlobalContext: function (config){
+                var BaseController = controllers.BaseController;
+                BaseController.defineMethod('getContext', {
+                    value: function (){
+                        return config.__context__;
+                    }
+                });
+            },
             __scanProject: function (config, dynamicManager){
                 var _appScanner = new AppScanner(),
-                    _catalog = config.catalog;
+                    _catalog = config.catalog,
+                    _self = this;
 
                 /************load system default controllers************/
                 var __default = {
@@ -52,7 +71,7 @@ zn.define([
                 }).then(function (apps){
 
                 }).finally(function (){
-                    zn.info('http://'+config.host+":"+config.port+"/[project]/[controller]/[action]");
+                    zn.info(config.__context__.root + "/[project]/[controller]/[action]");
                 });
             }
         }

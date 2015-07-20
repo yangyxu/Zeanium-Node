@@ -2,10 +2,18 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    './config',
     '../mysql/MySqlCommand',
     'node:mysql'
-],function (config, MySqlCommand, mysql) {
+],function (MySqlCommand, mysql) {
+
+    var DB_DEFAULT_CONFIG = {
+        dbType:'mysql',
+        host: '127.0.0.1',
+        user: 'test',
+        password: 'test',
+        database:'test',
+        port: 3306
+    };
 
     return zn.class('Connection', {
         statics:{
@@ -15,20 +23,19 @@ zn.define([
         },
         events: ['connection','close'],
         properties: {
-            dbType: null,
             command: null
         },
         methods: {
             init: function (inArgs){
-                var _args = inArgs||config['default'];
-                if(zn.type(inArgs)=='string'){
-                    _args = config[_args];
-                }
+                var _args = inArgs || DB_DEFAULT_CONFIG;
+                _args.type = _args.type || 'mysql';
                 this.sets(_args);
-                switch(this.get('dbType').toLowerCase()){
+                switch(_args.type.toLowerCase()){
                     case 'mysql':
                         this.__connectMySql(_args);
-                        this.set('command', new MySqlCommand({connection: this._connection}));
+                        this.set('command', new MySqlCommand({
+                            connection: this._connection
+                        }));
                         break;
                     case 'mssql':
 
@@ -51,12 +58,15 @@ zn.define([
             },
             __connectMySql: function (_args){
                 var _connection = mysql.createConnection(_args);
+
                 _connection.connect(function (err){
                     this.__handlerMySqlConnectError(err, _args);
                 }.bind(this));
+
                 _connection.on('error', function (err){
                     this.__handlerMySqlConnectError(err, _args);
                 }.bind(this));
+
                 this._connection = _connection;
             },
             __handlerMySqlConnectError: function (err, args) {
