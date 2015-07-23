@@ -9,6 +9,8 @@ zn.define([
 ],function (Select, Insert, Update, Delete) {
 
     var Async = zn.async;
+    var String = zn.format.String;
+    var __slice = Array.prototype.slice;
 
     return zn.class('MySqlCommand', {
         properties: {
@@ -19,7 +21,7 @@ zn.define([
                 this.sets(inArgs);
             },
             select: function (){
-                return Select.getInstance(null, this).fields(Array.prototype.slice.call(arguments));
+                return Select.getInstance(null, this).fields(__slice.call(arguments));
             },
             insert: function (table){
                 return Insert.getInstance(null, this).into(table);
@@ -31,9 +33,11 @@ zn.define([
                 return Delete.getInstance(null, this).from(table);
             },
             query: function (queryString) {
-                var _defer = Async.defer();
-                zn.debug(queryString);
-                this.get('connection').query(queryString, function(err, rows, fields) {
+                var _defer = Async.defer(),
+                    _query = String.formatString.apply(String, arguments);
+
+                zn.debug(_query);
+                this.get('connection').query(_query, function(err, rows, fields) {
                     if (err){
                         zn.error(err.message);
                         _defer.reject(err);
@@ -42,6 +46,7 @@ zn.define([
                         _defer.resolve({rows: rows, fields: fields});
                     }
                 });
+
                 return _defer.promise;
             }
         }

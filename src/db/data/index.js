@@ -4,7 +4,7 @@ zn.define([
     './Store'
 ], function (Model, Collection, Store) {
 
-    this.data = {
+    return {
         Model: Model,
         Collection: Collection,
         Store: Store

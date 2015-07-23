@@ -53,10 +53,9 @@ zn.define([
                 }
             },
             __forward: function (statue, body, contentType, encode){
-                this.response.writeHead(200,{
+                this.response.writeHead(200, {
                     "Content-Type": contentType,
-                    "Content-Length": Buffer.byteLength(body, encode),
-                    "Server":"Zeanium-Server Version 1.0"
+                    "Content-Length": Buffer.byteLength(body, encode)
                 });
                 this.response.end(body, encode);
             }

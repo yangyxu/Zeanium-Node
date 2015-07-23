@@ -1,3 +1,11 @@
 zn.define([
-    './data/'
-]);
+    './data/',
+    './common/'
+], function (data, common) {
+
+    return {
+        data: data,
+        common: common
+    }
+
+});

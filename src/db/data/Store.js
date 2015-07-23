@@ -41,7 +41,7 @@ zn.define([
                         }).then(function (data){
                             _defer.resolve(data);
                         }).catch(function (e){
-                            _connection.close();
+                            //throw new Error(e.message);
                         }).finally(function (){
                             _connection.close();
                         });

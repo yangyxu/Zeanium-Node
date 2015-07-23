@@ -1,30 +1,27 @@
-zn.define([
-    './BaseModel'
-], function (BaseModel) {
+zn.define(function () {
 
-    return zn.class("User", BaseModel, {
-        table: 't_user',
+    var model = zn.db.common.model;
+
+    return zn.model("oa_rights_user", {
+        mixins: [
+            model.Base,
+            model.Tag
+        ],
         properties: {
-            username: {
+            uid: {
                 value: null,
-                type: ['varchar', 100],
+                type: ['varchar', 20],
                 default: ''
             },
             pwd: {
                 value: null,
-                type: ['varchar', 100],
+                type: ['varchar', 20],
                 default: ''
             },
-            nickname: {
+            icCard: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
-            },
-            state: {
-                value: null,
-                type: ['int', 11],
-                //convert: 'SYS_TRANS_GT({})',
-                default: 19
             },
             sex: {
                 value: null,
@@ -37,69 +34,49 @@ zn.define([
                 type: ['int', 11],
                 default: 0
             },
-            follows: {
+            avatar: {
                 value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            fans: {
-                value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            points: {
-                value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            visits: {
-                value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            totalOrders: {
-                value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            tempOrders: {
-                value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            quote: {
-                value: null,
-                type: ['varchar', 250],
-                default: ''
+                type: ['varchar', 50],
+                default: 'default.png'
             },
             email: {
                 value: null,
                 type: ['varchar', 50],
                 default: ''
             },
-            phone: {
+            fixedPhone: {
                 value: null,
                 type: ['varchar', 20],
                 default: ''
             },
-            country: {
+            mobilePhone: {
+                value: null,
+                type: ['varchar', 20],
+                default: ''
+            },
+            pinYin: {
+                value: null,
+                type: ['varchar', 4],
+                default: ''
+            },
+            agents: {
+                value: null,
+                type: ['varchar', 100],
+                default: ','
+            },
+            department: {
                 value: null,
                 type: ['bigint', 20],
                 default: 0
             },
-            province: {
+            qq: {
                 value: null,
                 type: ['bigint', 20],
                 default: 0
             },
-            city: {
+            weiXin: {
                 value: null,
-                type: ['bigint', 20],
-                default: 0
-            },
-            address: {
-                value: null,
-                type: ['varchar', 250],
+                type: ['varchar', 20],
                 default: ''
             },
             guiderId: {
@@ -107,10 +84,16 @@ zn.define([
                 type: ['bigint', 20],
                 default: 0
             },
-            avatarImg: {
+            address: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
+            },
+            birthday: {
+                value: null,
+                type: ['datetime'],
+                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                default: null
             },
             lastLoginTime: {
                 value: null,

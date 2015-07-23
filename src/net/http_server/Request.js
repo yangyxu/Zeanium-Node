@@ -9,10 +9,9 @@ zn.define([
         events: [ 'data', 'end', 'close' ],
         properties: {
             paths: null,
-            query: null,
-            dataValue: {
-                value: {}
-            },
+            query: {},
+            formValue: {},
+            checkValue: {},
             serverRequest: null
         },
         methods: {
@@ -20,11 +19,10 @@ zn.define([
                 this.__setRequest(serverRequest);
             },
             getValue: function (inName) {
-                return this.get('query')[inName]||this.get('dataValue')[inName];
+                return this.checkValue[inName];
             },
             setValue: function (inKey, inValue){
-                this.get('dataValue')[inKey] = inValue;
-                return this;
+                return this.checkValue[inKey] = inValue, this;
             },
             getParameter: function (inName){
                 return this.getValue(inName);
@@ -39,29 +37,33 @@ zn.define([
                 return new Boolean(this.getValue(inName)).valueOf();
             },
             checkArgs: function (args, response){
-                var _dv = null,
-                    _rv = null;
+                var _defaultValue = null,
+                    _newValue = null,
+                    _values = zn.extend({}, this.query, this.formValue);
 
-                for(var k in args){
-                    _dv = args[k];
-                    _rv = this.getValue(k);
-                    if (!_rv){
-                        response.error('The value of '+k+' is Required.');
+                for(var _key in args){
+                    _defaultValue = args[_key];
+                    _newValue = _values[_key];
+
+                    if (_defaultValue === undefined && _newValue === undefined){
+                        response.error('The value of ' + _key + ' is Required.');
                         return false;
                     }
-                    if(zn.type(_dv)=='object'){
-                        var _value = _dv.value, _reg = _dv.regexp;
+                    if(zn.type(_defaultValue)=='object'){
+                        var _value = _defaultValue.value,
+                            _reg = _defaultValue.regexp;
                         if(!_reg.test(_value)){
-                            response.error('The value of '+k+' is Invalid.');
+                            response.error('The value of ' + _key + ' is Invalid.');
                             return false;
                         }
                     }
 
-                    args[k] = args[k] || _rv;
-
+                    if(_newValue === undefined && _defaultValue){
+                        _values[_key] = _defaultValue;
+                    }
                 }
 
-                return true;
+                return this.checkValue = _values, _values;
             },
             __setRequest: function (request){
                 if(!request){ return false; }

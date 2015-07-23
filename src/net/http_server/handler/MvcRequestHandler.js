@@ -72,10 +72,15 @@ zn.define([
                         return;
                     }
 
-                    var _meta = _controller.member(action).meta;
-                    if(!this.__checkMeta(_meta, req, res, _defaultAppName)){ return; }
+                    var _meta = _controller.member(action).meta,
+                        _values = this.__checkMeta(_meta, req, res, _defaultAppName);
+                    if(!_values){
+                        return false;
+                    }
 
-                    _action.call(_controller, req, res, req.get('serverRequest'), res.get('serverResponse'));
+                    res.getConfig = function (){ return _controller.config; }
+
+                    _action.call(_controller, req, res, _values, req.get('serverRequest'), res.get('serverResponse'));
                 }catch(e){
                     zn.error(e.message);
                     req.setParameter('ERROR_MESSAGE', e.message);
@@ -83,7 +88,6 @@ zn.define([
                 }
             },
             __checkMeta: function (_meta, req, res, _defaultAppName){
-                var _values = {};
                 if(_meta){
                     var _requestMethod = req.method,
                         _method = _meta.method || 'GET&POST',
@@ -94,9 +98,10 @@ zn.define([
                         return false;
                     }
 
+                    return req.checkArgs(_argv, res);
                 }
 
-                return _values;
+                return req.checkArgs({}, res);
             }
         }
     });

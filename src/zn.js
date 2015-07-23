@@ -342,6 +342,14 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
             return this;
         },
+        toJSON: function (){
+            var _data = {};
+            for(var i= 0, _len = this.length; i < _len; i++){
+                _data[i] = this[i];
+            }
+
+            return _data;
+        },
         indexOf: function (item){
             for(var i= 0, _len = this.length; i < _len; i++){
                 if (this[i] === item){
@@ -372,6 +380,9 @@ zn.GLOBAL.zn = zn;  //set global zn var
     };
 
     var __fixObject__ = {
+        toArray: function (target){
+            return __slice.call(target);
+        },
         keys: function (obj){
             if(obj !== Object(obj)){
                 throw new TypeError('Object.keys called on a non-object');
@@ -1430,6 +1441,9 @@ zn.GLOBAL.zn = zn;  //set global zn var
             counter: 0,
             preLoadedPackage: {},
             loadModule: function (path, callback, parent){
+                if (zn.is(path, Module)){
+                    return path.load(callback);
+                }
                 if (path.substring(0, 5) === 'node:') {
                     return callback(require(path.substring(5)));
                 }
@@ -1437,6 +1451,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 if(_path.slice(-1) === '/'){
                     _path += 'index.js';
                 }
+
                 var _module = Module.all[_path];
                 if (_module) {
                     _module.load(callback);
@@ -1572,7 +1587,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 if (_depLength === 0) {
                     _value = _factory.call(_value) || _value;
                     this.set('value', _value);
-                    this.set('status', MODULE_STATUS.LOADING);
+                    this.set('status', MODULE_STATUS.LOADED);
 
                     zn.each(this._callbacks, function (cb) {
                         cb(_value);
@@ -1708,25 +1723,74 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 });
             },
             load: function (path, callback, parent) {
-                if (zn.is(path, Module)) {
-                    path.load(callback);
-                }else if (zn.is(path, 'string')) {
-                    var _currPath = path;
-
-                    if (_currPath.substring(0, 5) === 'node:') {
-                        if (callback) {
-                            callback(require(_currPath.substring(5)));
-                        }
-                        return true;
-                    }
-
-                    Module.loadModule(_currPath, callback, parent);
-                }
+                return Module.loadModule(path, callback, parent), this;
             }
         }
     });
 
     zn.load = Loader.load;
+
+})(zn);
+/**
+ * Created by yangyxu on 8/20/14.
+ */
+(function (zn){
+
+    var __slice = Array.prototype.slice;
+
+    /**
+     * String: String
+     * @class String
+     * @namespace zn.format
+     **/
+    var StringFormatter = zn.class('zn.format.String', {
+        static: true,
+        properties: {
+
+        },
+        methods: {
+            init: function (args){
+
+            },
+            formatString: function (){
+                var _argv = __slice.call(arguments);
+
+                switch(_argv.length){
+                    case 1:
+                        return _argv[0];
+                    case 2:
+                        var _data = {};
+                        switch(zn.type(_argv[1])){
+                            case 'string':
+                                _data[0] = _argv[1];
+                                break;
+                            case 'array':
+                                _data = _argv[1].toJSON();
+                                break;
+                            case 'object':
+                                _data = _argv[1];
+                                break;
+                        }
+
+                        return this.__formatSql(_argv[0], _data);
+                    default:
+                        var _sql = _argv.shift();
+
+                        return this.__formatSql(_sql, _argv.toJSON());
+                }
+            },
+            __formatSql: function (sql, data){
+                var _reg = null;
+                zn.each(data, function (value, index){
+                    _reg = new RegExp('\\{'+index+'\\}', 'gi');
+                    sql = sql.replace(_reg, value);
+                });
+                _reg = null;
+
+                return sql;
+            }
+        }
+    });
 
 })(zn);
 /**
@@ -1771,8 +1835,8 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 this._finallys.push(onFinally);
                 return this;
             },
-            defer: function (inArgs) {
-                var _self = this, _defer = new Defer(inArgs);
+            defer: function (resolve, reject) {
+                var _self = this, _defer = new Defer(resolve, reject);
                 _defer.on('complete', function (sender, data){
                     _self._currIndex++;
                     _self._dataArray.push(data);
@@ -1823,8 +1887,14 @@ zn.GLOBAL.zn = zn;  //set global zn var
             promise: null
         },
         methods: {
-            init: function (inArgs) {
+            init: function (resolve, reject) {
                 this._promise = new Promise();
+                if(resolve){
+                    this.resolve(resolve);
+                }
+                if(reject){
+                    this.reject(reject);
+                }
             },
             resolve: function (data) {
                 try{
@@ -1865,7 +1935,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
     var Promise = zn.class('Promise', {
         statics: {
             isPromise: function (obj) {
-                return obj !== null && typeof obj.then === 'function';
+                return obj !== null && obj !== undefined && typeof obj.then === 'function';
             },
             defer: null
         },
@@ -2158,7 +2228,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
     var TestLoader = zn.class('zn.unit.TestLoader',{
         static: true,
         properties: {
-
+            basePath: ''
         },
         methods: {
             init: function (){
@@ -2166,16 +2236,25 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 this._caseMethods = [];
             },
             load: function (path){
-                this._casePaths.push(path);
+                if(Array.isArray(path)){
+                    this._casePaths.concat(path);
+                }else {
+                    this._casePaths.push(path);
+                }
+
                 return this;
             },
             run: function () {
                 this.__testingCase();
             },
             __testingCase: function (){
-                var _case = this._casePaths.shift(), _self = this;
+                var _case = this._casePaths.shift(),
+                    _basePath = this.basePath,
+                    _path = _basePath + _case;
+                    _self = this;
+
                 if(_case){
-                    zn.load(_case, function (testCaseClass){
+                    zn.load(_path, function (testCaseClass){
                         var _methods = testCaseClass.getMeta('methods')||[];
                         zn.info('Testing Case: '+ _case);
                         _self.__testingCaseMethods(_methods);
@@ -2219,7 +2298,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 var minutes=Math.floor(leave2/(60*1000));
                 var leave3=leave2%(60*1000);
                 var seconds=Math.round(leave3/1000);
-                zn.info('Test method '+methodname+' { second: '+seconds+'s, diff: '+_diff+' }');
+                zn.info('Test method '+methodname+' :{ second: '+seconds+'s, diff: '+_diff+' }');
             }
         }
     });

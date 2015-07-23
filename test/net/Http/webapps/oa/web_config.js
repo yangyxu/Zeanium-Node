@@ -1,5 +1,5 @@
 zn.define({
-    deploy: 'us',
+    deploy: 'oa',
     controllers: '/controller/',
     views: {
         path: '/view/',
@@ -19,7 +19,8 @@ zn.define({
             user: 'root',
             password: '123456',
             database:'jpdy',
-            port: 3306
+            port: 3306,
+            multipleStatements: true
         },
         'local_mongo': {
             type: 'mongo',

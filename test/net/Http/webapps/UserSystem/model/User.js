@@ -1,9 +1,12 @@
-zn.define([
-    './BaseModel'
-], function (BaseModel) {
+zn.define(function () {
 
-    return zn.class("User", BaseModel, {
-        table: 't_user',
+    var model = zn.db.common.model;
+
+    return zn.model("t_user", {
+        mixins: [
+            model.Base,
+            model.Tag
+        ],
         properties: {
             username: {
                 value: null,
@@ -19,12 +22,6 @@ zn.define([
                 value: null,
                 type: ['varchar', 100],
                 default: ''
-            },
-            state: {
-                value: null,
-                type: ['int', 11],
-                //convert: 'SYS_TRANS_GT({})',
-                default: 19
             },
             sex: {
                 value: null,

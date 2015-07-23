@@ -1,8 +1,6 @@
-zn.define([
-    'db'
-], function (db) {
+zn.define(function () {
 
-    return zn.class("BaseModel", db.data.Model, {
+    return zn.class("zn.db.common.model.Base", zn.db.data.Model, {
         properties: {
             id: {
                 value: null,
@@ -10,11 +8,10 @@ zn.define([
                 ignore: true,
                 primary: true
             },
-            delFlag: {
+            title: {
                 value: null,
                 type: ['varchar', 100],
-                ignore: true,
-                default: '0'
+                default: ''
             },
             createTime: {
                 value: null,
@@ -23,6 +20,12 @@ zn.define([
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: 'now()'
             },
+            createPerson: {
+                value: null,
+                type: ['int', 11],
+                //ignore: true,
+                default: '0'
+            },
             modifyTime: {
                 value: null,
                 type: ['datetime'],
@@ -30,6 +33,18 @@ zn.define([
                 auto_update: 'now()',
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
+            },
+            modifyPerson: {
+                value: null,
+                type: ['int', 11],
+                ignore: true,
+                default: '0'
+            },
+            delFlag: {
+                value: null,
+                type: ['int', 4],
+                ignore: true,
+                default: '0'
             },
             note: {
                 value: null,

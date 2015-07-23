@@ -70,6 +70,7 @@ zn.define([
                         config: _config,
                         stores: _stores
                     });
+
                     _controllers[_key] = _controller;
                 });
 

@@ -22,13 +22,13 @@ zn.define([
                     pageSize: 10
                 },
                 value: function (request, response, values) {
-
+                    var _self = this;
                     this._collection.find().then(function (data){
                         if(!data){
                             response.error('query no data');
                         }else {
-                            //_self.viewModel('user-list', { users: data }, response);
-                            response.success(data);
+                            response.viewModel('user-list', { users: data }, response);
+                            //response.success(data);
                         }
                     });
 
