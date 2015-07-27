@@ -5,8 +5,12 @@ zn.define(function (fs) {
 
     return zn.class('RequestHandlerManager', zn.data.List, {
         properties: {
-            mapping: {},
-            apps: {},
+            mapping: {
+                value: {}
+            },
+            apps: {
+                value: {}
+            },
             defaultDelopyName: '__default'
         },
         methods: {

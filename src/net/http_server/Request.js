@@ -9,9 +9,15 @@ zn.define([
         events: [ 'data', 'end', 'close' ],
         properties: {
             paths: null,
-            query: {},
-            formValue: {},
-            checkValue: {},
+            query: {
+                value: {}
+            },
+            formValue: {
+                value: {}
+            },
+            checkValue: {
+                value: {}
+            },
             serverRequest: null
         },
         methods: {

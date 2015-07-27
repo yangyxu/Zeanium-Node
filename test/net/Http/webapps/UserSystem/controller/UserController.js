@@ -1,8 +1,8 @@
 zn.define([
-    '../model/User',
+    '../model/Role',
     '../collection/UserCollection',
     '../web_config'
-],function (User, UserCollection, web_config) {
+],function (Role, UserCollection, web_config) {
 
     var Store = zn.db.data.Store;
 
@@ -13,7 +13,7 @@ zn.define([
         methods: {
             init: function (args){
                 this.super(args);
-                this._collection = this.getStore('local_mysql').getCollection(User, UserCollection);
+                this._collection = this.getStore('local_mysql').getCollection(Role, UserCollection);
             },
             getAllUsers: {
                 method: 'GET/POST',
