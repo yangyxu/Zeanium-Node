@@ -7,8 +7,7 @@ zn.define([
         host: '127.0.0.1',
         port: 8888,
         catalog: '/webapps/',
-        mode: 'release',     //release, debug, view,
-
+        mode: 'debug',     //release, debug, view,
         dynamicHandlerManager: {
             min: 0,
             max: 100,
@@ -19,7 +18,7 @@ zn.define([
                     ''
                 ],
                 convert: function (rout, url){
-                    return url.indexOf('.') === -1 && url.split('/').length === 4;
+                    return url.indexOf('.') === -1 && url.split('/').length > 3;
                 }
             }
         },

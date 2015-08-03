@@ -30,7 +30,9 @@ zn.define([
             end: CHARS.END,
             templete: '',
             templeteConvert: null,
-            data: {},
+            data: {
+                value: {}
+            },
             status: RENDER_STATUS.PADDING
         },
         methods: {
@@ -120,7 +122,6 @@ zn.define([
                 return [_body, _includes];
             },
             __apply: function (templete, data, callback){
-
                 var _argvs = [],
                     _values = [],
                     _analyze = this.__analyze(templete),
@@ -161,7 +162,6 @@ zn.define([
             },
             __getTempleteString: function (templete, callback){
                 var _templete = this.templeteConvert ? this.templeteConvert(templete) : templete;
-
                 fs.readFile(_templete, {
                     encoding:'utf-8'
                 }, function (err, temp) {

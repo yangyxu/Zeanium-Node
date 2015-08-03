@@ -27,26 +27,19 @@ zn.define([
                     _self.status = 0;
                 });
 
-                if (_paths.length){
-                    switch (_paths.length){
-                        case 1:
-                            if(_paths[0]=='favicon.ico'){
-                                _res.end();
-                            }else {
-                                _req.setParameter('ERROR_MESSAGE', "The request miss controller.");
-                                this.__forward(_defaultAppName, '_error', '__404', _req, _res);
-                            }
-                            break;
-                        case 2:
-                            _req.setParameter('ERROR_MESSAGE', "The request miss action.");
-                            this.__forward(_defaultAppName, '_error', '__404', _req, _res);
-                            break;
-                        case 3:
-                            this.__forward(_paths[0], _paths[1], _paths[2], _req, _res);
-                            break;
-                    }
-                }else {
-                    this.__forward(_defaultAppName, '_default', '__index', _req, _res);
+                if (!_paths.length){
+                    return this.__forward(_defaultAppName, '_default', '__index', _req, _res);
+                }
+
+                switch (_paths.length){
+                    case 1:
+                        _req.setErrorMessage("The request miss controller.");
+                        return this.__forward(_defaultAppName, '_error', '__404', _req, _res);
+                    case 2:
+                        _req.setErrorMessage("The request miss action.");
+                        return this.__forward(_defaultAppName, '_error', '__404', _req, _res);
+                    case 3:
+                        return this.__forward(_paths[0], _paths[1], _paths[2], _req, _res);
                 }
             },
             __forward: function (project, controller, action, req, res){
@@ -55,21 +48,21 @@ zn.define([
                         _defaultAppName = this.handlerManager.defaultDelopyName;
 
                     if(!_app){
-                        req.setParameter('ERROR_MESSAGE', "The http server can't found the ["+project+"] project.");
-                        this.__forward(_defaultAppName, '_error', '__404', req, res);
+                        req.setErrorMessage("The http server can't found the ["+project+"] project.");
+                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
                     }
 
                     var _controller = _app['_controllers'][controller];
                     if(!_controller){
-                        req.setParameter('ERROR_MESSAGE', "The http server can't found the ["+controller+"] controller.");
-                        this.__forward(_defaultAppName, '_error', '__404', req, res);
+
+                        req.setErrorMessage("The http server can't found the ["+controller+"] controller.");
+                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
                     }
 
                     var _action = _controller[action];
                     if(!_action){
-                        req.setParameter('ERROR_MESSAGE', "The http server can't found the ["+action+"] action.");
-                        this.__forward(_defaultAppName, '_error', '__404', req, res);
-                        return;
+                        req.setErrorMessage("The http server can't found the ["+action+"] action.");
+                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
                     }
 
                     var _meta = _controller.member(action).meta,
@@ -79,12 +72,11 @@ zn.define([
                     }
 
                     res.getConfig = function (){ return _controller.config; }
-
                     _action.call(_controller, req, res, _values, req.get('serverRequest'), res.get('serverResponse'));
                 }catch(e){
                     zn.error(e.message);
-                    req.setParameter('ERROR_MESSAGE', e.message);
-                    //this.__forward(this.get('defaultAppName'), '_error', '__404', req, res);
+                    req.setErrorMessage(e.message);
+                    this.__forward(_defaultAppName, '_error', '__404', req, res);
                 }
             },
             __checkMeta: function (_meta, req, res, _defaultAppName){
@@ -93,8 +85,8 @@ zn.define([
                         _method = _meta.method || 'GET&POST',
                         _argv = _meta.argv || {};
                     if(_method.indexOf(_requestMethod) === -1){
-                        req.setParameter('ERROR_MESSAGE', "The allowed request method is ["+_route.method+"] but not ["+req.method+"].");
-                        this.__forward(_defaultAppName, '_error', '__method_not_allowed', req, res);
+                        req.setErrorMessage("The allowed request method is [" + _meta.method + "] but not [" + req.method + "].");
+                        this.__forward(_defaultAppName, '_error', '__405', req, res);
                         return false;
                     }
 

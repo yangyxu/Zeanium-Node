@@ -31,6 +31,8 @@ zn.define([
                     'root': _root
                 };
 
+                zn.SERVER_PATH = __dirname;
+
                 RequestAcceptor.initHandlerManager(_config);
                 this.config = _config;
                 this.__createServer(_config);
@@ -54,7 +56,7 @@ zn.define([
             },
             __onClose: function(){
                 this.fire('close', this);
-                Logger.info("close");
+                Logger.info("close zeanium-server");
             }
         }
     });

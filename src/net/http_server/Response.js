@@ -22,7 +22,8 @@ zn.define([
         properties: {
             request: null,
             contentType: 'DEFAULT',
-            serverResponse: null
+            serverResponse: null,
+            view: null
         },
         methods: {
             init: function (request){
@@ -85,8 +86,16 @@ zn.define([
             viewModel: function (view, model){
                 var _context = this.serverResponse.getContext(),
                     _response = this;
-                _context['contextPath'] = _context['root'] + '/' + this.getConfig().deploy;
+                _context['contextPath'] = _context['root'] + '/' + (this.getConfig().deploy||'');
                 zn.extend(model, _context);
+
+                if(view.charAt(0) === '_'){
+                    this.view = {
+                        absolutePath: zn.SERVER_PATH,
+                        path: '/view/',
+                        suffix: 'html'
+                    }
+                }
 
                 _htmlRender.sets({
                     templete: view,
@@ -101,14 +110,19 @@ zn.define([
                 });
             },
             __getTempletePath: function (view){
-                var _config = this.getConfig();
+                var _serverConfig = this.getConfig(),
+                    _root = _serverConfig.root,
+                    _view = this.view || _serverConfig.view || {
+                            absolutePath: _root,
+                            path: '/view/',
+                            suffix: 'html'
+                        };
 
-                var _viewConfig = zn.overwrite(_config.view || {}, {
-                    path: '/view/',
-                    suffix: 'html'
-                });
+                if(view.indexOf('.') === -1){
+                    view += '.' + _view.suffix;
+                }
 
-                return _config.root + _viewConfig.path + view + '.' + _viewConfig.suffix;
+                return _view.absolutePath + _view.path + view;
             },
             __writeJson: function (inData, inEncode){
                 inData.version = this.__getServerVersion();

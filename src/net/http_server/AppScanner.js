@@ -13,37 +13,51 @@ zn.define([
 
         },
         methods: {
-            init: function (){
-
+            init: function (config){
+                config.apps = {};
+                this._config = config;
             },
             scan: function (path, catalog, onLoadApp){
                 var _defer = Async.defer(),
-                    _onLoadApp = onLoadApp||function (){},
+                    _onLoadApp = onLoadApp || function (){},
                     _self = this;
+
                 zn.info('Scanning catalog:'+path);
+
                 fs.readdir(path, function(err, files){
                     if(err){
                         zn.error(err);
                         return;
                     }
-                    var _apps = [], _appPath = {};
+                    var _apps = [],
+                        _appPath = {};
                     files.forEach(function(file){
                         if(file.indexOf('.')===-1){
                             var _path = path + file,
                                 _web_config = _path + '/web_config';
+
                             zn.info('Loading Path: '+catalog+file);
+
                             zn.load(_web_config, function (config){
                                 if(!_appPath[file] && config.controllers){
                                     _appPath[file] = _path;
                                     zn.load(_path+config.controllers, function (controllers){
+
                                         zn.info('Loading Project: '+config.deploy);
+
+                                        if(config.view){
+                                            config.view.absolutePath = _path;
+                                        }
+
                                         config.root = _path;
+
                                         var _app = {
                                             _folder: file,
                                             _deploy: config.deploy || file,
                                             _controllers: _self.__convertController(controllers, config)
                                         };
-                                        //console.log(_app);
+
+                                        _self._config.apps[file] = _app;
                                         _apps.push(_app);
                                         _onLoadApp(_app);
                                     });

@@ -7,7 +7,7 @@ zn.define([
         host: _localhost,
         port: 8888,
         catalog: '/webapps/',
-        mode: 'view',
+        mode: 'relase',
         __dirname: __dirname
     };
 

@@ -12,29 +12,25 @@ zn.define([
             query: {
                 value: {}
             },
-            formValue: {
-                value: {}
-            },
-            checkValue: {
-                value: {}
-            },
             serverRequest: null
         },
         methods: {
             init: function (serverRequest){
+                this._getData = {};
+                this._postData = {};
                 this.__setRequest(serverRequest);
             },
             getValue: function (inName) {
-                return this.checkValue[inName];
+                return this._getData[inName];
             },
             setValue: function (inKey, inValue){
-                return this.checkValue[inKey] = inValue, this;
+                return this._getData[inKey] = inValue, this;
             },
-            getParameter: function (inName){
-                return this.getValue(inName);
+            getErrorMessage: function (){
+                return this._ERROR_MESSAGE;
             },
-            setParameter: function (inKey, inValue){
-                return this.setValue(inKey, inValue);
+            setErrorMessage: function (inValue){
+                return this._ERROR_MESSAGE = inValue, this;
             },
             getInt: function (inName) {
                 return +(this.getValue(inName));
@@ -45,7 +41,7 @@ zn.define([
             checkArgs: function (args, response){
                 var _defaultValue = null,
                     _newValue = null,
-                    _values = zn.extend({}, this.query, this.formValue);
+                    _values = zn.extend({}, this.query, this._postData);
 
                 for(var _key in args){
                     _defaultValue = args[_key];
@@ -69,7 +65,7 @@ zn.define([
                     }
                 }
 
-                return this.checkValue = _values, _values;
+                return this._getData = _values, _values;
             },
             __setRequest: function (request){
                 if(!request){ return false; }
@@ -89,11 +85,13 @@ zn.define([
                     var _buffer = new Buffer(_self._dataLength),
                         _pos = 0;
                     for (var i = 0, _len = _self._dataAry.length; i < _len; i++) {
-                        _dataAry[i].copy(_buffer, _pos);
+                        _self._dataAry[i].copy(_buffer, _pos);
                         _pos += _self._dataAry[i].length;
                     }
                     _self._dataAry = [];
                     _self._dataLength = 0;
+                    //console.log(_buffer.toString("utf-8"));
+                    //console.log(_buffer);
                     _self.fire('end', _buffer);
                 });
 

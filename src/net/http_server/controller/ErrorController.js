@@ -1,4 +1,6 @@
-zn.define(function () {
+zn.define([
+    '../config/error_message',
+], function (error_message) {
 
     return zn.controller('_error', {
         properties: {
@@ -6,10 +8,14 @@ zn.define(function () {
         },
         methods: {
             __404: function (request, response) {
-                response.writeEnd("404 Error: "+ request.getParameter("ERROR_MESSAGE"));
+                var _error = error_message['404'];
+                _error.detail = request.getErrorMessage();
+                response.viewModel('_error', _error);
             },
-            __method_not_allowed: function (request, response) {
-                response.writeEnd("405 METHOD_NOT_ALLOWED: "+ request.getParameter("ERROR_MESSAGE"));
+            __405: function (request, response) {
+                var _error = error_message['405'];
+                _error.detail = request.getErrorMessage();
+                response.viewModel('_error', _error);
             }
         }
     });

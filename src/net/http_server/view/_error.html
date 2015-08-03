@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Zeanium-Server V1.0.1</title>
+        <% include('__zeanium_common_style') %>
+    </head>
+    <body>
+        <div class="zn-main">
+            <div class="zn-head">
+                <div class="warp">
+                    <div class="title">Zeanium-Server(V1.0.0) 服务器错误</div>
+                </div>
+            </div>
+            <div class="zn-body">
+                <div class="warp content">
+                    <div class="content-container">
+                        <fieldset>
+                            <h2><%=code%> - <%=msg%></h2>
+                            <h3><%=detail%></h3>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <% include('__foot') %>
+        </div>
+    </body>
+</html>
