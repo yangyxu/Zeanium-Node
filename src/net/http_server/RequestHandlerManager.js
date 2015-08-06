@@ -3,7 +3,7 @@
  */
 zn.define(function (fs) {
 
-    return zn.class('RequestHandlerManager', zn.data.List, {
+    return zn.class('RequestHandlerManager', zn.data.TList, {
         properties: {
             mapping: {
                 value: {}

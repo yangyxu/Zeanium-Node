@@ -1,16 +1,19 @@
 zn.define(function () {
 
     var BaseController = zn.class('BaseController', {
-        properties: {
-            config: null,
-            stores: null
-        },
         methods: {
-            init: function (args){
-                this.sets(args);
+            init: {
+                auto: true,
+                value: function (config, stores){
+                    this._config = config;
+                    this._stores = stores;
+                }
             },
-            getStore: function (name){
-                var _store = this.stores[name];
+            config: function (key){
+                return key ? this._config[key]: this._config;
+            },
+            store: function (name){
+                var _store = name ? this._stores[name]: this._stores;
                 if(!_store){
                     throw new Error('The database '+name+' is not exist.');
                 }

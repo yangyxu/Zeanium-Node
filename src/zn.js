@@ -1232,6 +1232,22 @@ zn.GLOBAL.zn = zn;  //set global zn var
         }
     };
 
+    var __execSuperCtor = function (__super__, __context__, __arguments__){
+        if(__super__ && __super__ !== ZNObject){
+            var _superCtor = __super__.member('init');
+            if(_superCtor && _superCtor.meta.after){
+                __context__.__afters__.push({
+                    context: __context__,
+                    handler: _superCtor.meta.after
+                });
+            }
+            if(_superCtor && _superCtor.meta.auto){
+                _superCtor.meta.value.apply(__context__, __arguments__);
+            }
+            return arguments.callee(__super__._super_, __context__);
+        }
+    };
+
     /**
      * Define a class
      * @method define
@@ -1244,7 +1260,9 @@ zn.GLOBAL.zn = zn;  //set global zn var
         var _args = __class._arguments.apply(this, arguments);
         var _name = _args.name,
             _super = _args.super,
-            _meta = _args.meta;
+            _meta = _args.meta,
+            _init = _meta.methods.init;
+
         var ZNClass, _SuperClass, _prototype;
 
         if (_super._static_) {
@@ -1287,42 +1305,42 @@ zn.GLOBAL.zn = zn;  //set global zn var
                         throw new Error('Cannot instantiate abstract class.');
                     } :
                     function () {
-                        var _mixins = ZNClass._mixins_||[];
+                        var _mixins = ZNClass._mixins_ || [],
+                            _ctors = ZNClass._ctors_ || [],
+                            _ctor_ = null,
+                            _arguments = arguments;
+
                         this.__id__ = __id__++;
                         this.__handlers__ = {};
                         this.__initializing__ = true;
                         this.__afters__ = [];
 
-                        (function (__super__, __context__){
-                            if(__super__ && __super__ !== ZNObject){
-                                var _superCtor = __super__.member('init');
-                                if(_superCtor && _superCtor.meta.after){
-                                    __context__.__afters__.push({
-                                        context: __context__,
-                                        handler: _superCtor.meta.after
-                                    });
-                                }
-                                if(_superCtor && _superCtor.meta.auto){
-                                    _superCtor.meta.value.apply(__context__, arguments);
-                                }
-                                return arguments.callee(__super__._super_, __context__);
-                            }
-                        })(this.__super__, this);
+                        var _mixinPrototype = null,
+                            _ctor = null;
 
                         for (var i = 0, _len = _mixins.length; i < _len; i++) {
-                            var _ctor = _mixins[i].prototype.__ctor__;
+                            _mixinPrototype = _mixins[i].prototype;
+                            _ctor = _mixinPrototype.__ctor__;
+                            _ctor = zn.is(_ctor, 'function') ? _ctor : _ctor.value;
+                            __execSuperCtor(_mixinPrototype.__super__, _mixinPrototype, _arguments);
                             if (_ctor) {
                                 _ctor.call(this);
                             }
                         }
 
-                        if (this.__ctor__) {
-                            this.__ctor__.apply(this, arguments);
+                        __execSuperCtor(this.__super__, this, _arguments);
+
+                        for (var j = 0, _ctorLen = _ctors.length; j < _ctorLen; j++) {
+                            _ctor_ = _ctors[j];
+                            _ctor_ = zn.is(_ctor_, 'function') ? _ctor_ : _ctor_.value;
+                            if (_ctor_) {
+                                _ctor_.apply(this, _arguments);
+                            }
                         }
 
                         while(this.__afters__.length>0){
                             var _after = this.__afters__.pop();
-                            _after.handler.call(_after.context);
+                            _after.handler.apply(_after.context, _arguments);
                         }
 
                         this.__afters__ = null;
@@ -1331,6 +1349,8 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
                         this.__initializing__ = false;
                     };
+
+                ZNClass._ctors_ = [];
             }
 
             if (ZNClass._super_ !== _super) {
@@ -1347,8 +1367,11 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 _prototype = ZNClass.prototype;
             }
 
-            if (_meta.methods.init) {
-                _prototype.__ctor__ = _meta.methods.init;
+            if (_init) {
+                ZNClass._ctors_.push(_init);
+                if(!_prototype.__ctor__){
+                    _prototype.__ctor__ = _init;
+                }
             }
 
         }
@@ -2336,19 +2359,240 @@ zn.GLOBAL.zn = zn;  //set global zn var
     });
 
 })(zn);
+(function (zn) {
+
+    var ArrayPrototype = Array.prototype,
+        __push = ArrayPrototype.push,
+        __sort = ArrayPrototype.sort,
+        __join = ArrayPrototype.join,
+        __slice = ArrayPrototype.slice,
+        __splice = ArrayPrototype.splice,
+        __indexOf = ArrayPrototype.indexOf,
+        __lastIndexOf = ArrayPrototype.lastIndexOf,
+        __forEach = ArrayPrototype.forEach,
+        __toArray = function (data) {
+            if (zn.is(data, List)) {
+                return data.toArray();
+            }
+            else if (zn.is(data, 'array')) {
+                return data.slice(0);
+            }
+            else {
+                var _data = [];
+                zn.each(data, function (item) {
+                    _data.push(item);
+                });
+
+                return _data;
+            }
+        };
+
+    var List = zn.class('zn.data.List', {
+        properties: {
+            /**
+             * @property count
+             * @type {Number}
+             */
+            count: {
+                get: function () {
+                    return this.length;
+                },
+                set: function (){
+                    throw new Error("Unable to set count of List");
+                }
+            }
+        },
+        methods: {
+            init: {
+                auto:true,
+                value: function (data) {
+                    this.length = 0;
+                    this.insertRange(data, 0);
+                }
+            },
+            unique: function (){
+
+            },
+            dispose: function () {
+                this.clear();
+            },
+            /**
+             * Add an item.
+             * @method add
+             * @param item
+             */
+            add: function (item) {
+                var _index = this.length;
+                __push.call(this, item);
+
+                return _index;
+            },
+            /**
+             * Add multiple items.
+             * @method addRange
+             * @param iter
+             * @returns {*}
+             */
+            addRange: function (data) {
+                return this.insertRange(data, this.length);
+            },
+            /**
+             * @method remove
+             * @param item
+             * @returns {*}
+             */
+            remove: function (item) {
+                var _index = this.indexOf(item);
+                if (_index >= 0) {
+                    __splice.call(this, _index, 1);
+                    return _index;
+                }
+                else {
+                    return -1;
+                }
+            },
+            /**
+             * @method removeAt
+             * @param index
+             * @returns {*}
+             */
+            removeAt: function (index) {
+                return __splice.call(this, index, 1)[0];
+            },
+            /**
+             * @method insert
+             * @param item
+             * @param index
+             */
+            insert: function (item, index) {
+                return __splice.call(this, index, 0, item), item;
+            },
+            /**
+             * @method insertRange
+             * @param index
+             * @param iter
+             * @returns {*}
+             */
+            insertRange: function (data, index) {
+                return __splice.apply(this, [index, 0].concat(__toArray(data))), index;
+            },
+            /**
+             * @method clear
+             * @returns {*}
+             */
+            clear: function () {
+                return __splice.call(this, 0);
+            },
+            /**
+             * @method getItem
+             * @param index
+             * @returns {*}
+             */
+            getItem: function (index) {
+                if (index < this.length) {
+                    return this[index];
+                }
+                else {
+                    throw new Error('Index out of range.');
+                }
+            },
+            /**
+             * @method setItem
+             * @param index
+             * @param item
+             * @returns {*}
+             */
+            setItem: function (index, item) {
+                if (index < this.length) {
+                    this[index] = item;
+                }
+                else {
+                    throw new Error('Index out of range.');
+                }
+            },
+            /**
+             * @method getRange
+             * @param index
+             * @param count
+             * @returns {*}
+             */
+            getRange: function (index, count) {
+                return new List(__slice.call(this, index, index + count));
+            },
+            /**
+             * @method indexOf
+             * @param item
+             * @returns {*}
+             */
+            indexOf: function (item) {
+                return __indexOf.call(this, item);
+            },
+            /**
+             * @method lastIndexOf
+             * @param item
+             * @returns {*}
+             */
+            lastIndexOf: function (item) {
+                return __lastIndexOf.call(this, item);
+            },
+            /**
+             * @method contains
+             * @param item
+             * @returns {boolean}
+             */
+            contains: function (item) {
+                return this.indexOf(item) >= 0;
+            },
+            toggle: function (item){
+                if(this.contains(item)){
+                    this.remove(item);
+                }else{
+                    this.add(item);
+                }
+            },
+            /**
+             * @method sort
+             * @param callback
+             * @returns {Array}
+             */
+            sort: function (callback) {
+                return __sort.call(this, callback);
+            },
+            /**
+             * @method each
+             * @param callback
+             * @param context
+             */
+            each: function (callback, context) {
+                __forEach.call(this, callback, context);
+            },
+            /**
+             * @method  toArray
+             * @returns {Array}
+             */
+            toArray: function () {
+                return __slice.call(this, 0);
+            },
+            join: function (){
+                return __join.call(this);
+            }
+        }
+    });
+
+})(zn);
 /**
  * Created by yangyxu on 2014/9/16.
- * List
+ * TList
  */
 (function (zn){
 
     /**
-     * List
-     * @class List
+     * TList
+     * @class TList
      * @namespace zn.util
      **/
 
-    zn.class('zn.data.List', {
+    zn.class('zn.data.TList', {
         statics: {
             getInstance: function (args){
                 return new this(args);
@@ -2869,9 +3113,10 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 });
                 this.__bindings__ = null;
             },
-            let: function (name, value) {
+            let: function (name, value, owner) {
                 var _binding = Bindable.parseOptions(value);
                 if (_binding) {
+                    _binding.owner = owner;
                     this.setBinding(name, _binding);
                 }
                 else {

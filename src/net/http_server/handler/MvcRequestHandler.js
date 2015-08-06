@@ -53,8 +53,11 @@ zn.define([
                     }
 
                     var _controller = _app['_controllers'][controller];
-                    if(!_controller){
+                    if(!res.getConfig()){
+                        res.getConfig = function () { return _controller.config(); }
+                    }
 
+                    if(!_controller){
                         req.setErrorMessage("The http server can't found the ["+controller+"] controller.");
                         return this.__forward(_defaultAppName, '_error', '__404', req, res);
                     }
@@ -67,11 +70,11 @@ zn.define([
 
                     var _meta = _controller.member(action).meta,
                         _values = this.__checkMeta(_meta, req, res, _defaultAppName);
+
                     if(!_values){
                         return false;
                     }
 
-                    res.getConfig = function (){ return _controller.config; }
                     _action.call(_controller, req, res, _values, req.get('serverRequest'), res.get('serverResponse'));
                 }catch(e){
                     zn.error(e.message);

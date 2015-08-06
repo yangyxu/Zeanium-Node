@@ -12,11 +12,10 @@ zn.define([
         },
         methods: {
             init: function (args){
-                this.super(args);
-                this._collection = this.getStore('local_mysql').getCollection(Role, UserCollection);
+                this._collection = this.store('local_mysql').getCollection(Role, UserCollection);
             },
             getAllUsers: {
-                method: 'POST',
+                method: 'GET/POST',
                 argv: {
                     pageIndex: 1,
                     pageSize: 10
@@ -24,9 +23,6 @@ zn.define([
                 value: function (request, response, values) {
                     var _self = this;
 
-                    response.error(values);
-
-                    /*
                     this._collection.find().then(function (data){
                         if(!data){
                             response.error('query no data');
@@ -34,7 +30,7 @@ zn.define([
                             response.viewModel('user-list', { users: data }, response);
                             //response.success(data);
                         }
-                    });*/
+                    });
 
                 }
             }

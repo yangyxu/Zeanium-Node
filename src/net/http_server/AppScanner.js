@@ -80,11 +80,7 @@ zn.define([
 
                 zn.each(controllers, function (controller, name){
                     _key = controller.getMeta('controller') || name;
-                    _controller = new controller({
-                        config: _config,
-                        stores: _stores
-                    });
-
+                    _controller = new controller(_config, _stores);
                     _controllers[_key] = _controller;
                 });
 

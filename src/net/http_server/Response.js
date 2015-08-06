@@ -81,12 +81,14 @@ zn.define([
                 this.end();
             },
             getConfig: function (){
-                return {};
+                //must be not return or return null
             },
             viewModel: function (view, model){
                 var _context = this.serverResponse.getContext(),
-                    _response = this;
-                _context['contextPath'] = _context['root'] + '/' + (this.getConfig().deploy||'');
+                    _response = this,
+                    _config = this.getConfig()||{ deploy: '' };
+
+                _context['contextPath'] = _context['root'] + '/' + _config.deploy;
                 zn.extend(model, _context);
 
                 if(view.charAt(0) === '_'){
