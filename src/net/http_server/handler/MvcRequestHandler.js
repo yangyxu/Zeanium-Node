@@ -44,8 +44,10 @@ zn.define([
             },
             __forward: function (project, controller, action, req, res){
                 try{
+                    zn.info('project: ' + project + ', controller: ' + controller + ', action: ' + action);
                     var _app = this.handlerManager.resolveApplication(project),
-                        _defaultAppName = this.handlerManager.defaultDelopyName;
+                        _defaultAppName = this.handlerManager.defaultDelopyName,
+                        _self = this;
 
                     if(!_app){
                         req.setErrorMessage("The http server can't found the ["+project+"] project.");
@@ -53,10 +55,6 @@ zn.define([
                     }
 
                     var _controller = _app['_controllers'][controller];
-                    if(!res.getConfig()){
-                        res.getConfig = function () { return _controller.config(); }
-                    }
-
                     if(!_controller){
                         req.setErrorMessage("The http server can't found the ["+controller+"] controller.");
                         return this.__forward(_defaultAppName, '_error', '__404', req, res);
@@ -68,14 +66,20 @@ zn.define([
                         return this.__forward(_defaultAppName, '_error', '__404', req, res);
                     }
 
-                    var _meta = _controller.member(action).meta,
-                        _values = this.__checkMeta(_meta, req, res, _defaultAppName);
+                    var _webConfig = _controller.config()
 
-                    if(!_values){
-                        return false;
-                    }
+                    res._webConfig = _webConfig;
 
-                    _action.call(_controller, req, res, _values, req.get('serverRequest'), res.get('serverResponse'));
+                    req.parse(_webConfig, function (data){
+                        var _meta = _controller.member(action).meta,
+                            _values = _self.__checkMeta(_meta, req, res, _defaultAppName);
+
+                        if(!_values){
+                            return false;
+                        }
+
+                        _action.call(_controller, req, res, _values, req.$post, req.$get, req.$files, data);
+                    });
                 }catch(e){
                     zn.error(e.message);
                     req.setErrorMessage(e.message);

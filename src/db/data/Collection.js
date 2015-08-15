@@ -7,9 +7,12 @@ zn.define(function () {
 
     var Collection = zn.class('zn.db.data.Collection', {
         methods: {
-            init: function (inStore, inModel){
-                this._store = inStore;
-                this._model = inModel||Model;
+            init: {
+                auto: true,
+                value: function (inStore, inModel){
+                    this._store = inStore;
+                    this._model = inModel||Model;
+                }
             },
             add: function (inModel){
                 var _defer = Async.defer(),

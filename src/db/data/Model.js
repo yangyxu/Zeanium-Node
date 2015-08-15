@@ -66,10 +66,15 @@ zn.define(function () {
             }
         },
         methods: {
-            init: function (args){
-                this._table = this.constructor.__getTable();
-                this._fields = this.constructor.__getFields();
-                this.sets(args);
+            init: {
+                auto: true,
+                value: function (args){
+                    console.log(args);
+                    /*
+                    this._table = this.constructor.__getTable();
+                    this._fields = this.constructor.__getFields();
+                    this.sets(args);*/
+                }
             },
             toJson: function () {
                 var _self = this,

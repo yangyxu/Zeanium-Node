@@ -28,6 +28,15 @@ zn.define([
         methods: {
             init: function (request){
                 this.set('request', request);
+                this._webConfig = {
+                    deploy: '',
+                    root: __dirname,
+                    view: {
+                        absolutePath: __dirname,
+                        path: '/view/',
+                        suffix: 'html'
+                    }
+                };
             },
             writeHead: function (httpState, inArgs){
                 var _self = this,
@@ -80,13 +89,10 @@ zn.define([
                 _sr.setHeader("Location", url);
                 this.end();
             },
-            getConfig: function (){
-                //must be not return or return null
-            },
             viewModel: function (view, model){
                 var _context = this.serverResponse.getContext(),
                     _response = this,
-                    _config = this.getConfig()||{ deploy: '' };
+                    _config = this._webConfig;
 
                 _context['contextPath'] = _context['root'] + '/' + _config.deploy;
                 zn.extend(model, _context);
@@ -112,13 +118,7 @@ zn.define([
                 });
             },
             __getTempletePath: function (view){
-                var _serverConfig = this.getConfig(),
-                    _root = _serverConfig.root,
-                    _view = this.view || _serverConfig.view || {
-                            absolutePath: _root,
-                            path: '/view/',
-                            suffix: 'html'
-                        };
+                var _view = this.view || this._webConfig.view;
 
                 if(view.indexOf('.') === -1){
                     view += '.' + _view.suffix;

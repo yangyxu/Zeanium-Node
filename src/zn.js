@@ -697,6 +697,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
     var sharedMethods = {
         __handlers__: {},
+
         /**
          * Get specified member.
          * @param name
@@ -1129,7 +1130,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 if (zn.is(_args0, 'string')) {
                     _name = _args0;
                     _super = null;
-                } else if (zn.is(arg0, 'function')) {
+                } else if (zn.is(_args0, 'function')) {
                     _name = null;
                     _super = _args0;
                 } else {
@@ -1234,16 +1235,34 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
     var __execSuperCtor = function (__super__, __context__, __arguments__){
         if(__super__ && __super__ !== ZNObject){
-            var _superCtor = __super__.member('init');
+            var _superCtor = __super__.member('init'),
+                _mixins = __super__._mixins_,
+                _mixinCtor = null;
+
             if(_superCtor && _superCtor.meta.after){
                 __context__.__afters__.push({
                     context: __context__,
                     handler: _superCtor.meta.after
                 });
             }
+
+            if(_mixins.length){
+                zn.each(_mixins, function (mixin){
+                    if(mixin['@init']){
+                        _mixinCtor = mixin['@init'].meta;
+                        _mixinCtor = zn.is(_mixinCtor, 'function') ? _mixinCtor : _mixinCtor.value;
+                        //__execSuperCtor(mixin.prototype.__super__, mixin.prototype, __arguments__);
+                        if (_mixinCtor) {
+                            _mixinCtor.call(__context__);
+                        }
+                    }
+                });
+            }
+
             if(_superCtor && _superCtor.meta.auto){
                 _superCtor.meta.value.apply(__context__, __arguments__);
             }
+
             return arguments.callee(__super__._super_, __context__);
         }
     };
@@ -1315,16 +1334,20 @@ zn.GLOBAL.zn = zn;  //set global zn var
                         this.__initializing__ = true;
                         this.__afters__ = [];
 
-                        var _mixinPrototype = null,
+                        var _mixin = null,
                             _ctor = null;
 
                         for (var i = 0, _len = _mixins.length; i < _len; i++) {
-                            _mixinPrototype = _mixins[i].prototype;
-                            _ctor = _mixinPrototype.__ctor__;
-                            _ctor = zn.is(_ctor, 'function') ? _ctor : _ctor.value;
-                            __execSuperCtor(_mixinPrototype.__super__, _mixinPrototype, _arguments);
-                            if (_ctor) {
-                                _ctor.call(this);
+                            _mixin = _mixins[i];
+                            if(_mixin['@init']){
+                                _ctor = _mixin['@init'].meta;
+                                _ctor = zn.is(_ctor, 'function') ? _ctor : _ctor.value;
+                                __execSuperCtor(_mixin.prototype.__super__, this, _arguments);
+                                if (_ctor) {
+                                    _ctor.call(this);
+                                }
+                            }else {
+                                __execSuperCtor(_mixin.prototype.__super__, this, _arguments);
                             }
                         }
 
@@ -2711,7 +2734,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
             },
             watch: function (path, handler, context){
                 var _paths = path === '*' ?
-                    this.constructor.__properties__ :
+                    this.constructor._properties_ :
                     (zn.is(path, 'array') ? path : [ path ]);
 
                 _paths.forEach(function (_path){
@@ -2722,7 +2745,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
             },
             unwatch: function (path, handler, context){
                 var _paths = path === '*' ?
-                    this.constructor.__properties__ :
+                    this.constructor._properties_ :
                     (zn.is(path, 'array') ? path : [ path ]);
 
                 _paths.forEach(function (_path){
@@ -2960,6 +2983,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                     _value = null,
                     _owner = this._owner,
                     _target = this._target,
+                    _targetPathValue = null,
                     _targetPath = this._targetPath,
                     _converter = this._converter;
 
@@ -2969,7 +2993,9 @@ zn.GLOBAL.zn = zn;  //set global zn var
                     _values.push(_value);
                 });
 
-                return _target.set(_targetPath, _converter.convert.apply(_converter.context, _values)), this;
+                _targetPathValue = _converter.convert.apply(_converter.context, _values);
+
+                return _target.set(_targetPath, _targetPathValue), this;
             },
             __rebind: function () {
                 var _sourcePaths = this._sourcePaths,
@@ -3113,11 +3139,11 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 });
                 this.__bindings__ = null;
             },
-            let: function (name, value, owner) {
+            let: function (name, value, owner, target) {
                 var _binding = Bindable.parseOptions(value);
                 if (_binding) {
                     _binding.owner = owner;
-                    this.setBinding(name, _binding);
+                    this.setBinding(name, _binding, target);
                 }
                 else {
                     this.set(name, value);
@@ -3126,11 +3152,12 @@ zn.GLOBAL.zn = zn;  //set global zn var
             getBinding: function (name) {
                 return this.__bindings__[name];
             },
-            setBinding: function (name, options) {
-                this.clearBinding(name);
-                options.source = this.get('model');
+            setBinding: function (name, options, target) {
+                options.source = options.model || this.get('model');
                 options.owner = options.owner || this;
-                this.__bindings__[name] = new Binding(this, name, options);
+                this.clearBinding(name);
+                this.__bindings__[name] = new Binding(target || this, options.targetPath || name, options);
+                return this;
             },
             clearBinding: function (name) {
                 var binding = this.__bindings__[name];
@@ -3148,6 +3175,387 @@ zn.GLOBAL.zn = zn;  //set global zn var
                         _self.let(key, value.binding);
                     }
                 });
+            }
+        }
+    });
+
+})(zn);
+(function (zn) {
+
+    var Map = zn.class('zn.data.Map', {
+        properties: {
+            /**
+             * @property length
+             * @type {Number}
+             */
+            count: {
+                get: function () {
+                    var length = 0;
+                    this.each(function () {
+                        length++;
+                    });
+
+                    return length;
+                }
+            },
+            /**
+             * @property keys
+             * @type {Array}
+             */
+            keys: {
+                get: function () {
+                    return Object.keys(this._map);
+                },
+                set: function (){
+                    throw new Error("Unable to set keys of Map");
+                }
+            },
+            /**
+             * @property values
+             * @type {Array}
+             */
+            values: {
+                get: function () {
+                    return this.__getMapValues();
+                },
+                set: function (){
+                    throw new Error("Unable to set values of Map");
+                }
+            }
+        },
+        methods: {
+            init: {
+                auto: true,
+                value: function (map) {
+                    this._map = {};
+                    this.concat(map);
+                }
+            },
+            concat: function (map){
+                if (map) {
+                    var _map = this._map,
+                        _self = this;
+                    zn.each(map, function (value, key) {
+                        _self.set(key, value);
+                    });
+                }
+
+                return this;
+            },
+            /**
+             * @method contains
+             * @param key {String}
+             * @returns {Boolean}
+             */
+            contains: function (key) {
+                return key in this._map;
+            },
+            /**
+             * @method getItem
+             * @param key {String}
+             * @returns {*}
+             */
+            getItem: function (key) {
+                return this._map[key];
+            },
+            /**
+             * @method get
+             * @param key {String}
+             * @returns {*}
+             */
+            get: function (key) {
+                if(this.has(key)){
+                    return this.super(key);
+                }
+
+                var _item = this.getItem(key);
+                return _item && _item.value;
+            },
+            /**
+             * @method set
+             * @param key {String}
+             * @param value {any}
+             */
+            set: function (key, value) {
+                if(this.has(key)){
+                    return this.super(key);
+                }
+
+                var _key = key,
+                    _item = this._map[_key];
+
+                if (!_item) {
+                    _item = this._map[_key] = {
+                        key: _key
+                    };
+                }
+
+                return _item.value = value, this;
+            },
+            /**
+             * @method remove
+             * @param key {String}
+             */
+            remove: function (key) {
+                return delete this._map[key], this;
+            },
+            /**
+             * @method clear
+             */
+            clear: function () {
+                return this._map = {}, this;
+            },
+            /**
+             * @method each
+             * @param callback {Function}
+             * @param [context] {Object}
+             */
+            each: function (callback, context) {
+                return zn.each(this._map, callback, context), this;
+            },
+            eachKey: function (callback, context){
+                return zn.each(this.keys, callback, context), this;
+            },
+            eachValue: function (callback, context){
+                return zn.each(this.values, callback, context), this;
+            },
+            /**
+             * @method toArray
+             * @returns {Array}
+             */
+            toArray: function () {
+                var _data = [];
+                this.each(function (item) {
+                    _data.push(item);
+                });
+
+                return _data;
+            },
+            /**
+             * @method toObject
+             * @returns {Object}
+             */
+            toObject: function () {
+                var _data = {};
+                this.each(function (item) {
+                    _data[item.key] = item.value;
+                });
+
+                return _data;
+            },
+            __getMapValues: function () {
+                var _data = [];
+                this.each(function (item) {
+                    _data.push(item.value);
+                });
+
+                return _data;
+            }
+        }
+    });
+
+})(zn);
+(function (zn) {
+
+    zn.class('zn.data.ObservableList', zn.data.List, {
+        mixins: [ zn.data.Observable ],
+        events: ['change'],
+        methods: {
+            /**
+             * Add an item.
+             * @method add
+             * @param item
+             */
+            add: function (item) {
+                var _index = this.super(item);
+                this.notify('count');
+                this.fire('change', {
+                    action: 'add',
+                    items: [ item ],
+                    index: _index
+                });
+
+                return _index;
+            },
+            /**
+             * @method addRange
+             * @param data
+             */
+            addRange: function (data) {
+                var _index = this.super(data);
+                this.notify('count');
+                this.fire('change', {
+                    action: 'add',
+                    items: data,
+                    index: _index
+                });
+
+                return _index;
+            },
+            /**
+             * @method insert
+             * @param item
+             * @param index
+             */
+            insert: function (item, index) {
+                this.super(item, index);
+                this.notify('count');
+                this.fire('change', {
+                    action: 'add',
+                    items: [ item ],
+                    index: index
+                });
+
+                return index;
+            },
+            /**
+             * @method insertRange
+             * @param data
+             * @param index
+             */
+            insertRange: function (data, index) {
+                this.super(data, index);
+                this.notify('count');
+                this.fire('change', {
+                    action: 'add',
+                    items: data,
+                    index: index
+                });
+
+                return index;
+            },
+            /**
+             * @method remove
+             * @param item
+             */
+            remove: function (item) {
+                var _index = this.super(item);
+                if (_index >= 0) {
+                    this.notify('count');
+                    this.fire('change', {
+                        action: 'remove',
+                        items: [ item ],
+                        index: _index
+                    });
+                }
+
+                return index;
+            },
+            /**
+             * @method removeAt
+             * @param index
+             */
+            removeAt: function (index) {
+                var _item = this.super(index);
+                if (_item !== undefined) {
+                    this.notify('count');
+                    this.fire('change', {
+                        action: 'remove',
+                        items: [ _item ],
+                        index: index
+                    });
+                }
+
+                return _item;
+            },
+            /**
+             * @method clear
+             */
+            clear: function () {
+                var _items = this.super();
+                this.notify('count');
+                this.fire('change', {
+                    action: 'clear',
+                    items: _items
+                });
+
+                return _items;
+            },
+            /**
+             * @method sort
+             * @param callback
+             */
+            sort: function (callback) {
+                var _items = this.super(callback);
+                this.notify('count');
+                this.fire('change', {
+                    action: 'sort',
+                    sort: callback || function (a, b) {
+                        if (a > b) {
+                            return 1;
+                        }
+                        else if (a < b) {
+                            return -1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                });
+
+                return _items;
+            }
+        }
+    });
+
+})(zn);
+(function (zn) {
+
+    zn.class('zn.data.ObservableMap', zn.data.Map, {
+        mixins: [ zn.data.Observable ],
+        events: [ 'change' ],
+        methods: {
+            set: function (key, value) {
+                if(this.has(key)){
+                    return this.super(key);
+                }
+
+                var _map = this._map,
+                    _item = {
+                        key: key,
+                        value: value
+                    };
+
+                if (key in _map) {
+                    var _old = _map[key];
+                    _map[key] = _item;
+                    this.fire('change', {
+                        action: 'replace',
+                        oldItem: _old,
+                        newItem: _item
+                    });
+                }
+                else {
+                    _map[key] = _item;
+                    this.notify('count');
+                    this.fire('change', {
+                        action: 'add',
+                        items: [ _item ]
+                    });
+                }
+            },
+            remove: function (key) {
+                var _map = this._map;
+                if (key in _map) {
+                    var _item = _map[key];
+                    delete _map[key];
+                    this.notify('count');
+                    this.fire('change', {
+                        action: 'remove',
+                        items: [ _item ]
+                    });
+                }
+            },
+            clear: function () {
+                var _items = this.toArray();
+                this.super();
+                this.notify('count');
+                this.fire('change', {
+                    action: 'clear',
+                    items: this.toArray()
+                });
+
+                return this;
             }
         }
     });

@@ -17,8 +17,11 @@ zn.define([
 
         },
         methods: {
-            init: function (inConfig){
-                this._config = inConfig || 'default';
+            init: {
+                auto: true,
+                value: function (inConfig){
+                    this._config = inConfig || 'default';
+                }
             },
             getConnection: function (){
                 return Connection.getConnection(this._config);

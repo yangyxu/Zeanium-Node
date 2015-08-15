@@ -20,8 +20,15 @@ zn.define([
                     pageIndex: 1,
                     pageSize: 10
                 },
-                value: function (request, response, values) {
+                value: function (request, response, $data, $post, $get, $files) {
                     var _self = this;
+
+                    //console.log($files);
+
+                    response.success($data);
+
+                    /*
+
 
                     this._collection.find().then(function (data){
                         if(!data){
@@ -30,7 +37,7 @@ zn.define([
                             response.viewModel('user-list', { users: data }, response);
                             //response.success(data);
                         }
-                    });
+                    });*/
 
                 }
             }
