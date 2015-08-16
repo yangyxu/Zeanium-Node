@@ -1,6 +1,7 @@
 zn.define([
-    '../model/User'
-], function (User) {
+    '../model/User',
+    '../model/Region'
+], function (User, Region) {
 
     return zn.collection("UserCollection", {
         methods: {
@@ -79,6 +80,32 @@ zn.define([
                             }else {
                                 _defer.reject('User is not exist.');
                             }
+                        }).catch(function (e){
+                            throw new Error(e.message);
+                        }).finally(function (){
+                            _connection.close();
+                        });
+                }catch(e){
+                    zn.error(e.message);
+                    throw new Error(e.message);
+                }
+
+                return _defer.promise;
+            },
+            getRegions: function (){
+                var _defer = zn.async.defer(),
+                    _self = this;
+
+                try{
+                    var _table = Region.__getTable();
+                    var _fields = Region.__getFields(false);
+                    var _connection = this._store.getConnection();
+                    var _result = _connection.command
+                        .select(_fields)
+                        .from(_table)
+                        .query()
+                        .then(function (data){
+                            _defer.resolve(data.rows);
                         }).catch(function (e){
                             throw new Error(e.message);
                         }).finally(function (){

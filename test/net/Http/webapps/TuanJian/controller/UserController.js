@@ -66,17 +66,27 @@ zn.define([
                 },
                 value: function (request, response, $data, $post, $get, $files) {
                     var _files = request.uploadFiles($files);
-
                     this._collection.logout($data.userId).then(function (data){
                         if(!data){
                             response.error('query no data');
-                        }else {
+                        } else {
                             response.success(data);
                         }
 
                     });
+                }
+            },
+            getRegions: {
+                method: 'GET',
+                value: function (request, response, $data, $post, $get, $files) {
+                    this._collection.getRegions().then(function (data){
+                        if(!data){
+                            response.error('query no data');
+                        } else {
+                            response.success(data);
+                        }
 
-
+                    });
                 }
             }
         }
