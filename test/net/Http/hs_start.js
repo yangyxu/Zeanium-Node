@@ -6,6 +6,9 @@ zn.define([
 ], function (net, os) {
 
     var _localhost = os.platform()==='darwin'?'127.0.0.1':'0.0.0.0';
+
+
+    _localhost = '127.0.0.1';
     var _config =  {
         host: _localhost,
         port: 8888,
