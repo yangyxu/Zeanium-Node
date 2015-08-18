@@ -18,7 +18,7 @@ zn.define({
             type: 'mysql',
             host: '127.0.0.1',
             user: 'root',
-            password: 'yangyxu',
+            password: '123456',
             database:'tuanjian',
             port: 3306
         },

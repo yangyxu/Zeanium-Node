@@ -1,20 +1,12 @@
 var zn = require('../../../../../../src/zn');
 
-var _config =
-
 zn.define([
     'node:fs',
-    'db'
-], function (fs, db) {
+    'db',
+    '../web_config'
+], function (fs, db, web_config) {
 
-    var store = db.data.Store.getStore({
-        type: 'mysql',
-        host: '127.0.0.1',
-        user: 'root',
-        password: 'yangyxu',
-        database:'tuanjian',
-        port: 3306
-    });
+    var store = db.data.Store.getStore(web_config.databases['local_mysql']);
     fs.readdir(__dirname, function(err, files){
         if(err){
             zn.error(err);

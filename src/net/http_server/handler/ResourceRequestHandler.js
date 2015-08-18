@@ -20,7 +20,11 @@ zn.define([
                 this.__reset(serverRequest, serverResponse, handlerManager);
                 var _req = this.request,
                     _paths = _req.get('paths'),
-                    _ext = _paths[_paths.length-1].split('.')[1],
+                    _file = _paths[_paths.length-1];
+                if(!_file){
+
+                }
+                var _ext = _file.split('.')[1],
                     _project = _paths.shift(),
                     _defaultAppName = handlerManager.defaultDelopyName,
                     _self = this;

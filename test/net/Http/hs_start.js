@@ -9,6 +9,7 @@ zn.define([
 
 
     _localhost = '127.0.0.1';
+
     var _config =  {
         host: _localhost,
         port: 8888,
