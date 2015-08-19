@@ -1488,6 +1488,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
         if(zn.PLATFORM !== 'darwin') {
             SLASH = '\\';
         }
+        zn.SLASH = SLASH;
     }
 
     var __path = {
@@ -1523,6 +1524,10 @@ zn.GLOBAL.zn = zn;  //set global zn var
             var _path = path,
                 _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
                 _slashIndex = _path.indexOf(SLASH);
+
+            if(zn.PLATFORM !== 'darwin') {
+                _path = _path.split('/').join('\\');
+            }
 
             if(_path.indexOf(zn.PATH) > -1 || _path.indexOf(zn.ZN_PATH) > -1){
                 return _path;

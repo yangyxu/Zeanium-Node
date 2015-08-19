@@ -34,7 +34,7 @@ zn.define([
                     files.forEach(function(file){
                         if(file.indexOf('.')===-1){
                             var _path = path + file,
-                                _web_config = _path + '/web_config';
+                                _web_config = _path + zn.SLASH + 'web_config';
 
                             zn.info('Loading Path: '+ catalog + file);
 
