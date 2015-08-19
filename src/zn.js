@@ -4,12 +4,61 @@
 var zn = {
     VERSION: '0.0.1',
     DEBUG: false,
+    ZN_PATH: '',
+    PATH: '',
     GLOBAL: (function () { return this; }).call(null)
 };
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = zn;
-    zn.znPath = __dirname;
+    zn.ZN_PATH = __dirname;
+    zn.PATH = process.cwd();
+}else{
+    var _zn_url = '';
+    try{
+        __a__ = __b__;
+    }
+    catch(e){
+        if(e.fileName){   //firefox
+            _zn_url = e.fileName;
+        }
+        else if(e.sourceURL){  //safair
+            _zn_url = e.sourceURL;
+        }
+        else if(e.stacktrace){  //opera
+            console.log(e.stacktrace);
+        }
+        else if(e.stack){  //chrome
+            _zn_url = e.stack.split('\n')[1];
+            _zn_url = _zn_url.replace(/\s/g,"");
+            _zn_url = _zn_url.substring(2, _zn_url.length);
+        }
+        else {
+            console.log(e.toString());
+        }
+    }
+    if(!_zn_url){
+        var _scripts = document.getElementsByTagName("script"),
+            _src = '',
+            _node;
+
+        for(var i = 0 , _len = scripts.length; i < _len; i++){
+            _node = scripts[i];
+            if(_node.getAttribute){
+                _src = _node.getAttribute('src') || '';
+                if (_src.slice(-5) === 'zn.js'||_src.slice(-10) === 'zn.minx.js') {
+                    _zn_url = _src;
+                    break;
+                }
+            }
+        }
+    }
+
+    if(_zn_url){
+        zn.ZN_PATH = _zn_url.substring(0, _zn_url.lastIndexOf('/') + 1);
+    }else {
+        throw new Error('zn.js has not been included, please do it first.');
+    }
 }
 
 zn.GLOBAL.zn = zn;  //set global zn var
@@ -1417,7 +1466,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
 })(zn);
 /**
- * require method
+ * require module
  */
 (function (zn){
 
@@ -1435,7 +1484,8 @@ zn.GLOBAL.zn = zn;  //set global zn var
     var __path = {
         normalizePath: function (path){
             var _paths = path.split(SLASH);
-            var _values = [_paths[0]], _path;
+            var _values = [_paths[0]],
+                _path;
 
             for (var i = 1, _len = _paths.length; i < _len; i++) {
                 _path = _paths[i];
@@ -1460,49 +1510,32 @@ zn.GLOBAL.zn = zn;  //set global zn var
 
             return _values.join(SLASH);
         },
-        formatCurrentPath: function (currPath, parent){
-            var _currPath = currPath,
-                _parentPath = parent ? (parent.get('path')||''): zn.PATH,
-                _slashIndex = _currPath.indexOf(SLASH);
+        formatPath: function (path, parent){
+            var _path = path,
+                _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
+                _slashIndex = _path.indexOf(SLASH);
+
+            if(_path.indexOf(zn.PATH) > -1 || _path.indexOf(zn.ZN_PATH) > -1){
+                return _path;
+            }
+
             if (_slashIndex > 0) {
-                _currPath = _parentPath ? (_parentPath.substring(0, _parentPath.lastIndexOf(SLASH) + 1) + _currPath) : _currPath;
-                _currPath = this.normalizePath(_currPath);
+                _path = _parentPath ? (_parentPath.substring(0, _parentPath.lastIndexOf(SLASH) + 1) + _path) : _path;
             }
             else if (_slashIndex === 0) {
-                _currPath = this.normalizePath(zn.PATH ? (zn.PATH.substring(0, zn.PATH.lastIndexOf(SLASH)) + _currPath) : _currPath);
+                _path = zn.PATH.substring(0, zn.PATH.lastIndexOf(SLASH)) + _path;
             }
             else {
-                if (_doc) {
-                    var _znPath = zn.ZN_JS_PATH;
-                    if(!_znPath){
-                        var _src = '';
-                        if (!_doc.getElementById('zn-js')) {
-                            zn.each(_doc.getElementsByTagName('script'), function (node) {
-                                if(node.getAttribute){
-                                    _src = node.getAttribute('src') || '';
-                                    if (_src.slice(-5) === 'zn.js') {
-                                        return false;
-                                    }
-                                }
-                            });
-                        }
-
-                        if(_src){
-                            _znPath = zn.ZN_JS_PATH =_src;
-                        }else {
-                            throw new Error('zn.js has not been included, please do it first.');
-                        }
-                    }
-
-                    _slashIndex = _znPath.lastIndexOf(SLASH);
-                    _currPath = _znPath.slice(0, _slashIndex >= 0 ? (_slashIndex + 1) : 0) + _currPath; // + '/';
-                }
-                else {
-                    _currPath = './' + _currPath + '/';
-                }
+                _path = zn.ZN_PATH + '/' + _path+'/';
             }
 
-            return _currPath;
+            if(_path.slice(-1) === '/'){
+                _path += 'index.js';
+            }
+
+            _path = this.normalizePath(_path);
+
+            return _path;
         }
     };
 
@@ -1525,12 +1558,9 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 if (path.substring(0, 5) === 'node:') {
                     return callback(require(path.substring(5)));
                 }
-                var _path = __path.formatCurrentPath(path, parent);
-                if(_path.slice(-1) === '/'){
-                    _path += 'index.js';
-                }
+                var _path = __path.formatPath(path, parent),
+                    _module = Module.all[_path];
 
-                var _module = Module.all[_path];
                 if (_module) {
                     _module.load(callback);
                 }
@@ -1639,10 +1669,10 @@ zn.GLOBAL.zn = zn;  //set global zn var
             },
             exec: function (callback){
                 var _argv = process.argv,
-                    _currPath = _argv[1];
+                    _path = _argv[1];
 
                 this.sets({
-                    path: _currPath,
+                    path: _path,
                     status: MODULE_STATUS.LOADING
                 });
 

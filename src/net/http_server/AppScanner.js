@@ -36,7 +36,7 @@ zn.define([
                             var _path = path + file,
                                 _web_config = _path + '/web_config';
 
-                            zn.info('Loading Path: '+catalog+file);
+                            zn.info('Loading Path: '+ catalog + file);
 
                             zn.load(_web_config, function (config){
                                 if(!_appPath[file] && config.controllers){
