@@ -1479,7 +1479,16 @@ zn.GLOBAL.zn = zn;  //set global zn var
             WAITING: 2,
             LOADED: 3
         };
+
     var _doc = zn.GLOBAL.document;
+
+    if(!_doc){
+        var _os = require('os');
+        zn.PLATFORM = _os.platform();
+        if(zn.PLATFORM !== 'darwin') {
+            SLASH = '\\';
+        }
+    }
 
     var __path = {
         normalizePath: function (path){
@@ -1526,10 +1535,10 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 _path = zn.PATH.substring(0, zn.PATH.lastIndexOf(SLASH)) + _path;
             }
             else {
-                _path = zn.ZN_PATH + '/' + _path+'/';
+                _path = zn.ZN_PATH + SLASH + _path + SLASH;
             }
 
-            if(_path.slice(-1) === '/'){
+            if(_path.slice(-1) === SLASH){
                 _path += 'index.js';
             }
 
@@ -1619,7 +1628,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
                     _callback(err);
                 };
 
-                _path = _path.slice(-1) === '/' ? _path + 'index.js' : _path;
+                _path = _path.slice(-1) === SLASH ? _path + 'index.js' : _path;
                 _path = _path.slice(-3).toLowerCase() === '.js' ? _path : _path + '.js';
                 _script.src = _path;
                 //_script.async = false;
