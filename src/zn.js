@@ -1483,12 +1483,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
     var _doc = zn.GLOBAL.document;
 
     if(!_doc){
-        var _os = require('os');
-        zn.PLATFORM = _os.platform();
-        if(zn.PLATFORM !== 'darwin') {
-            SLASH = '\\';
-        }
-        zn.SLASH = SLASH;
+        zn.SLASH = SLASH = require('path').sep;
     }
 
     var __path = {
@@ -1525,8 +1520,12 @@ zn.GLOBAL.zn = zn;  //set global zn var
                 _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
                 _slashIndex = _path.indexOf(SLASH);
 
-            if(zn.PLATFORM !== 'darwin') {
-                _path = _path.split('/').join('\\');
+            console.log('slashIndex: ' + _slashIndex + ', path: ' + _path);
+
+            if(SLASH == '/') {
+                _path = _path.split('\\').join(SLASH);
+            }else {
+                _path = _path.split(SLASH).join('\\');
             }
 
             if(_path.indexOf(zn.PATH) > -1 || _path.indexOf(zn.ZN_PATH) > -1){
