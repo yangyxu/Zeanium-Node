@@ -1521,7 +1521,7 @@ zn.GLOBAL.zn = zn;  //set global zn var
             if(SLASH === '/') {
                 _path = _path.split('\\').join(SLASH);
             }else {
-                _path = _path.split(SLASH).join('\\');
+                _path = _path.split('/').join(SLASH);
             }
 
             var _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
