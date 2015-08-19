@@ -1516,17 +1516,18 @@ zn.GLOBAL.zn = zn;  //set global zn var
             return _values.join(SLASH);
         },
         formatPath: function (path, parent){
-            var _path = path,
-                _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
-                _slashIndex = _path.indexOf(SLASH);
-
-            console.log('slashIndex: ' + _slashIndex + ', path: ' + _path);
+            var _path = path;
 
             if(SLASH == '/') {
                 _path = _path.split('\\').join(SLASH);
             }else {
                 _path = _path.split(SLASH).join('\\');
             }
+
+            var _parentPath = parent ? (parent.get('path')||zn.PATH): zn.PATH,
+                _slashIndex = _path.indexOf(SLASH);
+
+            console.log('slashIndex: ' + _slashIndex + ', path: ' + _path);
 
             if(_path.indexOf(zn.PATH) > -1 || _path.indexOf(zn.ZN_PATH) > -1){
                 return _path;
