@@ -25,9 +25,9 @@ zn.define([
 
                     //console.log($files);
 
-                    response.success($data);
+                    //response.success($data);
 
-                    /*
+
 
 
                     this._collection.find().then(function (data){
@@ -37,7 +37,7 @@ zn.define([
                             response.viewModel('user-list', { users: data }, response);
                             //response.success(data);
                         }
-                    });*/
+                    });
 
                 }
             }

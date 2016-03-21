@@ -2,13 +2,14 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
+    'node:chokidar',
     './controller/index',
     './Request',
     './Response',
     './RequestHandlerManager',
     './AppScanner',
     './handler/CatalogRequestHandler'
-],function (controllers, Request, Response, RequestHandlerManager, AppScanner, CatalogRequestHandler) {
+],function (chokidar, controllers, Request, Response, RequestHandlerManager, AppScanner, CatalogRequestHandler) {
 
     return zn.class('RequestAcceptor', {
         static: true,
@@ -25,12 +26,11 @@ zn.define([
 
                 this._dynamicManager = new RequestHandlerManager(_dynamic);
                 this._staticManager = new RequestHandlerManager(_static);
+                this._config = config;
                 /**scanProject for dynamicManager**/
 
                 this.__getContext = function (){ return config.__context__; }
-                this.__scanProject(config, this._dynamicManager);
-
-                this._config = config;
+                this.__scanProject(this._config, this._dynamicManager);
             },
             accept: function (serverRequest, serverResponse){
                 var _url = serverRequest.url,
@@ -119,6 +119,19 @@ zn.define([
                 }
 
             },
+            __watch: function (){
+                chokidar.watch('.', {
+                    ignored: /[\/\\]\./
+                }).on('raw', function(event, path, details) {
+                    this.__doFileChange(path);
+                }.bind(this));
+            },
+            __doFileChange: function (path){
+                if(path.substr(-3, 3)=='.js'){
+                    this.__scanProject(this._config, this._dynamicManager);
+                    //console.log(path);
+                }
+            },
             __scanProject: function (config, dynamicManager){
                 var _appScanner = new AppScanner(config),
                     _catalog = config.catalog,
@@ -130,7 +143,7 @@ zn.define([
                     _controllers: _appScanner.__convertController(controllers)
                 };
                 dynamicManager.registerApplication(__default);
-
+                this.__watch(config.__dirname + _catalog);
                 /************load apps controllers************/
                 _appScanner.scan(config.__dirname + _catalog, _catalog, function (app){
                     dynamicManager.registerApplication(app);

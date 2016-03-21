@@ -23,6 +23,24 @@ zn.define([
                     this._config = inConfig || 'default';
                 }
             },
+            setDataBase: function (value){
+                this._config.database = value;
+            },
+            execCommand: function (command){
+                var _defer = zn.async.defer();
+                var _connection = this.getConnection();
+                var _result = _connection.command
+                    .query(command)
+                    .then(function (data){
+                        _defer.resolve(data);
+                    }).catch(function (e){
+                        //throw new Error(e.message);
+                    }).finally(function (){
+                        _connection.close();
+                    });
+
+                return _defer.promise;
+            },
             getConnection: function (){
                 return Connection.getConnection(this._config);
             },

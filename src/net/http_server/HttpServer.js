@@ -48,7 +48,11 @@ zn.define([
             },
             __onRequest: function(request, response){
                 this.fire('request',request, response);
-                RequestAcceptor.accept(request, response);
+                try{
+                    RequestAcceptor.accept(request, response);
+                }catch(e){
+                    zn.error(e);
+                }
             },
             __onConnection: function (socket) {
                 this.fire('connection', socket);

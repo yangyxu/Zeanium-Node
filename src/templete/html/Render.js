@@ -23,7 +23,6 @@ zn.define([
         console.log('include: '+value);
     }
 
-
     return zn.class('Render', {
         properties: {
             start: CHARS.BEGIN,
@@ -129,22 +128,30 @@ zn.define([
                     _context = _data;
 
                 var _temp = _analyze[0],
-                    _includes = _analyze[1];
+                    _includes = _analyze[1],
+                    _str = '';
 
                 for(var key in _data){
                     _argvs.push(key);
                     _values.push(_data[key]);
                 }
 
-                var _str = (new Function(_argvs, _temp)).apply(_context, _values).join("");
+                try {
+                    _str = (new Function(_argvs, _temp)).apply(_context, _values).join("");
+                    _str = this.__unescape(_str);
 
-                _str = this.__unescape(_str);
-
-                var _count = Object.keys(_includes).length;
-                if(_count){
-                    this.__loadIncludes(_str, _includes, _context, _count, callback);
-                }else {
+                    var _count = Object.keys(_includes).length;
+                    if(_count){
+                        this.__loadIncludes(_str, _includes, _context, _count, callback);
+                    }else {
+                        callback(_str);
+                    }
+                } catch (e) {
+                    _str = e.toString();
+                    zn.error(_str);
                     callback(_str);
+                } finally {
+
                 }
             },
             __getContext: function (data){

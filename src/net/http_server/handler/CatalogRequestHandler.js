@@ -15,6 +15,7 @@ zn.define([
                 this.super(inConfig);
             },
             doRequest: function (serverRequest, serverResponse, config){
+                console.log('catalog');
                 this.__reset(serverRequest, serverResponse, null);
                 var _req = this.request,
                     _url = _req.url,
@@ -26,7 +27,6 @@ zn.define([
                 if(_filePath.slice(-1) === '/'){
                     _filePath = this.__getIndexPath(_filePath, config.indexs);
                 }
-
                 if(config.mode==='view'){
                     if(_filePath.slice(-1) === '/'||_filePath.indexOf('.') === -1){
                         this.__readDir(_filePath, '_list');
