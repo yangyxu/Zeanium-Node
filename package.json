@@ -20,12 +20,7 @@
     ],
     "author": "yangyxu",
     "license": "MIT",
-    "devDependencies": {
-        "grunt": "~0.4.1",
-        "grunt-contrib": "~0.7.0"
-    },
     "dependencies": {
-        "zeanium":"^1.0.2",
         "formidable": "^1.0.15",
         "mysql": "^2.5.0",
         "websocket": "^1.0.8"
