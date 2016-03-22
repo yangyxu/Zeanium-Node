@@ -1,18 +1,11 @@
 {
-    "core": [
-        "src/core/zn.js",
-        "src/core/builtin.js",
-        "src/core/fix.js",
-        "src/core/class.js",
-        "src/core/require.js"
+    "cache": [
+        "src/cache/Cache.js",
+        "src/cache/CacheManager.js",
+        "src/cache/index.js"
     ],
-    "dom": [
-        "src/dom/Element.js"
-    ],
-    "component": [
-
-    ],
-    "view": [
-
+    "filter": [
+        "src/filter/Filter.js",
+        "src/filter/StringFilter.js"
     ]
 }

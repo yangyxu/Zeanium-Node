@@ -1,9 +1,0 @@
-zn.define([
-
-], function () {
-
-    return {
-
-    }
-
-});
