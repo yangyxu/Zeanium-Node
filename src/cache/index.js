@@ -1,7 +1,7 @@
 zn.define([
     './Cache',
     './CacheManager'
-],function (CacheManager){
+],function (Cache, CacheManager){
 
     return {
         Cache: Cache,
