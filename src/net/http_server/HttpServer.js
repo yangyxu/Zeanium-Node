@@ -49,9 +49,14 @@ zn.define([
             __onRequest: function(request, response){
                 this.fire('request',request, response);
                 try{
+                    response.setHeader("Access-Control-Allow-Origin", "*");
+                    response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+                    response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+                    response.setHeader("X-Powered-By", "zeanium-node@0.0.3");
+                    response.setHeader("Content-Type", "application/json;charset=utf-8");
                     RequestAcceptor.accept(request, response);
                 }catch(e){
-                    zn.error(e);
+                    zn.error('HttpServer line - 59 '+e.message);
                 }
             },
             __onConnection: function (socket) {
