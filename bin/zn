@@ -3,17 +3,23 @@
 'use strict';
 
 var argv = process.argv;
+var info = require('../package.json');
 var exec = require('child_process').exec;
 var _argv2 = argv[2], _argv3 = argv[3];
-
+console.log(info.name + ' v '+info.version);
 switch (_argv2) {
-    case 'create':
+    case 'help':
+        console.log(info);
+        break;
+    case 'init':
         if(_argv3){
-            exec('git clone https://github.com/yangyxu/ZNProjectTemplate.git ' + _argv3, function (err, stdout, stdin){
+            console.log('begin init workspace ' + _argv3 + ' ....');
+            exec('git clone https://github.com/yangyxu/ZNWorkSpaceTemplate.git ' + _argv3, function (err, stdout, stdin){
                 if(err){
                     throw err;
                 }
                 console.log(stdout);
+                console.log('end init workspace ' + _argv3 + ' ....');
                 /*
                 exec('npm install', function (err, stdout, stdin){
                     if(err){
@@ -23,7 +29,28 @@ switch (_argv2) {
                 });*/
             });
         } else {
-            console.log('Project Name is required.');
+            console.log('WorkSpace Name is required.');
+        }
+        break;
+    case 'project':
+        if(_argv3){
+            console.log('begin init project ' + _argv3 + ' ....');
+            exec('git clone https://github.com/yangyxu/ZNProjectTemplate.git ' + _argv3, function (err, stdout, stdin){
+                if(err){
+                    throw err;
+                }
+                console.log(stdout);
+                console.log('end init project ' + _argv3 + ' ....');
+                /*
+                exec('npm install', function (err, stdout, stdin){
+                    if(err){
+                        throw err;
+                    }
+                    console.log(stdout);
+                });*/
+            });
+        } else {
+            console.log('WorkSpace Name is required.');
         }
         break;
     case 'build':
