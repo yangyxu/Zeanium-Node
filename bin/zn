@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var child_process = require('child_process');
+var argv = process.argv;
+var cmd =  argv[0];
+var args = argv.slice(2);
+var dir = path.join(process.cwd(), path.dirname(argv[2]));
+var paths = [];
+var temp = '';
+
+args.unshift(__dirname + '/_zn');
+
+while(temp != dir) {
+    temp = dir;
+    dir = path.dirname(dir);
+    paths.push(path.join(temp, 'node_modules'));
+}
+
+process.env['NODE_PATH'] = paths.join(path.delimiter);
+
+var proc = child_process.spawn(argv[0], args, {
+    env: process.env
+});
+
+proc.stdout.on('data', function (data) {
+  console.log('' + data);
+});
+
+proc.stderr.on('data', function (data) {
+  console.log('' + data);
+});
