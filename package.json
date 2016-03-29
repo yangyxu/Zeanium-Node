@@ -1,6 +1,6 @@
 {
     "name": "zeanium-node",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Zeanium for Node.js.",
     "main": "index.js",
     "directories": {
@@ -30,7 +30,7 @@
     },
     "preferGlobal": "true",
     "bin": {
-        "zeanium-node": "./bin/zn",
-        "zn": "./bin/zn"
+        "zeanium-node": "node ./bin/zn",
+        "zn": "node ./bin/zn"
     }
 }

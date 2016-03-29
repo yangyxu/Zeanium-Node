@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 var path = require('path');
 var argv = process.argv;
 require('../src/zn');
@@ -13,5 +15,5 @@ if (argv.length >= 3) {
     zn.load(file);
 }
 else{
-    console.log('ZN v' + zn.VERSION);
+    console.log('zeanium-node v' + zn.VERSION);
 }
