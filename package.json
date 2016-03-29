@@ -30,7 +30,7 @@
     },
     "preferGlobal": "true",
     "bin": {
-        "zeanium-node": "node ./bin/zn",
-        "zn": "node ./bin/zn"
+        "zeanium-node": "./bin/zn",
+        "zn": "./bin/zn"
     }
 }
