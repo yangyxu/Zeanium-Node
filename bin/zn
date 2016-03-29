@@ -9,7 +9,7 @@ var _argv2 = argv[2], _argv3 = argv[3];
 switch (_argv2) {
     case 'create':
         if(_argv3){
-            exec('git clone https://github.com/yangyxu/Vertjs.git myproject', function (err, stdout, stdin){
+            exec('git clone https://github.com/yangyxu/ZNProjectTemplate.git ' + _argv3, function (err, stdout, stdin){
                 if(err){
                     throw err;
                 }
