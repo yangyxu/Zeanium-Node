@@ -1,12 +1,13 @@
 {
     "name": "zeanium-node",
-    "version": "0.0.5",
-    "description": "",
+    "version": "0.0.6",
+    "description": "Zeanium for Node.js.",
     "main": "index.js",
     "directories": {
         "test": "test"
     },
     "scripts": {
+        "start": "node ./bin/zn",
         "test": "qunit"
     },
     "repository": {
@@ -14,6 +15,8 @@
         "url": "https://github.com/yangyxu/Zeanium-Node.git"
     },
     "keywords": [
+        "cli",
+        "command",
         "Javascript",
         "OOP",
         "Framework"
@@ -24,5 +27,10 @@
         "formidable": "^1.0.15",
         "mysql": "^2.5.0",
         "websocket": "^1.0.8"
+    },
+    "preferGlobal": "true",
+    "bin": {
+        "zeanium-node": "./bin/zn",
+        "zn": "./bin/zn"
     }
 }
