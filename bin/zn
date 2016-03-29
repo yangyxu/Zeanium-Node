@@ -2,4 +2,40 @@
 
 'use strict';
 
-console.log('zeanium-node');
+var argv = process.argv;
+var exec = require('child_process').exec;
+var _argv2 = argv[2], _argv3 = argv[3];
+
+switch (_argv2) {
+    case 'create':
+        if(_argv3){
+            exec('git clone https://github.com/yangyxu/Vertjs.git myproject', function (err, stdout, stdin){
+                if(err){
+                    throw err;
+                }
+                console.log(stdout);
+                /*
+                exec('npm install', function (err, stdout, stdin){
+                    if(err){
+                        throw err;
+                    }
+                    console.log(stdout);
+                });*/
+            });
+        } else {
+            console.log('Project Name is required.');
+        }
+        break;
+    case 'build':
+
+        break;
+    case 'start':
+        exec('node start.js', function (err, stdout, stdin){
+            if(err){
+                throw err;
+            }
+            console.log(stdout);
+        });
+        break;
+
+}
