@@ -86,7 +86,7 @@ zn.define([
                 this.get('serverResponse').write(line, inEncode);
             },
             writePath: function (_path, _encoding){
-                _path = path.normalize(_path);
+                _path = path.normalize(_path).split('?')[0];
                 if(fs.existsSync(_path)){
                     fs.readFile(_path, _encoding, function(err, content){
                         var _ext = _path.split('.').pop();
