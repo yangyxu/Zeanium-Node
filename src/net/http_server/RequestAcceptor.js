@@ -33,8 +33,8 @@ zn.define([
             },
             initHandlerManager: function (config){
                 this._config = config;
-                if(config.currentPath || fs.existsSync(config.webRoot+'web_config.js')){
-                    if(fs.existsSync(config.webRoot+'web_config.js')) {
+                if(config.currentPath || fs.existsSync(config.webRoot+'zn.app.config.js')){
+                    if(fs.existsSync(config.webRoot+'zn.app.config.js')) {
                         this._appScanner.scanProject(config.webRoot, '', function (app){
                             this._urlPrefix = app._deploy;
                             this.registerApplication(app);

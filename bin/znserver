@@ -10,6 +10,8 @@ zn.define([
 
     var argv = process.argv;
     var _argv = {};
+
+    console.log(argv);
     zn.each(argv.slice(1), function (value){
         var _temps = value.split(':');
         _argv[_temps[0]] = _temps[1];
