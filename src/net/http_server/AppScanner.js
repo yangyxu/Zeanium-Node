@@ -19,7 +19,7 @@ zn.define([
             scanProject: function (path, file, onLoadApp){
                 var _self = this,
                     _path = path + file,
-                    _config = _path + zn.SLASH + 'web_config';
+                    _config = _path + zn.SLASH + 'zn.app.config';
 
                 zn.info('Loading Project: '+ _path);
                 zn.load(_config, function (config){

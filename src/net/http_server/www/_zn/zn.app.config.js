@@ -1,6 +1,6 @@
 zn.define({
     deploy: '_zn',
-    controllers: '/controller/',
+    controllers: '/server/controller/',
     views: {
         path: '/view/',
         suffix: 'html'
