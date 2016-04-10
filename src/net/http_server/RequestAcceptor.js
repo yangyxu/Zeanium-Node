@@ -84,7 +84,7 @@ zn.define([
                 for(var key in this._handlerManagers){
                     _handlerManager = this._handlerManagers[key];
                     _match = _handlerManager.match(_url);
-                    zn.info('Do [' + key + '] request handler : ' + _match);
+                    //zn.info('Do [' + key + '] request handler : ' + _match);
                     if(_match){
                         _result = _handlerManager.accept(_req, _res);
                         if(_result!==false){
