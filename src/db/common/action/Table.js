@@ -3,15 +3,10 @@
  */
 zn.define(function () {
 
-    return zn.collection('zn.db.common.collection.Table', {
+    return zn.collection('zn.db.common.action.Table', {
         methods: {
-            init: function (){
-                this.super(Store.getStore({
-                    host: '127.0.0.1',
-                    user: 'root',
-                    password: '123456',
-                    port: 3306
-                }));
+            init: function (inStore){
+                this.super(inStore);
             },
             __getCreateSql: function (table, fields) {
                 var _table = table, _fieldsSql = [], _field = null;
@@ -47,30 +42,8 @@ zn.define(function () {
             dropField: function (table, field){
                 this._store.execCommand('ALTER TABLE ' + table + ' DROP ' + field + ';');
             },
-            useDB: function (db) {
+            usedb: function (db) {
                 this._store.setDataBase(db);
-            },
-            insertRow: function (table, data){
-                var _defer = zn.async.defer();
-                var _connection = this._store.getConnection();
-                var _keys = Object.keys(data).join(','),
-                    _values = Object.values(data).join(',');
-                var _result = _connection.command
-                    .query('insert into {0} ({1}) values ({2});', [table, _keys, _values])
-                    .then(function (data){
-                        _defer.resolve(data.rows);
-                    }).catch(function (e){
-                        throw new Error(e.message);
-                    }).finally(function (){
-                        _connection.close();
-                    });
-                return _defer.promise;
-            },
-            updateRow: function (table, data, condiction){
-
-            },
-            deleteRow: function (table, condiction){
-
             }
         }
     });

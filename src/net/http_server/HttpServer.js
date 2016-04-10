@@ -4,9 +4,10 @@
 zn.define([
     './config/server',
     './RequestAcceptor',
+    './Controller',
     'node:http',
     'node:url',
-],function (config, RequestAcceptor, http, url) {
+],function (config, RequestAcceptor, Controller, http, url) {
 
     return zn.class('HttpServer', {
         statics: {
@@ -30,11 +31,12 @@ zn.define([
                     'uuid': _uuid,
                     'root': _root
                 };
+                _config.webRoot = _config.__dirname + (_config.catalog||'');
+                _config.serverPath = __dirname;
 
                 zn.SERVER_PATH = __dirname;
-
-                RequestAcceptor.initHandlerManager(_config);
                 this.config = _config;
+                RequestAcceptor.initHandlerManager(_config);
                 this.__createServer(_config);
             },
             __createServer: function (config){
@@ -49,19 +51,13 @@ zn.define([
             __onRequest: function(request, response){
                 this.fire('request',request, response);
                 try{
-                    response.setHeader("Access-Control-Allow-Origin", "*");
-                    response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
-                    response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-                    response.setHeader("X-Powered-By", "zeanium-node@0.0.3");
-                    response.setHeader("Content-Type", "application/json;charset=utf-8");
                     RequestAcceptor.accept(request, response);
-                }catch(e){
-                    zn.error('HttpServer line - 59 '+e.message);
+                } catch (e){
+                    zn.error('HttpServer.js  Line - 61 ' + e.message);
                 }
             },
             __onConnection: function (socket) {
-                this.fire('connection', socket);
-                zn.info("connection(idleStart):"+socket._idleStart);
+                //zn.debug("NEW HTTP Connection[ idleStart ]: " + socket._idleStart);
             },
             __onClose: function(){
                 this.fire('close', this);

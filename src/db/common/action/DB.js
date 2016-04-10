@@ -3,15 +3,10 @@
  */
 zn.define(function () {
 
-    return zn.collection('zn.db.common.collection.DB', {
+    return zn.collection('zn.db.common.action.DB', {
         methods: {
-            init: function (){
-                this.super(Store.getStore({
-                    host: '127.0.0.1',
-                    user: 'root',
-                    password: '123456',
-                    port: 3306
-                }));
+            init: function (dbconfig){
+                this.super(Store.getStore(dbconfig));
             },
             create: function (name){
                 return this._store.execCommand('CREATE DATABASE ' + name);
@@ -21,6 +16,9 @@ zn.define(function () {
             },
             show: function (){
                 return this._store.execCommand('SHOW DATABASES;');
+            },
+            use: function (db) {
+                this._store.setDataBase(db);
             }
         }
     });

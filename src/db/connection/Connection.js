@@ -6,15 +6,6 @@ zn.define([
     'node:mysql'
 ],function (MySqlCommand, mysql) {
 
-    var DB_DEFAULT_CONFIG = {
-        dbType:'mysql',
-        host: '127.0.0.1',
-        user: 'test',
-        password: 'test',
-        database:'test',
-        port: 3306
-    };
-
     return zn.class('Connection', {
         statics:{
             getConnection: function (inArgs){
@@ -27,7 +18,11 @@ zn.define([
         },
         methods: {
             init: function (inArgs){
-                var _args = inArgs || DB_DEFAULT_CONFIG;
+                if(!inArgs){
+                    zn.error('zn.db.Connection init method: inArgs is undefined.');
+                    return false;
+                }
+                var _args = inArgs;
                 _args.type = _args.type || 'mysql';
                 this.sets(_args);
                 switch(_args.type.toLowerCase()){
@@ -73,9 +68,10 @@ zn.define([
                 if (err) {
                     // 如果是连接断开，自动重新连接
                     if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+                        zn.info("Reconnet MySql Server");
                         this.__connectMySql(args);
                     } else {
-                        console.error(err.stack || err);
+                        zn.error(err.stack || err);
                     }
                 }
             }

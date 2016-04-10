@@ -5,7 +5,7 @@ zn.define(function () {
     var Async = zn.async;
     var String = zn.format.String;
 
-    return zn.collection('zn.db.common.collection.Tree', {
+    return zn.collection('zn.db.common.action.TreeBackup', {
         methods: {
             init: function (inStore, inModel){
                 this.super(inStore, inModel);

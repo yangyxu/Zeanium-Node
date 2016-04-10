@@ -1,7 +1,7 @@
 {
     "name": "zeanium-node",
-    "version": "0.0.12",
-    "description": "Zeanium for Node.js.",
+    "version": "0.1.1",
+    "description": "Zeanium for Node.js, simple http server and custome your business.",
     "main": "index.js",
     "directories": {
         "test": "test"
@@ -24,13 +24,15 @@
     "author": "yangyxu",
     "license": "MIT",
     "dependencies": {
-        "formidable": "^1.0.15",
+        "formidable": "^1.0.17",
         "mysql": "^2.5.0",
-        "websocket": "^1.0.8"
+        "websocket": "^1.0.8",
+        "chokidar": "^1.4.3"
     },
     "preferGlobal": "true",
     "bin": {
+        "zn": "./bin/zn",
         "zeanium-node": "./bin/zn",
-        "zn": "./bin/zn"
+        "zn-server": "./bin/zn_server"
     }
 }

@@ -1,67 +1,48 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define([
-    './RequestHandler',
-    '../config/mime',
-    'node:path',
-    'node:fs'
-],function (RequestHandler, mime, path, fs) {
+zn.define(function () {
 
-    return zn.class('ResourceRequestHandler', RequestHandler, {
+    return zn.handler('ResourceRequestHandler', {
         properties: {
-            root: ''
+
         },
         methods: {
             init: function (inConfig){
                 this.super(inConfig);
             },
-            doRequest: function (serverRequest, serverResponse, handlerManager){
-                this.__reset(serverRequest, serverResponse, handlerManager);
-                var _req = this.request,
-                    _paths = _req.get('paths'),
+            doRequest: function (request, response){
+                this.super(request, response);
+                var _paths = request.get('paths'),
                     _file = _paths[_paths.length-1];
-                if(!_file){
 
+                if(!_file){
+                    return response.doIndex(), false;
                 }
                 var _ext = _file.split('.')[1],
-                    _project = _paths.shift(),
-                    _defaultAppName = handlerManager.defaultDelopyName,
-                    _self = this;
+                    _project = _paths.shift();
 
-                this.status = 1;
-
-                var _app = this.handlerManager.resolveApplication(_project);
-
+                var _app = this._apps[_project];
                 if(!_app){
-                    return _self.__forward(404, '未找到项目: ' + _project, 'text/html', 'utf8');
+                    return response.writeURL(request.url), false;
                 }
 
-                var _fileName = _paths.join('/'),
-                    _filePath = this.root + '/' + _app['_folder'] + '/' + _fileName;
-                _filePath = path.normalize(_filePath);
+                response.setWebConfig(_app._config);
 
-                var _contentType = mime['.'+_ext] || 'text/plain',
-                    _encode = _contentType==='text/html' ? 'utf8' : 'binary';
-
-                if(!fs.existsSync(_filePath)){
-                    return _self.__forward(404, '未找到资源文件: ' + _fileName, 'text/html', 'utf8');
-                }else {
-                    fs.readFile(_filePath, 'binary', function(err,file){
-                        if(err){
-                            return _self.__forward(500, '服务器请求错误：' + err, 'text/html', 'utf8');
-                        }else {
-                            return _self.__forward(200, file, _contentType, _encode);
-                        }
-                    });
+                if(!_paths.length){
+                    return response.doIndex(), false;
                 }
+
+                return response.writePath(_app._config.root + zn.SLASH + _paths.join('/')), false;
             },
-            __forward: function (statue, body, contentType, encode){
-                this.response.writeHead(200, {
-                    "Content-Type": contentType,
-                    "Content-Length": Buffer.byteLength(body, encode)
-                });
-                this.response.end(body, encode);
+            __200: function (){
+
+            },
+            __404: function (){
+
+            },
+            __500: function (){
+
             }
         }
     });

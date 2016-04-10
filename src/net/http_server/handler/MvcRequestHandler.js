@@ -1,106 +1,91 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define([
-    './RequestHandler'
-],function (RequestHandler) {
+zn.define(function () {
 
-    return zn.class('MvcRequestHandler', RequestHandler, {
+    return zn.handler('MvcRequestHandler', {
         properties: {
 
         },
         methods: {
             init: function (inConfig){
-                this.sets(inConfig);
                 this.super(inConfig);
             },
-            doRequest: function (serverRequest, serverResponse, handlerManager){
-                this.__reset(serverRequest, serverResponse, handlerManager);
-                var _req = this.request,
-                    _res = this.response,
-                    _paths = _req.get('paths'),
-                    _self = this,
-                    _defaultAppName = handlerManager.defaultDelopyName;
-
-                this.status = 1;
-                _res.on('end', function (){
-                    _self.status = 0;
-                });
-
+            doRequest: function (request, response){
+                this.super(request, response);
+                var _paths = request.get('paths');
                 if (!_paths.length){
-                    return this.__forward(_defaultAppName, '_default', '__index', _req, _res);
+                    return this.forword('_zn', '_default', '__index', request, response);
                 }
+
+                console.log('paths, ', _paths);
 
                 switch (_paths.length){
                     case 1:
-                        _req.setErrorMessage("The request miss controller.");
-                        return this.__forward(_defaultAppName, '_error', '__404', _req, _res);
+                        return response.writeURL(request.url), false;
                     case 2:
-                        _req.setErrorMessage("The request miss action.");
-                        return this.__forward(_defaultAppName, '_error', '__404', _req, _res);
+                        return response.writeURL(request.url), false;
                     case 3:
-                        return this.__forward(_paths[0], _paths[1], _paths[2], _req, _res);
+                        return this.forword(_paths[0], _paths[1], _paths[2], request, response);
                 }
             },
-            __forward: function (project, controller, action, req, res){
+            forword: function (project, controller, action, request, response){
                 try{
-                    zn.info('project: ' + project + ', controller: ' + controller + ', action: ' + action);
-                    var _app = this.handlerManager.resolveApplication(project),
-                        _defaultAppName = this.handlerManager.defaultDelopyName,
-                        _self = this;
-
-                    if(!_app){
-                        req.setErrorMessage("The http server can't found the ["+project+"] project.");
-                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
+                    zn.info('MvcRequestHandler forword: { project: ' + project + ', controller: ' + controller + ', action: ' + action+' }');
+                    if(!this._apps){
+                        return response.writeURL(request.url), false;
                     }
+
+                    var _app = this._apps[project];
+                    if(!_app){
+                        return response.writeURL(request.url), false;
+                    }
+
+                    response.setWebConfig(_app._config);
 
                     var _controller = _app['_controllers'][controller];
                     if(!_controller){
-                        req.setErrorMessage("The http server can't found the ["+controller+"] controller.");
-                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
+                        return response.writeURL(request.url), false;
                     }
 
                     var _action = _controller[action];
                     if(!_action){
-                        req.setErrorMessage("The http server can't found the ["+action+"] action.");
-                        return this.__forward(_defaultAppName, '_error', '__404', req, res);
+                        return response.writeURL(request.url), false;
                     }
 
-                    var _webConfig = _controller.config()
-
-                    res._webConfig = _webConfig;
-
-                    req.parse(_webConfig, function (data){
+                    request.parse(function (data){
                         var _meta = _controller.member(action).meta,
-                            _values = _self.__checkMeta(_meta, req, res, _defaultAppName);
+                            _values = this.__checkMeta(_meta, request, response);
 
                         if(!_values){
                             return false;
                         }
-
-                        _action.call(_controller, req, res, _values, req.$post, req.$get, req.$files, data);
-                    });
+                        _action.call(_controller, request, response, _values, request.$post, request.$get, request.$files, data);
+                    }.bind(this));
                 }catch(e){
                     zn.error(e.message);
                     req.setErrorMessage(e.message);
-                    this.__forward(_defaultAppName, '_error', '__404', req, res);
+                    return this.forword('_zn', '_error', '__404', request, response);
                 }
+
+                return false;
             },
-            __checkMeta: function (_meta, req, res, _defaultAppName){
+            __checkMeta: function (_meta, request, response){
                 if(_meta){
-                    var _requestMethod = req.method,
+                    var _requestMethod = request.method,
                         _method = _meta.method || 'GET&POST',
                         _argv = _meta.argv || {};
+
                     if(_method.indexOf(_requestMethod) === -1){
-                        req.setErrorMessage("The allowed request method is [" + _meta.method + "] but not [" + req.method + "].");
-                        this.__forward(_defaultAppName, '_error', '__405', req, res);
+                        request.setErrorMessage("The allowed request method is [" + _meta.method + "] but not [" + request.method + "].");
+                        this.forword('_zn', '_error', '__405', request, response);
                         return false;
                     }
 
-                    return req.checkArgs(_argv, res);
+                    return request.checkArgs(_argv, response);
                 }
 
-                return req.checkArgs({}, res);
+                return request.checkArgs({}, response);
             }
         }
     });

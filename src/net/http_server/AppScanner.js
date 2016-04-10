@@ -13,59 +13,57 @@ zn.define([
 
         },
         methods: {
-            init: function (config){
-                config.apps = {};
-                this._config = config;
+            init: function (){
+                this._appPaths = {};
             },
-            scan: function (path, catalog, onLoadApp){
+            scanProject: function (path, file, onLoadApp){
+                var _self = this,
+                    _path = path + file,
+                    _config = _path + zn.SLASH + 'web_config';
+
+                zn.info('Loading Project: '+ _path);
+                zn.load(_config, function (config){
+                    var _deploy = config.deploy || file || '__ZNDEFAULT__';
+                    var _app = {
+                        _config: config,
+                        _folder: file,
+                        _deploy: _deploy,
+                        _controllers: {}
+                    };
+                    config.root = _path;
+                    if(config.view){
+                        config.view.absolutePath = _path;
+                    }
+                    if(config.controllers){
+                        zn.load(_path + config.controllers, function (controllers){
+                            _app['_controllers'] = _self.__convertController(controllers, config);
+                            onLoadApp(_app);
+                        });
+                    } else {
+                        onLoadApp(_app);
+                    }
+                });
+            },
+            scanWebRoot: function (path, scanHandler){
                 var _defer = Async.defer(),
-                    _onLoadApp = onLoadApp || function (){},
                     _self = this;
 
-                zn.info('Scanning catalog:'+path);
+                zn.info('[ Begin ] Scanning WebRoot:' + path);
 
                 fs.readdir(path, function(err, files){
                     if(err){
                         zn.error(err);
                         return;
                     }
-                    var _apps = [],
-                        _appPath = {};
+                    var _apps = [];
                     files.forEach(function(file){
-                        if(file.indexOf('.')===-1){
-                            var _path = path + file,
-                                _web_config = _path + zn.SLASH + 'web_config';
-
-                            zn.info('Loading Path: '+ catalog + file);
-
-                            zn.load(_web_config, function (config){
-                                if(!_appPath[file] && config.controllers){
-                                    _appPath[file] = _path;
-                                    zn.load(_path+config.controllers, function (controllers){
-
-                                        zn.info('Loading Project: '+config.deploy);
-
-                                        if(config.view){
-                                            config.view.absolutePath = _path;
-                                        }
-
-                                        config.root = _path;
-
-                                        var _app = {
-                                            _folder: file,
-                                            _deploy: config.deploy || file,
-                                            _controllers: _self.__convertController(controllers, config)
-                                        };
-
-                                        _self._config.apps[file] = _app;
-                                        _apps.push(_app);
-                                        _onLoadApp(_app);
-                                    });
-                                }
+                        if(file.indexOf('.') === -1){
+                            _self.scanProject(path, file, function (app){
+                                _apps.push(app);
+                                scanHandler(app);
                             });
                         }
                     });
-
                     _defer.resolve(_apps);
                 });
 

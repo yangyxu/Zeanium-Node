@@ -7,19 +7,13 @@ zn.define(function (fs) {
         properties: {
             mapping: {
                 value: {}
-            },
-            apps: {
-                value: {}
-            },
-            defaultDelopyName: '__default'
+            }
         },
         methods: {
             init: function (args){
-                this.sets(args);
-                zn.extend(this.TArgs, {
-                    root: args.serverRoot
-                });
+                this._TClassArgv = args.TClassArgv;
                 this.super(args);
+                this.sets(args);
             },
             match: function (path){
                 var _mapping = this.get('mapping'),
@@ -36,26 +30,9 @@ zn.define(function (fs) {
                 return false;
             },
             accept: function (request, response){
-                this.__getHandler().doRequest(request, response, this);
+                return this.__getHandler().doRequest(request, response);
             },
-            registerApplication: function (app){
-                var _app = app,
-                    _appName = _app._deploy || this.defaultDelopyName;
-
-                var _appObj = this.resolveApplication(_appName);
-
-                if(_appObj){
-                    zn.extend(_appObj._controllers, _app._controllers);
-                }else{
-                    this.get('apps')[_appName] = _app;
-                }
-
-                zn.info('Register App: '+_appName);
-            },
-            resolveApplication: function (appName){
-                return this.get('apps')[appName];
-            },
-            __getHandler: function (){
+            __getHandler: function (argv){
                 var _handler = this.findOneT(function (handler, index){
                     if(handler.status === 0){
                         return true;
@@ -63,11 +40,10 @@ zn.define(function (fs) {
                 });
 
                 if(!_handler){
-                    _handler = this.push();
+                    _handler = this.push(argv || this._TClassArgv);
                 }
 
                 return _handler;
-
             }
         }
     });

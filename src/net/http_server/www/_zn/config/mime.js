@@ -19,7 +19,7 @@ zn.define({
     ".cab"   : "application/vnd.ms-cab-compressed",
     ".cc"    : "text/x-c",
     ".chm"   : "application/vnd.ms-htmlhelp",
-    ".class" : "application/octet-stream",
+    ".class"   : "application/octet-stream",
     ".com"   : "application/x-msdownload",
     ".conf"  : "text/plain",
     ".cpp"   : "text/x-c",

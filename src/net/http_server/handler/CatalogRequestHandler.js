@@ -1,22 +1,20 @@
 /**
- * Created by yangyxu on 8/20/14.
+ * Created by yangyxu on 8/20/14.  530154382
  */
 zn.define([
-    './RequestHandler',
     '../config/mime',
     '../config/error_message',
     'node:path',
     'node:fs'
-],function (RequestHandler, mime, error_message, path, fs) {
+],function (mime, error_message, path, fs) {
 
-    return zn.class('CatalogRequestHandler', RequestHandler, {
+    return zn.handler('CatalogRequestHandler', {
         methods: {
             init: function (inConfig){
                 this.super(inConfig);
             },
             doRequest: function (serverRequest, serverResponse, config){
-                console.log('catalog');
-                this.__reset(serverRequest, serverResponse, null);
+                console.log('CatalogRequestHandler: ');
                 var _req = this.request,
                     _url = _req.url,
                     _self = this;

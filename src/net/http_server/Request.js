@@ -19,12 +19,13 @@ zn.define([
             serverRequest: null
         },
         methods: {
-            init: function (serverRequest){
+            init: function (serverRequest, config){
                 this._$data = {};
                 this._$post = {};
                 this._$get = {};
                 this._$files = {};
-                this.__setRequest(serverRequest);
+                this._config = config;
+                this.setServerRequest(serverRequest);
             },
             getValue: function (inName) {
                 return this._$data[inName];
@@ -75,17 +76,17 @@ zn.define([
 
                 return this._$data = _values, _values;
             },
-            parse: function (webConfig, callback){
-                this._config = webConfig;
+            parse: function (callback){
                 this.__parseFormData(callback);
             },
-            __setRequest: function (request){
-                if(!request){ return false; }
-                this._serverRequest = request;
-                this.__parseUrlData(request);
+            setServerRequest: function (serverRequest){
+                if(!serverRequest){ return false; }
+                this._serverRequest = serverRequest;
+                this.__parseUrlData(serverRequest);
+
             },
-            __getUploadInfo: function (config){
-                var _config = config || { upload: {}},
+            __getUploadInfo: function (){
+                var _config = this._webConfig,
                     _upload = _config.upload || {},
                     _root = (_config.root || __dirname)+'/uploads/';
 
@@ -100,16 +101,19 @@ zn.define([
             __parseFormData: function (callback){
                 var _self = this,
                     _request = this._serverRequest,
-                    _config = this._config,
-                    _upload = this.__getUploadInfo(_config),
+                    _upload = this.__getUploadInfo(),
                     _incomingForm = new formidable.IncomingForm();
 
                 this._upload = _upload;
                 _incomingForm.uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径
                 _incomingForm.parse(_request,function(error, fields, files){
-                    _self._$post = fields;
-                    _self._$files = files;
-                    callback({ upload: _upload, error: error, fields: fields, files: files });
+                    if(error){
+                        zn.error('Request.js   --  line 110 message:  formidable.IncomingForm parse error.');
+                    } else {
+                        _self._$post = fields;
+                        _self._$files = files;
+                        callback({ upload: _upload, error: error, fields: fields, files: files });
+                    }
                 });
             },
             uploadFile: function (file, upload){

@@ -2,14 +2,16 @@ zn.define([
     './Base',
     './Tag',
     './Tree',
-    './Rights'
-], function (Base, Tag, Tree, Rights) {
+    './Rights',
+    './Attachment'
+], function (Base, Tag, Tree, Rights, Attachment) {
 
     return {
         Base: Base,
         Tag: Tag,
         Tree: Tree,
-        Rights: Rights
+        Rights: Rights,
+        Attachment: Attachment
     }
 
 });

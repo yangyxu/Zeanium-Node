@@ -1,36 +1,39 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define([
-    '../Request',
-    '../Response',
-], function (Request, Response) {
+zn.define(function () {
 
-    return zn.class('RequestHandler', {
+    var RequestHandler = zn.class('RequestHandler', {
         properties: {
             status: 0,
-            handlerManager: null,
-            request: null,
-            response: null
+            root: ''
         },
         methods: {
             init: function (inArgs){
+                this._config = inArgs.config;
+                this._apps = inArgs.apps;
                 this.sets(inArgs);
-                this.request = new Request();
-                this.response = new Response(this.request);
             },
-            doRequest: function (serverRequest, serverResponse, handlerManager){
-                throw new Error('The Class['+this.toString()+' has not implement doRequest(request, response) method.');
-            },
-            __reset: function (serverRequest, serverResponse, handlerManager){
-                this.sets({
-                    status: 0,
-                    handlerManager: handlerManager
-                });
-                this.request.__setRequest(serverRequest);
-                this.response.__setResponse(serverResponse);
+            doRequest: function (request, response) {
+                this._status = 1;
+                response.on('close', function (){
+                    this._status = 0;
+                    zn.info('request closed.');
+                }.bind(this));
             }
         }
     });
+
+    zn.handler = function (){
+        var _args = arguments,
+            _name = _args[0],
+            _meta = _args[1];
+
+        _meta.handler = _name;
+
+        return zn.class(_name, RequestHandler, _meta);
+    }
+
+    return RequestHandler;
 
 });

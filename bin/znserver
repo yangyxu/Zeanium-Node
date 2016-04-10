@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+'use strict';
+var zn = require('../src/zn');
+zn.define([
+    'net',
+    'node:child_process',
+    'node:os',
+    '../package.json'
+], function (net, child_process, os, info) {
+
+    var argv = process.argv;
+    var _argv = {};
+    zn.each(argv.slice(1), function (value){
+        var _temps = value.split(':');
+        _argv[_temps[0]] = _temps[1];
+    });
+
+    net.http.HttpServer.createServer({
+        host: os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0',
+        port: _argv.port || 8080,
+        currentPath: true,
+        catalog: '/',
+        __dirname: __dirname
+    });
+
+}).exec();
