@@ -97,7 +97,10 @@ zn.define([
                         }
                     }.bind(this));
                 } else {
-                    this.writeContent(404, '未找到资源文件: ' + this._request.url, '.html');
+                    if(!this._config.debug){
+                        _path = this._request.url;
+                    }
+                    this.writeContent(404, '未找到资源文件: ' + _path, '.html');
                 }
             },
             writeURL: function (url, encoding){

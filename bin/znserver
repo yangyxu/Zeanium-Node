@@ -19,6 +19,7 @@ zn.define([
         host: os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0',
         port: _argv.port || 8080,
         currentPath: true,
+        debug: true,
         catalog: '/',
         __dirname: __dirname
     });
