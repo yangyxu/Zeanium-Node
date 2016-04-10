@@ -18,8 +18,6 @@ zn.define(function () {
                     return this.forword('_zn', '_default', '__index', request, response);
                 }
 
-                console.log('paths, ', _paths);
-
                 switch (_paths.length){
                     case 1:
                         return response.writeURL(request.url), false;
@@ -31,7 +29,8 @@ zn.define(function () {
             },
             forword: function (project, controller, action, request, response){
                 try{
-                    zn.info('MvcRequestHandler forword: { project: ' + project + ', controller: ' + controller + ', action: ' + action+' }');
+                    //zn.info('MvcRequestHandler forword: { project: ' + project + ', controller: ' + controller + ', action: ' + action+' }');
+
                     if(!this._apps){
                         return response.writeURL(request.url), false;
                     }
