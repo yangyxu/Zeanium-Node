@@ -21,7 +21,7 @@ zn.define([
         currentPath: true,
         debug: true,
         catalog: '/',
-        __dirname: __dirname
+        __dirname: process.cwd() || __dirname
     });
 
 }).exec();
