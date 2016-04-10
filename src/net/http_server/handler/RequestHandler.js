@@ -33,6 +33,7 @@ zn.define(function () {
 
         return zn.class(_name, RequestHandler, _meta);
     }
+    
 
     return RequestHandler;
 
