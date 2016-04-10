@@ -5,9 +5,8 @@ var zn = require('../src/zn');
 zn.define([
     'net',
     'node:child_process',
-    'node:os',
-    '../package.json'
-], function (net, child_process, os, info) {
+    'node:os'
+], function (net, child_process, os) {
 
     var argv = process.argv;
     var _argv = {};
