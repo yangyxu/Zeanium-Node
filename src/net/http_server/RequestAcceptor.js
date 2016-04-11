@@ -125,7 +125,7 @@ zn.define([
                 }.bind(this));
             },
             __initFinished: function(path){
-                this.__watch(path);
+                //this.__watch(path);
                 this.registerHandlerManagers();
                 zn.info(this._config.__context__.root);
             }

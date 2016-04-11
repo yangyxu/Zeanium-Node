@@ -10,9 +10,14 @@ zn.define([
 
     var argv = process.argv;
     var _argv = {};
+    argv = argv.slice(2);
 
-    console.log(argv);
-    zn.each(argv.slice(1), function (value){
+    /*
+    if(argv[0]=='init'){
+        return;
+    }*/
+
+    zn.each(argv, function (value){
         var _temps = value.split(':');
         _argv[_temps[0]] = _temps[1];
     });
@@ -25,5 +30,7 @@ zn.define([
         catalog: '/',
         __dirname: process.cwd() || __dirname
     });
+
+    zn.info('You can press [ control + c ] to stop current zeanium server.');
 
 }).exec();
