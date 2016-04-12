@@ -1,4 +1,5 @@
 zn.define({
+    deploy: '__YourAppName__',
     controllers: '/server/controller/',
     views: {
         path: '/web/view/',
