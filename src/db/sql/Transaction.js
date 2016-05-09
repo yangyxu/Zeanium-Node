@@ -12,11 +12,6 @@ zn.define(function () {
             init: function (pool){
                 this._pool = pool;
                 this._queue = zn.queue({});
-                this._queue.finally(function(){
-                    if(this._connection){
-                        this._connection.release();
-                    }
-                }, this);
             },
             begin: function (){
                 var _self = this;
@@ -62,16 +57,18 @@ zn.define(function () {
 
                 return this;
             },
-            commit: function (callback){
+            commit: function (callback, commit){
                 var _self = this;
                 this._queue.push(function (task, connection, rows, files){
+                    callback && callback(rows, files);
                     connection.query('COMMIT', function (err, rows, files){
+                        connection.release();
                         if(err){
                             _self.rollback();
                         } else {
-                            task.done(connection, rows, files);
+                            _self._queue.clear();
                         }
-                        callback && callback(err, rows, files);
+                        commit && commit(err, rows, files);
                     });
                 }).start();
             },
