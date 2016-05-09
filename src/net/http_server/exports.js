@@ -1,4 +1,6 @@
 zn.define([
-    './HttpServer',
-    './handler/RequestHandler'
+    'db',
+    './handler/RequestHandler',
+    './controller/Controller',
+    './HttpServer'
 ]);

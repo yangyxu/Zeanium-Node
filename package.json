@@ -1,37 +1,38 @@
 {
-    "name": "zeanium-node",
-    "version": "0.1.13",
-    "description": "Zeanium for Node.js, simple http server and custome your business.",
-    "main": "index.js",
-    "directories": {
-        "test": "test"
-    },
-    "scripts": {
-        "start": "node ./bin/zn",
-        "test": "qunit"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/yangyxu/Zeanium-Node.git"
-    },
-    "keywords": [
-        "cli",
-        "command",
-        "Javascript",
-        "OOP",
-        "Framework"
-    ],
-    "author": "yangyxu",
-    "license": "MIT",
-    "dependencies": {
-        "formidable": "^1.0.17",
-        "mysql": "^2.5.0",
-        "chokidar": "^1.4.3"
-    },
-    "preferGlobal": "true",
-    "bin": {
-        "zn": "./bin/zn",
-        "zeanium-node": "./bin/zn",
-        "zn-server": "./bin/znserver"
-    }
+  "name": "zeanium-node",
+  "version": "0.1.13",
+  "description": "Zeanium for Node.js, simple http server and custome your business.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node ./bin/zn",
+    "test": "qunit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yangyxu/Zeanium-Node.git"
+  },
+  "keywords": [
+    "cli",
+    "command",
+    "Javascript",
+    "OOP",
+    "Framework"
+  ],
+  "author": "yangyxu",
+  "license": "MIT",
+  "dependencies": {
+    "casperjs": "^1.1.1",
+    "chokidar": "^1.4.3",
+    "formidable": "^1.0.17",
+    "mysql": "^2.10.2"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "zn": "./bin/zn",
+    "zeanium-node": "./bin/zn",
+    "zn-server": "./bin/znserver"
+  }
 }

@@ -20,26 +20,45 @@ zn.define([
 
     var _htmlRender = new html.Render();
 
-    return zn.class('Response', {
-        events: ['close'],
+    return zn.Class({
+        events: ['end','finish'],
         properties: {
             request: null,
             contentType: 'DEFAULT',
-            serverResponse: null,
-            view: null
+            context: null,
+            applicationContext: {
+                value: null,
+                get: function (){
+                    return this._applicationContext;
+                },
+                set: function (value){
+                    if(value){
+                        this._applicationContext = value;
+                        this.request.applicationContext = value;
+                    }
+                }
+            },
+            serverResponse: {
+                value: null,
+                get: function (){
+                    return this._serverResponse;
+                },
+                set: function (value){
+                    if(!value){ return; }
+                    this._serverResponse = value;
+                    value.setTimeout(12000, function (){
+                        value.end('[ request timeout ]');
+                    });
+                    value.on('finish', function (){
+                        this.fire('finish');
+                    }.bind(this));
+                }
+            }
         },
         methods: {
-            init: function (serverResponse, request){
-                this.setServerResponse(serverResponse);
-                this.set('request', request);
-                this._config = request._config;
-            },
-            setServerResponse: function (serverResponse){
-                this._serverResponse = serverResponse;
-                serverResponse.on('end', function(){
-                    //console.log('end');
-                    this.fire('close', this);
-                }.bind(this));
+            init: function (context, request){
+                this._context = context;
+                this._request = request;
             },
             writeHead: function (httpState, inArgs){
                 var _self = this,
@@ -57,10 +76,10 @@ zn.define([
                     'Content-Type': _self.__getContentType()
                 });
 
-                this.get('serverResponse').writeHead(httpState, _args);
+                this._serverResponse.writeHead(httpState, _args);
             },
             write: function(inData, inEncode){
-                var _req = this.get('request');
+                var _req = this._request;
                 var _callback = _req.getValue('callback'),
                     _data = JSON.stringify(inData);
 
@@ -71,7 +90,7 @@ zn.define([
                 this.writeHead(200, {
                     'Content-Type': CONTENT_TYPE[this.contentType]
                 });
-                this.get('serverResponse').write(_data+'\n\n', inEncode);
+                this._serverResponse.write(_data+'\n\n', inEncode);
             },
             writeContent: function (statue, content, contentType){
                 contentType = contentType.toLowerCase();
@@ -80,10 +99,8 @@ zn.define([
                     "Content-Type": mime[contentType]||'text/plain',
                     "Content-Length": Buffer.byteLength(content, _encode)
                 });
-                this._serverResponse.end(content, _encode);
-            },
-            writeLine: function (line, inEncode){
-                this.get('serverResponse').write(line, inEncode);
+
+                this.end(content, _encode);
             },
             writePath: function (_path, _encoding){
                 _path = path.normalize(_path).split('?')[0];
@@ -91,86 +108,149 @@ zn.define([
                     fs.readFile(_path, _encoding, function(err, content){
                         var _ext = _path.split('.').pop();
                         if(err){
-                            this.writeContent(500, '服务器错误 Error: ' + err.message, '.html');
+                            this.viewModel('_error', {
+                                code: 500,
+                                msg: '服务器错误 Error: ' + err.message,
+                                detail: ''
+                            }, true);
                         }else {
                             this.writeContent(200, content, '.' + _ext);
                         }
                     }.bind(this));
                 } else {
-                    if(!this._config.debug){
-                        _path = this._request.url;
-                    }
-                    this.writeContent(404, '未找到资源文件: ' + _path, '.html');
+                    this.doIndex();
                 }
             },
             writeURL: function (url, encoding){
                 this.writePath(this.__fixBasePath() + url, encoding || 'binary');
             },
             doIndex: function (){
-                var _basePath = this.__fixBasePath(), _path;
-                zn.each(this._config.indexs || [], function (index){
-                    if(fs.existsSync(_basePath + index)){
-                        _path = _basePath + index;
-                        return false;
-                    }
-                });
+                var _basePath = this.__fixBasePath();
+                    _mode = null,
+                    _path = null;
 
-                if(_path){
-                    this.writePath(_path);
+                if(this._applicationContext){
+                    _mode = this._applicationContext._config.mode;
+                    _basePath = _basePath + this._request._uri;
                 } else {
-                    this.viewModel('_welcome', {});
+                    _basePath = _basePath + this._request.url;
+                }
+                _basePath = path.normalize(_basePath);
+                if(!_mode){
+                    _mode = this._context._config.mode;
+                }
+
+                if(_mode=='catalog'){
+                    this.doCatalog(_basePath);
+                } else {
+                    zn.each(this._context._config.indexs || [], function (index){
+                        if(fs.existsSync(_basePath + index)){
+                            _path = _basePath + index;
+                            return false;
+                        }
+                    });
+                    if(_path){
+                        this.writePath(_path);
+                    } else {
+                        if(!this._context._config.debug){
+                            _basePath = this._request.url;
+                        }
+                        this.viewModel('_error', {
+                            code: 404,
+                            msg: '未找到资源文件: ' + _basePath,
+                            detail: ''
+                        }, true);
+                    }
                 }
             },
+            doCatalog: function (src){
+                var _baseURL = path.normalize(this.request._pathname + zn.SLASH);
+                var _dirPath = src || this.__fixBasePath();
+                if(!fs.statSync(_dirPath).isDirectory()){
+                    if(fs.existsSync(_dirPath)){
+                        this.writePath(_dirPath);
+                    }else {
+                        this.viewModel('_error', {
+                            code: 404,
+                            msg: '未找到资源文件: ' + _dirPath,
+                            detail: ''
+                        }, true);
+                    }
+                    return;
+                }
+                fs.readdir(_dirPath, function(err, files){
+                    if(err){
+                        this.viewModel('_error', {
+                            code: 500,
+                            msg: '服务器错误 Error: ' + err.message,
+                            detail: ''
+                        }, true);
+                    }else {
+                        files = files.map(function(file){
+                            if(fs.statSync(path.join(src, file)).isDirectory()){
+                                file = path.basename(file) + zn.SLASH;
+                            }else{
+                                file = path.basename(file);
+                            }
+                            return {
+                                href: _baseURL + file,
+                                name: file
+                            };
+                        });
+                        this.viewModel('_catalog', {
+                            files: files,
+                            title: _baseURL
+                        }, true);
+                    }
+                }.bind(this));
+            },
             end: function (inData, inEncode) {
-                this.get('serverResponse').end(inData, inEncode);
+                this._serverResponse.end(inData, inEncode);
+                this.fire('end', this);
             },
             writeEnd: function (inData, inEncode){
                 this.write(inData, inEncode);
                 this.end();
             },
             success: function (inData, inEncode){
-                var _data = {
-                    response: inData,
-                    code: 1
-                };
-                this.__writeJson(inData, inEncode);
+                this.__writeJson({
+                    result: inData,
+                    status: 200
+                }, inEncode);
             },
             error: function (inData, inEncode){
-                var _data = {
-                    response: inData,
-                    code: 0
-                };
-                this.__writeJson(_data, inEncode);
+                this.__writeJson({
+                    result: inData,
+                    status: 500
+                }, inEncode);
             },
-            forword: function (url){
-                var _sr = this.get('serverResponse');
-                _sr.statusCode = 302;
-                _sr.setHeader("Location", url);
+            forword: function (url, isInternal){
+                this.fire('end', this);
+                var _serverRequest = this.request._serverRequest,
+                    _serverResponse = this._serverResponse;
+                if(isInternal!==false && this.applicationContext){
+                    url = zn.SLASH + this.applicationContext.deploy + zn.SLASH + url;
+                }
+                _serverRequest.url = path.normalize(url);
+                this._context.accept(_serverRequest, _serverResponse);
+            },
+            redirect: function (url){
+                this._serverResponse.statusCode = 302;
+                this._serverResponse.setHeader("Location", url);
                 this.end();
             },
-            setWebConfig: function (webConfig){
-                this._webConfig = webConfig;
-                if(this._request){
-                    this._request._webConfig = webConfig;
+            viewModel: function (view, model, isServerView){
+                var _response = this;
+                this._isServerView = isServerView;
+                zn.extend(model, this._context.gets());
+                if(this.applicationContext){
+                    zn.extend(model, this.applicationContext.gets());
                 }
-            },
-            viewModel: function (view, model){
-                var _response = this,
-                    _config = this._config,
-                    _context = _config.__context__;
-
-                if(this._webConfig) {
-                    _context['contextPath'] = _context['root'] + zn.SLASH + this._webConfig.deploy;
-                }
-
-                zn.extend(model, _context);
-
                 _htmlRender.sets({
                     templete: view,
                     templeteConvert: this.__getTempletePath.bind(this),
                     data: model
                 });
-
                 _htmlRender.toRender(function (data){
                     _response.writeContent(200, data, '.html');
                 });
@@ -182,9 +262,10 @@ zn.define([
                     suffix: 'html'
                 };
 
-                if(this._webConfig){
-                    _view = this._webConfig.view || _view;
-                    _view.absolutePath = this._webConfig.root;
+                if(!this._isServerView && this.applicationContext){
+                    var _config = this.applicationContext._config;
+                    _view = _config.views || _config.view || _view;
+                    _view.absolutePath = _config.root;
                 }
 
                 if(view.indexOf('.') === -1){
@@ -195,7 +276,7 @@ zn.define([
             },
             __writeJson: function (inData, inEncode){
                 inData.version = this.__getServerVersion();
-                this.contentType = 'JSON';
+                //this.contentType = 'JSON';
                 this.writeEnd(inData, inEncode);
             },
             __getContentType: function (type){
@@ -206,10 +287,10 @@ zn.define([
             },
             __fixBasePath: function (){
                 var _basePath = null;
-                if(this._webConfig){
-                    _basePath = this._webConfig.root;
-                } else if(this._config) {
-                    _basePath = this._config.webRoot;
+                if(this._applicationContext){
+                    _basePath = this._applicationContext._config.root;
+                } else if(this._context) {
+                    _basePath = this._context._webPath;
                 }
 
                 return _basePath + zn.SLASH;

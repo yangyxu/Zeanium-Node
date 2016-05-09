@@ -1,6 +1,7 @@
-zn.define(function () {
+zn.define('../action/Tree',function (TreeAction) {
 
-    return zn.class("zn.db.common.model.Tree", zn.db.data.Model, {
+    return zn.Class("zn.db.common.model.Tree", zn.db.data.Model, {
+        action: TreeAction,
         properties: {
             pid: {
                 value: null,
@@ -20,6 +21,12 @@ zn.define(function () {
                 default: '0'
             },
             sons: {
+                value: null,
+                type: ['int', 11],
+                ignore: true,
+                default: '0'
+            },
+            maxCount: {
                 value: null,
                 type: ['int', 11],
                 ignore: true,

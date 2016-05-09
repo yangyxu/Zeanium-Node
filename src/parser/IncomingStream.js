@@ -30,7 +30,7 @@ zn.define([
         StringDecoder = string_decoder.StringDecoder,
         Stream = stream.Stream;
 
-    var IncomingStream = zn.class('zn.parser.IncomingStream', {
+    var IncomingStream = zn.Class('zn.parser.IncomingStream', {
         properties: {
 
         },

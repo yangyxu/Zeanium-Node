@@ -3,37 +3,35 @@
  */
 zn.define(function () {
 
-    return zn.handler('ResourceRequestHandler', {
-        properties: {
-
-        },
+    return zn.RequestHandler('ResourceRequestHandler', {
         methods: {
-            init: function (inConfig){
-                this.super(inConfig);
-            },
             doRequest: function (request, response){
-                this.super(request, response);
+                zn.debug('Resource: ' + request.url);
                 var _paths = request.get('paths'),
-                    _file = _paths[_paths.length-1];
+                    _file = _paths[_paths.length-1],
+                    _project = _paths.shift()||'',
+                    _context = this._context;
 
-                if(!_file){
+                if(request.url===zn.SLASH){
                     return response.doIndex(), false;
                 }
-                var _ext = _file.split('.')[1],
-                    _project = _paths.shift();
 
-                var _app = this._apps[_project];
+                var _app = _context._apps[_project];
                 if(!_app){
                     return response.writeURL(request.url), false;
                 }
 
-                response.setWebConfig(_app._config);
+                response.applicationContext = _app;
+
+                if(!_file){
+                    return response.doIndex(), false;
+                }
 
                 if(!_paths.length){
                     return response.doIndex(), false;
                 }
 
-                return response.writePath(_app._config.root + zn.SLASH + _paths.join('/')), false;
+                return response.writePath(_app._config.root + zn.SLASH + _paths.join(zn.SLASH)), false;
             },
             __200: function (){
 

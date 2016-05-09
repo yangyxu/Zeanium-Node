@@ -1,49 +1,94 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define(function (fs) {
+zn.define(function () {
 
-    return zn.class('RequestHandlerManager', zn.data.TList, {
+    return zn.Class({
         properties: {
-            mapping: {
-                value: {}
-            }
+            handlerClass: null,
+            mapping: null,
+            min: 0,
+            max: 20
         },
         methods: {
-            init: function (args){
-                this._TClassArgv = args.TClassArgv;
-                this.super(args);
-                this.sets(args);
+            init: function (argv, context){
+                this._requests = [];
+                this._handlers = [];
+                this._previous = null;
+                this._next = null;
+                this._context = context;
+                this.sets(argv);
+                var _min = this._min;
+                while (_min>0) {
+                    this.__createHandler();
+                    _min--;
+                }
             },
-            match: function (path){
-                var _mapping = this.get('mapping'),
-                    _paths = _mapping.routs,
-                    _convert = _mapping.convert,
-                    _path = path;
+            match: function (url){
+                var _mapping = this.mapping || function () { return true; };
+                var _result = _mapping(url, this._context, this);
+                if(_result !== false){
+                    _result = true;
+                }
+                return _result;
+            },
+            accept: function (serverRequest, serverResponse){
+                /*
+                var _handler = new this.handlerClass(this._context);
+                _handler.reset(serverRequest, serverResponse);
+                _handler.doRequest(_handler._request, _handler._response, this);*/
+                this._requests.push([serverRequest, serverResponse]);
+                this.doRequest();
+            },
+            doRequest: function (handler){
+                var _size = this._requests.length;
+                //zn.debug('Request Size: ' + _size + ', Handler Size: ' + this._handlers.length);
+                if(!_size){
+                    return;
+                }
+                var _handler = handler || this.__getHandler();
+                if(_handler){
+                    var _request = this._requests.shift();
+                    _handler.reset(_request[0], _request[1]);
+                    _handler.doRequest(_handler._request, _handler._response, this);
+                } else {
+                    this.__createHandler();
+                }
+            },
+            __getHandler: function (){
+                var _handlers = this._handlers,
+                    _handler = null,
+                    _len = _handlers.length;
 
-                for(var i= 0, _len = _paths.length; i < _len; i++){
-                    if(_convert(_paths[i], _path)){
-                        return true;
+                for(var i = 0; i < _len; i++){
+                    _handler = _handlers[i];
+                    if(_handler.status==0){
+                        return _handler;
                     }
                 }
-
-                return false;
-            },
-            accept: function (request, response){
-                return this.__getHandler().doRequest(request, response);
-            },
-            __getHandler: function (argv){
-                var _handler = this.findOneT(function (handler, index){
-                    if(handler.status === 0){
-                        return true;
-                    }
-                });
-
-                if(!_handler){
-                    _handler = this.push(argv || this._TClassArgv);
+                if(_len>this.max-1){
+                    return;
+                } else {
+                    return this.__createHandler();
                 }
-
+            },
+            __createHandler: function (){
+                var _handler = new this.handlerClass(this._context);
+                _handler.on('done', this.__onHandlerDone.bind(this));
+                this._handlers.push(_handler);
                 return _handler;
+            },
+            __onHandlerDone: function (handler){
+                var _hLen = this._handlers.length,
+                    _rLen = this._requests.length;
+                //zn.debug('Finished!  HandlerSize: ' + _hLen + ', RequestSize: ' + _rLen);
+                if((_hLen - _rLen) > 3){
+                    this._handlers.splice(this._handlers.indexOf(handler), 1);
+                    handler.destroy();
+                    handler = null;
+                    delete handler;
+                }
+                this.doRequest(handler);
             }
         }
     });

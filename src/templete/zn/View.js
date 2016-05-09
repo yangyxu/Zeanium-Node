@@ -5,7 +5,7 @@ zn.define([
     'node:fs'
 ],function (fs) {
 
-    return zn.class('View', {
+    return zn.Class({
         properties: {
 
         },

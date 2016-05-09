@@ -23,7 +23,7 @@ zn.define([
         console.log('include: '+value);
     }
 
-    return zn.class('Render', {
+    return zn.Class('Render', {
         properties: {
             start: CHARS.BEGIN,
             end: CHARS.END,
@@ -149,6 +149,7 @@ zn.define([
                 } catch (e) {
                     _str = e.toString();
                     zn.error(_str);
+                    console.log(e.stack);
                     callback(_str);
                 } finally {
 

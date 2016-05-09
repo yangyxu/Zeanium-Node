@@ -3,7 +3,7 @@
  */
 zn.define(function () {
 
-    return zn.class('Schema', {
+    return zn.Class('Schema', {
         statics: {
             getInstance: function (inArgs, context) {
                 return new this(inArgs, context);

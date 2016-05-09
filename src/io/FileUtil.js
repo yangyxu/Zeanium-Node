@@ -6,7 +6,7 @@ zn.define([
     'node:fs'
 ],function (chokidar, fs) {
 
-    return zn.class('FileUtil', {
+    return zn.Class('FileUtil', {
         static: true,
         methods: {
             init: function (){

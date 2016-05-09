@@ -3,7 +3,7 @@
  */
 zn.define(function () {
 
-    return zn.class('Where', {
+    return zn.Class('Where', {
         statics: {
             getInstance: function (inArgs, context) {
                 return new this(inArgs, context);

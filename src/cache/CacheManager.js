@@ -5,7 +5,7 @@ zn.define([
     './Cache'
 ],function (Cache) {
 
-    return zn.class('CacheManager', {
+    return zn.Class('CacheManager', {
         static: true,
         properties: {
             all: []

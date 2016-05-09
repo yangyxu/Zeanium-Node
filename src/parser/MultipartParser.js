@@ -45,7 +45,7 @@ zn.define([
         exports[s] = S[s];
     }
 
-    var MultipartParser = zn.class('zn.parser.MultipartParser', {
+    var MultipartParser = zn.Class('zn.parser.MultipartParser', {
         statics: {
             stateToString: function (stateNumber){
                 for (var state in S) {

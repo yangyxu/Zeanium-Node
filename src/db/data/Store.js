@@ -2,50 +2,61 @@
  * Created by yangyxu on 9/17/14.
  */
 zn.define([
-    '../connection/Connection'
-],function (Connection) {
+    '../mysql/MySqlCommand',
+    '../sql/Transaction',
+    'node:mysql'
+],function (MySqlCommand, Transaction, mysql) {
 
-    var Collection = zn.db.data.Collection;
-
-    var Store = zn.class('zn.db.data.Store', {
+    var Store = zn.Class('zn.db.data.Store', {
         statics: {
             getStore: function (config) {
                 return new this(config);
             }
         },
         properties: {
-
+            command: {
+                readonly: true,
+                get: function (){
+                    return new this._commandClass(this._pool);
+                }
+            }
         },
         methods: {
             init: {
                 auto: true,
                 value: function (inConfig){
-                    this._config = inConfig || 'default';
+                    this._config = inConfig || {};
+                    switch (inConfig.type.toLowerCase()) {
+                        case 'mysql':
+                            this._pool = mysql.createPool(zn.extend({
+                                "dateStrings": true,
+                                "multipleStatements": true
+                            }, inConfig));
+                            this._commandClass = MySqlCommand;
+                            break;
+                        case 'mongo':
+
+                            break;
+                    }
                 }
+            },
+            beginTransaction: function (){
+                return (new Transaction(this._pool)).begin();
             },
             setDataBase: function (value){
                 this._config.database = value;
             },
-            execCommand: function (command){
-                var _defer = zn.async.defer();
-                var _connection = this.getConnection();
-                var _result = _connection.command
-                    .query(command)
-                    .then(function (data){
-                        _defer.resolve(data);
-                    }).catch(function (e){
-                        //throw new Error(e.message);
-                    }).finally(function (){
-                        _connection.close();
-                    });
-
-                return _defer.promise;
+            create: function (name){
+                return this.query('CREATE DATABASE ' + name);
             },
-            getConnection: function (){
-                return Connection.getConnection(this._config);
+            drop: function (){
+                return this.query('DROP DATABASE ' + name);
             },
-            getCollection: function (inModelClass, inCollection){
-                return new (inCollection||Collection)(this, inModelClass);
+            show: function (){
+                return this.query('SHOW DATABASES;');
+            },
+            query: function (sql){
+                return this.command.query(sql);
             },
             createCollection: function (inModelClass) {
                 var _defer = zn.async.defer(),
@@ -54,17 +65,12 @@ zn.define([
 
                 if(true){
                     var _createSql = this.__propertiesToCreateSql(_modelClass);
-                    var _connection = this.getConnection();
-                    var _result = _connection.command
-                        .query("DROP TABLE IF EXISTS "+_modelClass.__getTable()+";")
-                        .then(function (data){
-                            return _connection.command.query(_createSql);
-                        }).then(function (data){
+                    var _result = this.command.query("DROP TABLE IF EXISTS " + _modelClass.__getTable() + ";")
+                        .then(function (data, command){
+                            return command.query(_createSql);
+                        }).then(function (data, command){
                             _defer.resolve(data);
-                        }).catch(function (e){
-                            //throw new Error(e.message);
-                        }).finally(function (){
-                            _connection.close();
+                            command.release();
                         });
                 }else {
                     throw new Error('The type of input model is not db.data.Model.');
@@ -75,102 +81,28 @@ zn.define([
             createCollections: function (modelAry) {
                 this.__createTable(modelAry, this.getConnection());
             },
-            __createTable: function (modelAry, _connection){
+            __createTable: function (modelAry, command){
                 var _modelClass = modelAry.shift(),
                     _self = this;
 
                 if(_modelClass){
-                    var _createSql = this.__propertiesToCreateSql(_modelClass);
-                    var _result = _connection.command
+                    var _createSql = _modelClass.__propertiesToCreateSql();
+                    var _result = (command||this.command)
                         .query("DROP TABLE IF EXISTS "+_modelClass.__getTable()+";")
-                        .then(function (data){
-                            return _connection.command.query(_createSql);
-                        }).then(function (data){
-                            _self.__createTable(modelAry, _connection);
-                        }).catch(function (e){
-                            _connection.close();
-                        });
+                        .then(function (data, command){
+                            return command.query(_createSql);
+                        }).then(function (data, command){
+                            _self.__createTable(modelAry, command);
+                        })
                 }else {
                     _connection.close();
                 }
 
-            },
-            __propertiesToCreateSql: function (_modelClass){
-                var _table = _modelClass.__getTable(),
-                    _fieldsSql = [],
-                    _self = this;
-
-                _modelClass.__getFields(false, function (property, key){
-                    var _propertySql = _self.__propertyToCreateSql(property, key);
-
-                    if(key=='id'){
-                        _fieldsSql.unshift(_propertySql);
-                    }else {
-                        _fieldsSql.push(_propertySql);
-                    }
-                });
-                var _sql = "DROP TABLE IF EXISTS "+_table+";";
-                var _sql = "";
-                _sql += "CREATE TABLE "+_table+" (";
-                _sql += _fieldsSql.join(',');
-                _sql += ") ENGINE=innodb DEFAULT CHARSET=utf8;";
-                return _sql;
-            },
-            __propertyToCreateSql: function (property, key){
-                var _keys = [key],
-                    _typeAry = property.type,
-                    _t1 = _typeAry[0],
-                    _t2 = _typeAry[1];
-
-                _keys.push(_t1+(_t2?'('+_t2+')':''));
-
-                if(property.primary){
-                    property.notNull = true;
-                    _keys.push("PRIMARY KEY");
-                }
-                var _isnull = property.notNull?'NOT NULL':'';
-
-                if(_isnull){
-                    _keys.push(_isnull);
-                }
-                var _default = this.__getDefaultValue(property);
-
-                if(_default){
-                    _keys.push(_default);
-                }
-                var _autoIncrement = property.primary?'AUTO_INCREMENT':'';
-
-                if(_autoIncrement){
-                    _keys.push(_autoIncrement);
-                }
-
-                return _keys.join(' ');
-            },
-            __getDefaultValue: function (property) {
-                if(property.default !== undefined){
-                    var _type = property.type[0], _value = property.default;
-                    switch(_type){
-                        case 'nvarchar':
-                        case 'varchar':
-                            _value = "'"+_value+"'";
-                            break;
-                        case 'date':
-
-                            break;
-                        case 'int':
-
-                            break;
-                    }
-
-                    return 'DEFAULT '+_value;
-                }else {
-                    return null;
-                }
             }
         }
     });
 
-    zn.store = Store;
+    zn.Store = Store;
 
     return Store;
 

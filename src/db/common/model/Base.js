@@ -1,6 +1,7 @@
-zn.define(function () {
+zn.define('../action/Base', function (BaseAction) {
 
-    return zn.class("zn.db.common.model.Base", zn.db.data.Model, {
+    return zn.Class("zn.db.common.model.Base", zn.db.data.Model, {
+        action: BaseAction,
         properties: {
             id: {
                 value: null,

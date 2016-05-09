@@ -3,7 +3,7 @@
  */
 zn.define(function () {
 
-    return zn.class('Filter', {
+    return zn.Class('Filter', {
         properties: {
 
         },

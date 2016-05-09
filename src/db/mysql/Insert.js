@@ -5,7 +5,7 @@ zn.define([
     './Schema'
 ],function (Schema) {
 
-    return zn.class('Insert', Schema, {
+    return zn.Class('Insert', Schema, {
         methods: {
             init: function (args, context){
                 this._fields = [];

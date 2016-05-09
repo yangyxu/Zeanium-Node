@@ -8,7 +8,7 @@ zn.define([
     'node:formidable'
 ],function (url, path, fs, formidable) {
 
-    return zn.class('Request', {
+    return zn.Class({
         events: [ 'data', 'end', 'close' ],
         properties: {
             paths: null,
@@ -16,16 +16,31 @@ zn.define([
             $post: null,
             $get: null,
             $files: null,
-            serverRequest: null
+            context: null,
+            applicationContext: null,
+            serverRequest: {
+                value: null,
+                get: function (){
+                    return this._serverRequest;
+                },
+                set: function (value){
+                    if(!value){ return false; }
+                    this._serverRequest = value;
+                    this._errors = [];
+                    this.__parseUrlData();
+                    //this.__parseRequest();
+                }
+            }
         },
         methods: {
-            init: function (serverRequest, config){
+            init: function (context, serverRequest){
                 this._$data = {};
                 this._$post = {};
                 this._$get = {};
                 this._$files = {};
-                this._config = config;
-                this.setServerRequest(serverRequest);
+                this._errors = [];
+                this._context = context;
+                this.serverRequest = serverRequest;
             },
             getValue: function (inName) {
                 return this._$data[inName];
@@ -34,10 +49,10 @@ zn.define([
                 return this._$data[inKey] = inValue, this;
             },
             getErrorMessage: function (){
-                return this._ERROR_MESSAGE;
+                return this._errors.join('\n');
             },
             setErrorMessage: function (inValue){
-                return this._ERROR_MESSAGE = inValue, this;
+                return this._errors.push(inValue.toString()), this;
             },
             getInt: function (inName) {
                 return +(this.getValue(inName));
@@ -79,14 +94,8 @@ zn.define([
             parse: function (callback){
                 this.__parseFormData(callback);
             },
-            setServerRequest: function (serverRequest){
-                if(!serverRequest){ return false; }
-                this._serverRequest = serverRequest;
-                this.__parseUrlData(serverRequest);
-
-            },
             __getUploadInfo: function (){
-                var _config = this._webConfig,
+                var _config = this.applicationContext._config,
                     _upload = _config.upload || {},
                     _root = (_config.root || __dirname)+'/uploads/';
 
@@ -99,22 +108,32 @@ zn.define([
                 });
             },
             __parseFormData: function (callback){
-                var _self = this,
-                    _request = this._serverRequest,
+                var _request = this._serverRequest,
                     _upload = this.__getUploadInfo(),
                     _incomingForm = new formidable.IncomingForm();
 
                 this._upload = _upload;
                 _incomingForm.uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径
-                _incomingForm.parse(_request,function(error, fields, files){
-                    if(error){
-                        zn.error('Request.js   --  line 110 message:  formidable.IncomingForm parse error.');
-                    } else {
-                        _self._$post = fields;
-                        _self._$files = files;
-                        callback({ upload: _upload, error: error, fields: fields, files: files });
-                    }
-                });
+                if(_request.data){
+                    var _data = _request.data;
+                    this._$post = _data.fields;
+                    this._$files = _data.files;
+                    callback(zn.extend({ upload: _upload }, _data));
+                } else {
+                    _incomingForm.parse(_request,function(error, fields, files){
+                        if(error){
+                            zn.error('Request.js   --  line 110 message:  formidable.IncomingForm parse error.  ' + error.toString());
+                        } else {
+                            _request.data = {
+                                fields: fields,
+                                files: files
+                            };
+                            this._$post = fields;
+                            this._$files = files;
+                            callback({ upload: _upload, fields: fields, files: files });
+                        }
+                    }.bind(this));
+                }
             },
             uploadFile: function (file, upload){
                 var _name = file.path.split(path.sep).pop(),
@@ -160,36 +179,26 @@ zn.define([
                 return _paths;
             },
             __parseRequest: function (){
-                var _self = this;
-                this._dataAry = [];
-                this._dataLength = 0;
-                request.on('data', function (data) {
-                    _self._dataLength += data.length;
-                    _self._dataAry.push(data);
+                var _self = this,
+                    _serverRequest = this._serverRequest;
+
+                _serverRequest.on('data', function (data) {
                     _self.fire('data', data);
                 });
 
-                request.on('end', function () {
-                    var _buffer = new Buffer(_self._dataLength),
-                        _pos = 0;
-                    for (var i = 0, _len = _self._dataAry.length; i < _len; i++) {
-                        _self._dataAry[i].copy(_buffer, _pos);
-                        _pos += _self._dataAry[i].length;
-                    }
-                    _self._dataAry = [];
-                    _self._dataLength = 0;
-                    _self.fire('end', _buffer);
+                _serverRequest.on('end', function () {
+                    _self.fire('end');
                 });
 
-                request.on('close', function(callback){
+                _serverRequest.on('close', function(callback){
                     _self.fire('close', callback);
                 });
             },
-            __parseUrlData: function (request){
-                var _req = request,
-                    _parse = url.parse(_req.url, true);
+            __parseUrlData: function (){
+                var _req = this._serverRequest,
+                    _parse = url.parse(_req.url, true),
+                    _paths = _parse.pathname.split('/');
 
-                var _paths = _parse.pathname.split('/');
                 _paths.shift();
                 if(_paths[0]==''){
                     _paths.shift();
@@ -197,6 +206,7 @@ zn.define([
                 this._$get = _parse.query;
                 this._paths = _paths;
                 this._uri = '/'+_paths.slice(1).join('/');
+                this._pathname = _parse.pathname;
                 zn.extend(this, _req);
             }
         }

@@ -8,7 +8,7 @@ zn.define([
 
     var EventEmitter = events.EventEmitter;
 
-    var OctetParser = zn.class('zn.parser.OctetParser', {
+    var OctetParser = zn.Class('zn.parser.OctetParser', {
         methods: {
             init: function (options){
                 if(!(this instanceof OctetParser)) return new OctetParser(options);

@@ -6,7 +6,7 @@ zn.define([
     'node:mysql'
 ],function (MySqlCommand, mysql) {
 
-    return zn.class('Connection', {
+    return zn.Class('Connection', {
         statics:{
             getConnection: function (inArgs){
                 return new this(inArgs);

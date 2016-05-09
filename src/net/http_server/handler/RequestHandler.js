@@ -1,39 +1,64 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define(function () {
+zn.define([
+    '../Request',
+    '../Response'
+], function (Request, Response) {
 
-    var RequestHandler = zn.class('RequestHandler', {
+    var RequestHandler = zn.Class('RequestHandler', {
+        events: ['init', 'done'],
         properties: {
             status: 0,
-            root: ''
+            context: null,
+            request: null,
+            response: null
         },
         methods: {
-            init: function (inArgs){
-                this._config = inArgs.config;
-                this._apps = inArgs.apps;
-                this.sets(inArgs);
+            init: {
+                auto: true,
+                value: function (context){
+                    this._context = context;
+                    this._request = new Request(context);
+                    this._response = new Response(context, this._request);
+                    this._response.on('end', this.__onFinish.bind(this), this);
+                    this.fire('init');
+                }
             },
-            doRequest: function (request, response) {
+            destroy: function (){
+                this._request.destroy();
+                this._request = null;
+                delete this._request;
+                this._response.destroy();
+                this._response = null;
+                delete this._response;
+                this.super();
+            },
+            reset: function (serverRequest, serverResponse){
+                this._request.serverRequest = serverRequest;
+                this._response.serverResponse = serverResponse;
                 this._status = 1;
-                response.on('close', function (){
-                    this._status = 0;
-                    zn.info('request closed.');
-                }.bind(this));
+            },
+            doRequest: function (request, response, chain) {
+
+            },
+            __onFinish: function (){
+                this._status = 0;
+                this.fire('done', this);
             }
         }
     });
 
-    zn.handler = function (){
+    zn.RequestHandler = function (){
         var _args = arguments,
             _name = _args[0],
             _meta = _args[1];
 
         _meta.handler = _name;
 
-        return zn.class(_name, RequestHandler, _meta);
+        return zn.Class(_name, RequestHandler, _meta);
     }
-    
+
 
     return RequestHandler;
 

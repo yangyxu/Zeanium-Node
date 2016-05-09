@@ -5,7 +5,7 @@ zn.define([
     'node:redis'
 ],function (redis) {
 
-    return zn.class('Cache', {
+    return zn.Class('Cache', {
         properties: {
             ip: '127.0.0.1',
             port: 6379,

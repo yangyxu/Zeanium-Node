@@ -1,11 +1,11 @@
 zn.define([
-    './model/',
-    './action/'
-], function (model, action) {
+    './action/',
+    './model/'
+], function (action, model) {
 
     return {
-        model: model,
-        action: action
+        action: action,
+        model: model
     }
 
 });

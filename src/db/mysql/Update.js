@@ -6,7 +6,7 @@ zn.define([
     './Where'
 ],function (Schema, Where) {
 
-    return zn.class('Update', Schema, {
+    return zn.Class('Update', Schema, {
         methods: {
             init: function (args, context){
                 this._updates = [];

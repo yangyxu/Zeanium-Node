@@ -5,7 +5,7 @@ zn.define([
     './Session'
 ],function (Session) {
 
-    return zn.class('SessionManager', {
+    return zn.Class('SessionManager', {
         static: true,
         properties: {
             all: {},

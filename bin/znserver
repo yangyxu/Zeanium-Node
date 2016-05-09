@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 'use strict';
-var zn = require('../src/zn');
+var zn = require('../src/zn.core.minx');
 zn.define([
     'net',
     'io',

@@ -1,8 +1,13 @@
 zn.define([
-    './'
-],function (http){
+    './model/WFIndex',
+    './model/WFInstance',
+    './model/WFDefinition'
+],function (User, WFInstance, WFDefinition){
 
     return {
-       http: http
+       WFIndex: WFIndex,
+       WFInstance: WFInstance,
+       WFDefinition: WFDefinition
     }
+
 });

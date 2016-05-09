@@ -1,8 +1,7 @@
 zn.define([
-    '../handler/RequestHandler',
-    '../handler/MvcRequestHandler',
+    '../handler/RestfulRequestHandler',
     '../handler/ResourceRequestHandler',
-],function (RequestHandler, MvcRequestHandler, ResourceRequestHandler){
+],function (RestfulRequestHandler, ResourceRequestHandler){
 
     return {
         host: '127.0.0.1',
@@ -12,44 +11,26 @@ zn.define([
         indexs: ['index.html', 'index.htm', 'default.html', 'default.htm'],
         requestHandlers: [
             {
-                name: 'mvc',
+                name: 'restful',
                 min: 0,
                 max: 100,
-                TClass: MvcRequestHandler,
-                TClassArgv: {},
-                mapping: {
-                    routs: [
-                        ''
-                    ],
-                    convert: function (rout, url){
-                        return url.indexOf('.') === -1 && url.split('/').length > 3;
+                handlerClass: RestfulRequestHandler,
+                mapping: function (url, context, handler){
+                    var _routers = context._routers;
+                    if(_routers[url]){
+                        return true;
+                    } else {
+                        return false;
                     }
                 }
             },
             {
                 name: 'resource',
                 min: 0,
-                max: 20,
-                TClass: ResourceRequestHandler,
-                TClassArgv: {},
-                mapping: {
-                    routs: [
-                        '/',
-                        '/resources/*'
-                    ],
-                    convert: function (rout, url){
-                        return true;
-                        /*
-                        if(url.indexOf('.') !== -1){
-                            return true;
-                        }
-                        if(rout.slice(-1)==='*' && url.indexOf(rout.substring(0, rout.length-1)) !== -1){
-                            return true;
-                        }
-                        if(rout === url){
-                            return true;
-                        }*/
-                    }
+                max: 5,
+                handlerClass: ResourceRequestHandler,
+                mapping: function (url, context, handler){
+                    return true;
                 }
             }
         ]

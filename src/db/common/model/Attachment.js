@@ -1,6 +1,6 @@
 zn.define(function () {
 
-    return zn.class("zn.db.common.model.Attachment", zn.db.data.Model, {
+    return zn.Class("zn.db.common.model.Attachment", zn.db.data.Model, {
         properties: {
             files: {
                 value: null,

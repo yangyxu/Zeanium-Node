@@ -1,8 +1,13 @@
 zn.define([
-    './http_server/exports'
-],function (http){
+    './model/User',
+    './model/Role',
+    './model/Group'
+],function (User, Role, Group){
 
     return {
-       http: http
+       User: User,
+       Role: Role,
+       Group: Group
     }
+
 });

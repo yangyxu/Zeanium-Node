@@ -3,13 +3,15 @@
  */
 zn.define([
     './config/server',
-    './RequestAcceptor',
-    './Controller',
-    'node:http',
-    'node:url',
-],function (config, RequestAcceptor, Controller, http, url) {
+    './HttpServerContext',
+    'node:http'
+],function (
+    config,
+    HttpServerContext,
+    http
+) {
 
-    return zn.class('HttpServer', {
+    return zn.Class('HttpServer', {
         statics: {
             createServer: function (inArgs) {
                 return new this(inArgs);
@@ -17,43 +19,34 @@ zn.define([
         },
         events: ['request','connection','close'],
         properties: {
-            config: {}
+            context: null
         },
         methods: {
             init: function (args){
-                var _config = zn.overwrite(args, config),
-                    _uuid = zn.uuid(),
-                    _root = 'http://' + _config.host + ":" + _config.port,
-                    _global_var_prefix = '@';
-
-                _config.__context__ = {
-                    'prefix': _global_var_prefix,
-                    'uuid': _uuid,
-                    'root': _root
-                };
-                _config.webRoot = _config.__dirname + (_config.catalog||'');
-                _config.serverPath = __dirname;
-
-                zn.SERVER_PATH = __dirname;
-                this.config = _config;
-                RequestAcceptor.initHandlerManager(_config);
-                this.__createServer(_config);
+                var _config = zn.overwrite(args, config);
+                this._context = new HttpServerContext({
+                    config: _config,
+                    webPath: process.cwd() + (_config.catalog||''),
+                    serverPath: __dirname
+                });
+                this.__createServer(_config.port, _config.host);
             },
-            __createServer: function (config){
+            __createServer: function (port, host){
                 var _httpServer = new http.Server();
                 _httpServer.addListener('request', this.__onRequest.bind(this));
                 _httpServer.addListener("connection", this.__onConnection.bind(this));
                 _httpServer.addListener("close", this.__onClose.bind(this));
-                _httpServer.listen(config.port, config.host);
+                _httpServer.listen(port, host);
 
                 return _httpServer;
             },
             __onRequest: function(request, response){
-                this.fire('request',request, response);
                 try{
-                    RequestAcceptor.accept(request, response);
+                    this.fire('request',request, response);
+                    this._context.accept(request, response);
                 } catch (e){
                     zn.error('HttpServer.js  Line - 61 ' + e.message);
+                    console.log(e.stack);
                 }
             },
             __onConnection: function (socket) {

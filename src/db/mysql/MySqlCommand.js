@@ -8,17 +8,15 @@ zn.define([
     './Delete'
 ],function (Select, Insert, Update, Delete) {
 
-    var Async = zn.async;
-    var String = zn.format.String;
     var __slice = Array.prototype.slice;
 
-    return zn.class('MySqlCommand', {
+    return zn.Class('MySqlCommand', {
         properties: {
-            connection: null
+            pool: null
         },
         methods: {
-            init: function (inArgs){
-                this.sets(inArgs);
+            init: function (pool){
+                this._pool = pool;
             },
             select: function (){
                 return Select.getInstance(null, this).fields(__slice.call(arguments));
@@ -32,19 +30,24 @@ zn.define([
             delete: function (table){
                 return Delete.getInstance(null, this).from(table);
             },
-            query: function (queryString) {
-                var _defer = Async.defer(),
-                    _query = String.formatString.apply(String, arguments);
+            query: function () {
+                var _defer = zn.async.defer(),
+                    _argv = __slice.call(arguments),
+                    _query = _argv.shift().format(_argv),
+                    _self = this;
 
                 zn.debug(_query);
-                this.get('connection').query(_query, function(err, rows, fields) {
-                    if (err){
-                        zn.error(err.message);
-                        _defer.reject(err);
-                        Async.catch(err);
-                    }else {
-                        _defer.resolve({rows: rows, fields: fields});
-                    }
+                this._pool.getConnection(function (err, connection){
+                    connection.query(_query, function(err, rows, fields) {
+                        if (err){
+                            zn.error(err.message);
+                            _defer.reject(err, _self);
+                            zn.async.catch(err, _self);
+                        }else {
+                            _defer.resolve(rows, fields, _self);
+                        }
+                        connection.release();
+                    });
                 });
 
                 return _defer.promise;

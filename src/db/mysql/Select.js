@@ -6,7 +6,7 @@ zn.define([
     './Where'
 ],function (Schema, Where) {
 
-    return zn.class('Select', Schema, {
+    return zn.Class('Select', Schema, {
         methods: {
             init: function (args, context){
                 this._fields = [];

@@ -5,7 +5,7 @@ zn.define([
     'node:querystring'
 ], function (querystring) {
 
-    var QueryStringParser = zn.class('zn.parser.QueryStringParser', {
+    var QueryStringParser = zn.Class('zn.parser.QueryStringParser', {
         methods: {
             init: function (maxKeys){
                 this._maxKeys = maxKeys;

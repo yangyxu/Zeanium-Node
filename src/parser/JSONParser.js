@@ -7,7 +7,7 @@ zn.define([
 
     var Buffer = buffer.Buffer;
 
-    var JSONParser = zn.class('zn.parser.JSONParser', zn.parser.Parser, {
+    var JSONParser = zn.Class('zn.parser.JSONParser', zn.parser.Parser, {
         methods: {
             init: function (args){
                 this._data = new Buffer('');

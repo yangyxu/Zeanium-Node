@@ -7,7 +7,7 @@ zn.define([
 
     var Cache = cache.Cache;
 
-    return zn.class('Session', Cache, {
+    return zn.Class('Session', Cache, {
         properties: {
 
         },

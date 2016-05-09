@@ -3,7 +3,7 @@
  */
 zn.define(function () {
 
-    var Parser = zn.class('zn.parser.Parser', {
+    var Parser = zn.Class('zn.parser.Parser', {
         events: [ 'write', 'field', 'end'],
         methods: {
             init: function (){

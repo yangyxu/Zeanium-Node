@@ -2,26 +2,21 @@
  * Created by yangyxu on 9/17/14.
  */
 zn.define(function () {
-    var Async = zn.async;
-    var String = zn.format.String;
 
-    return zn.collection('zn.db.common.action.Tree', {
+    return zn.Action({
         methods: {
-            init: function (inStore){
-                this.super(inStore);
-            },
-            addTreeModel: function (table, model){
-                var _defer = Async.defer(),
+            addTreeModel: function (model){
+                var _defer = zn.async.defer(),
                     _self = this;
 
-                var _fields = [], 
+                var _fields = [],
                     _values = [];
                 for(var key in model){
                     _fields.push(key);
                     _values.push(model[key]);
                 }
 
-                var _table = table;
+                var _table = this._ModelClass.__getTable();
                 var _connection = this._store.getConnection();
                 var _result = _connection.command
                     .query('select {0} from {1} where id={2};select max(treeOrder)+1 as treeOrder from {1} where delFlag=0 and pid={2};', ['id,depth,parentPath,treeOrder', _table, model.pid||0])
@@ -54,7 +49,7 @@ zn.define(function () {
 
                 return _defer.promise;
             },
-            deleteTreeModel: function (table, id){
+            deleteById: function (id){
                 var _defer = Async.defer(),
                     _self = this;
 
@@ -71,15 +66,15 @@ zn.define(function () {
                         var _model = data.rows[0];
 
                         if(_model){
-                            var _sql = String.formatString('delete from {0} where id={1};', _table, _model.id),
+                            var _sql = 'delete from {0} where id={1};'.format(_table, _model.id),
                                 _pid = +_model.pid;
 
                             if(_pid){
-                                _sql += String.formatString('update {0} set sons=sons-1 where id={1};', _table, _pid);
-                                _sql += String.formatString('update {0} set treeOrder=treeOrder-1 where treeOrder>{1} and pid={2};', _table, _model.treeOrder, _pid);
+                                _sql += 'update {0} set sons=sons-1 where id={1};'.format(_table, _pid);
+                                _sql += 'update {0} set treeOrder=treeOrder-1 where treeOrder>{1} and pid={2};'.format(_table, _model.treeOrder, _pid);
                             }
 
-                            _sql += String.formatString("delete from {0} where locate(',{1},',parentPath)<>0;", _table, _model.id);
+                            _sql += "delete from {0} where locate(',{1},',parentPath)<>0;".format(_table, _model.id);
 
                             return _connection.command.query(_sql);
                         }
@@ -133,8 +128,8 @@ zn.define(function () {
                                 _newOrder = _count;
                             }
 
-                            var _sql = String.formatString('update {0} set treeOrder={1} where treeOrder={2} and pid={3};', _table, _treeOrder, _newOrder, _model.pid);
-                            _sql += String.formatString('update {0} set treeOrder={1} where id={2};', _table, _newOrder, _model.id);
+                            var _sql = 'update {0} set treeOrder={1} where treeOrder={2} and pid={3};'.format(_table, _treeOrder, _newOrder, _model.pid);
+                            _sql += 'update {0} set treeOrder={1} where id={2};'.format(_table, _newOrder, _model.id);
 
                             return _connection.command.query(_sql);
                         }

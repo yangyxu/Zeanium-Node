@@ -14,7 +14,7 @@ zn.define([
         }
     }
 
-    return zn.class('StringFilter', Filter, {
+    return zn.Class('StringFilter', Filter, {
         properties: {
 
         },

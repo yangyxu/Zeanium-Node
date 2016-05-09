@@ -9,7 +9,7 @@ zn.define([
     var _slice = Array.prototype.slice,
         _concat = Array.prototype.concat;
 
-    return zn.class('Delete', Schema, {
+    return zn.Class('Delete', Schema, {
         methods: {
             init: function (args, context){
                 this._updates = [];

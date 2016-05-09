@@ -5,7 +5,7 @@ zn.define([
     'node:fs'
 ],function (fs) {
 
-    return zn.class('Page', {
+    return zn.Class({
         properties: {
 
         },

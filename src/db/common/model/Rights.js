@@ -1,8 +1,14 @@
-zn.define(function () {
+zn.define('../action/Rights',function (RightsAction) {
 
-    return zn.class("zn.db.common.model.Rights", zn.db.data.Model, {
+    return zn.Class("zn.db.common.model.Rights", zn.db.data.Model, {
+        action: RightsAction,
         properties: {
-            ifRights: {
+            ownerId: {
+                value: null,
+                type: ['int', 11],
+                default: '0'
+            },
+            ifEnabledRights: {
                 value: null,
                 type: ['int', 4],
                 ignore: true,

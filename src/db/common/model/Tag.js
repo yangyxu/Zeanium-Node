@@ -1,6 +1,6 @@
 zn.define(function () {
 
-    return zn.class("zn.db.common.model.Tag", zn.db.data.Model, {
+    return zn.Class("zn.db.common.model.Tag", zn.db.data.Model, {
         properties: {
             oid: {
                 value: null,

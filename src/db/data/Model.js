@@ -3,13 +3,13 @@
  */
 zn.define(function () {
 
-    var Model = zn.class('zn.db.data.Model', {
+    var Model = zn.Class('zn.db.data.Model', {
         statics: {
-            __getTable: function (){
+            getTable: function (){
                 return this.getMeta('table');
             },
-            __getFields: function (ifFilterPrimary, onCheckItem) {
-                var _properties = this.__getProperties(this);
+            getFields: function (ifFilterPrimary, onCheckItem) {
+                var _properties = this.getProperties(this);
                 var _fields = [],
                     _self = this,
                     _onCheckItem = onCheckItem||function (){};
@@ -38,61 +38,98 @@ zn.define(function () {
                         _fields.push(_key);
                     }
                 }
+
                 return _fields;
             },
-            __getProperties: function (modelClass, props) {
-                var _props = props || {},
+            getCreateSql: function (){
+                var _table = this.getTable(),
+                    _fieldsSql = [],
                     _self = this;
 
-                if(!modelClass.getMeta || modelClass._name_=='ZNObject'){
-                    return _props;
+                this.getFields(false, function (property, key){
+                    var _propertySql = _self.__propertyToCreateSql(property, key);
+
+                    if(key=='id'){
+                        _fieldsSql.unshift(_propertySql);
+                    }else {
+                        _fieldsSql.push(_propertySql);
+                    }
+                });
+                var _sql = "DROP TABLE IF EXISTS "+_table+";";
+                var _sql = "";
+                _sql += "CREATE TABLE "+_table+" (";
+                _sql += _fieldsSql.join(',');
+                _sql += ") ENGINE=innodb DEFAULT CHARSET=utf8;";
+                return _sql;
+            },
+            __propertyToCreateSql: function (property, key){
+                var _keys = [key],
+                    _typeAry = property.type,
+                    _t1 = _typeAry[0],
+                    _t2 = _typeAry[1];
+
+                _keys.push(_t1+(_t2?'('+_t2+')':''));
+
+                if(property.primary){
+                    property.notNull = true;
+                    _keys.push("PRIMARY KEY");
+                }
+                var _isnull = property.notNull?'NOT NULL':'';
+
+                if(_isnull){
+                    _keys.push(_isnull);
+                }
+                var _default = this.__getDefaultValue(property);
+
+                if(_default){
+                    _keys.push(_default);
+                }
+                var _autoIncrement = property.primary?'AUTO_INCREMENT':'';
+
+                if(_autoIncrement){
+                    _keys.push(_autoIncrement);
                 }
 
-                zn.extend(_props, modelClass.getMeta('properties'));
-                var _super = modelClass._super_,
-                    _mixins = modelClass._mixins_;
+                return _keys.join(' ');
+            },
+            __getDefaultValue: function (property) {
+                if(property.default !== undefined){
+                    var _type = property.type[0],
+                        _value = property.default;
+                    switch(_type){
+                        case 'nvarchar':
+                        case 'varchar':
+                            _value = "'"+_value+"'";
+                            break;
+                        case 'date':
 
-                if(_super){
-                    zn.extend(_props, _self.__getProperties(_super));
+                            break;
+                        case 'int':
+
+                            break;
+                    }
+
+                    return 'DEFAULT '+_value;
+                }else {
+                    return null;
                 }
-
-                if(_mixins&&_mixins.length){
-                    zn.each(_mixins, function (mixin){
-                        zn.extend(_props, _self.__getProperties(mixin));
-                    });
-                }
-
-                return _props;
             }
         },
         methods: {
             init: {
                 auto: true,
                 value: function (args){
-                    console.log(args);
-                    /*
-                    this._table = this.constructor.__getTable();
-                    this._fields = this.constructor.__getFields();
-                    this.sets(args);*/
+                    this._table = this.constructor.getTable();
+                    this._fields = this.constructor.getFields();
+                    this.sets(args);
                 }
             },
-            toJson: function () {
-                var _self = this,
-                    _data = {};
-
-                zn.each(this._fields, function (field, key){
-                    _data[field] = _self.get(field);
-                });
-
-                return _data;
-            },
             __getInsertFieldsValues: function () {
-                var _self = this,
-                    _kAry = [],
+                var _kAry = [],
                     _vAry = [];
 
-                this.constructor.__getFields(true, function (field, key){
-                    var _value = _self.get(key);
+                this.constructor.getFields(true, function (field, key){
+                    var _value = this.get(key);
                     if(zn.is(_value, 'object')){
                         _value = _value.value;
                     }
@@ -101,14 +138,14 @@ zn.define(function () {
                         _kAry.push(key);
                         _vAry.push(_value);
                     }
-                });
+                }.bind(this));
 
                 return [_kAry, _vAry];
             },
             __getUpdateFieldsValues: function () {
                 var _self = this,
                     _updates = {};
-                this.constructor.__getFields(true, function (field, key){
+                this.constructor.getFields(true, function (field, key){
                     var _value = _self.get(key)||_self.__formatAutoUpdate(field.auto_update);
                     if(_value!=null&&_value!=field.default){
                         _updates[key] = _value;
@@ -128,18 +165,14 @@ zn.define(function () {
         }
     });
 
-    zn.model = function (){
+    zn.Model = function (){
         var _args = arguments,
             _name = _args[0],
             _meta = _args[1];
 
         _meta.table = _name;
-
-        return zn.class(_name, Model, _meta);
+        return zn.Class(_name, Model, _meta);
     }
 
     return Model;
-
-
-
 });

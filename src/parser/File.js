@@ -11,7 +11,7 @@ zn.define([
     var WriteStream = fs.WriteStream,
         EventEmitter = events.EventEmitter;
 
-    var File = zn.class('zn.parser.File', {
+    var File = zn.Class('zn.parser.File', {
         properties: {
             size: 0,
             path: null,
