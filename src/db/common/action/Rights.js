@@ -5,7 +5,7 @@ zn.define(function () {
 
     return zn.Action({
         methods: {
-            pagingForRights: function (table, fields, where){
+            pagingForRights: function (fields, where){
 
             }
         }

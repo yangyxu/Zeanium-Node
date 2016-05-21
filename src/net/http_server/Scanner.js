@@ -128,6 +128,7 @@ zn.define([
                 _controllers = _controllers.map(function (value){ return path + value; });
 
                 var _splitIndex = _controllers.length,
+                    __models = {},
                     __actions = {},
                     __controllers= {};
                 zn.define(_controllers.concat(_models), function (){
@@ -145,10 +146,12 @@ zn.define([
                                     __actions[_table] = _action;
                                 }
                             }
+                            zn.extend(__models, items);
                         } else {
                             zn.extend(__controllers, items);
                         }
                     });
+                    applicationContext.registerModels(__models);
                     applicationContext.registerActions(__actions);
                     applicationContext.registerControllers(__controllers);
                     callback && callback(applicationContext);

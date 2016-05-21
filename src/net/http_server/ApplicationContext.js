@@ -2,8 +2,9 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    'node:path'
-], function (node_path) {
+    'node:path',
+    './controller/ApplicationController'
+], function (node_path, ApplicationController) {
 
     return zn.Class({
         events: ['register'],
@@ -22,11 +23,35 @@ zn.define([
                 this._APP_PATH = appConfig.APP_PATH;
                 this._deploy = appConfig.deploy||'';
                 this._routers = {};
+                this._models = {};
                 this._actions = {};
                 this._controllers = {};
                 this._appContexts= {};
                 this._appRoot = serverContext._root + zn.SLASH + this._deploy;
                 this.__initDBStore(appConfig.databases);
+                this.__registerApplicationController();
+            },
+            __registerApplicationController: function (){
+                var _key = ApplicationController.getMeta('controller') || '';
+                var _controller = new ApplicationController(this, this._stores);
+                var _member,
+                    _router,
+                    _self = this;
+                ApplicationController._methods_.forEach(function (method, index){
+                    _member = ApplicationController.member(method);
+                    if(_member.meta.router!==null){
+                        _router = _member.meta.router || _member.name;
+                        _router = node_path.normalize(zn.SLASH + (_self._deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
+                        _self._routers[_router] = {
+                            controller: _controller,
+                            action: method,
+                            handler: _member,
+                            appContext: _self
+                        };
+                    }
+                });
+
+                //console.log;
             },
             registerApplicationContext: function (appContext){
                 if(appContext){
@@ -34,12 +59,17 @@ zn.define([
                     zn.extend(this._serverContext._routers, appContext._routers);
                 }
             },
+            registerModels: function (models){
+                return zn.extend(this._models, models), this;
+            },
             registerActions: function (actions){
-                zn.extend(this._actions, actions);
+                return zn.extend(this._actions, actions), this;
             },
             registerControllers: function (controllers){
                 zn.extend(this._controllers, controllers);
                 zn.extend(this._routers, this.__convertControllers(controllers));
+
+                return this;
             },
             __convertControllers: function (controllers) {
                 var _config = this._appConfig,
@@ -56,13 +86,16 @@ zn.define([
                     _controller = new controller(_self, _stores);
                     controller._methods_.forEach(function (method, index){
                         _member = controller.member(method);
-                        _router = _member.meta.router || _member.name;
-                        _router = node_path.normalize(zn.SLASH + (_config.deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
-                        _routers[_router] = {
-                            controller: _controller,
-                            action: method,
-                            appContext: _self
-                        };
+                        if(_member.meta.router!==null){
+                            _router = _member.meta.router || _member.name;
+                            _router = node_path.normalize(zn.SLASH + (_config.deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
+                            _routers[_router] = {
+                                controller: _controller,
+                                action: method,
+                                handler: _member,
+                                appContext: _self
+                            };
+                        }
                     });
                 });
 

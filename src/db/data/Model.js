@@ -56,7 +56,7 @@ zn.define(function () {
                     }
                 });
                 var _sql = "DROP TABLE IF EXISTS "+_table+";";
-                var _sql = "";
+                //var _sql = "";
                 _sql += "CREATE TABLE "+_table+" (";
                 _sql += _fieldsSql.join(',');
                 _sql += ") ENGINE=innodb DEFAULT CHARSET=utf8;";

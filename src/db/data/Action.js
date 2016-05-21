@@ -14,6 +14,9 @@ zn.define(function () {
                     this._table = this._ModelClass.getTable();
                 }
             },
+            beginTransaction: function (){
+                return this._store.beginTransaction();
+            },
             insert: function (data){
                 var _fieldsValues = this.fixModel(data).__getInsertFieldsValues();
                 return this._store.command.insert(this._table)

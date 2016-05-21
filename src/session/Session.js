@@ -2,7 +2,7 @@
  * Created by yangyxu on 7/14/15.
  */
 zn.define([
-    'cache'
+    '../cache/index.js'
 ],function (cache) {
 
     var Cache = cache.Cache;

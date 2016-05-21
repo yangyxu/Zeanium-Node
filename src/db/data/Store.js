@@ -58,46 +58,15 @@ zn.define([
             query: function (sql){
                 return this.command.query(sql);
             },
-            createCollection: function (inModelClass) {
-                var _defer = zn.async.defer(),
-                    _self = this,
-                    _modelClass = inModelClass;
-
-                if(true){
-                    var _createSql = this.__propertiesToCreateSql(_modelClass);
-                    var _result = this.command.query("DROP TABLE IF EXISTS " + _modelClass.__getTable() + ";")
-                        .then(function (data, command){
-                            return command.query(_createSql);
-                        }).then(function (data, command){
-                            _defer.resolve(data);
-                            command.release();
-                        });
-                }else {
-                    throw new Error('The type of input model is not db.data.Model.');
-                }
+            createModel: function (inModelClass) {
+                var _defer = zn.async.defer();
+                this.command.query(inModelClass.getCreateSql())
+                    .then(function (data, command){
+                        _defer.resolve(data);
+                        command.release();
+                    });
 
                 return _defer.promise;
-            },
-            createCollections: function (modelAry) {
-                this.__createTable(modelAry, this.getConnection());
-            },
-            __createTable: function (modelAry, command){
-                var _modelClass = modelAry.shift(),
-                    _self = this;
-
-                if(_modelClass){
-                    var _createSql = _modelClass.__propertiesToCreateSql();
-                    var _result = (command||this.command)
-                        .query("DROP TABLE IF EXISTS "+_modelClass.__getTable()+";")
-                        .then(function (data, command){
-                            return command.query(_createSql);
-                        }).then(function (data, command){
-                            _self.__createTable(modelAry, command);
-                        })
-                }else {
-                    _connection.close();
-                }
-
             }
         }
     });

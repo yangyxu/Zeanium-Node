@@ -4,9 +4,10 @@
 zn.define([
     'node:chokidar',
     'node:fs',
+    'node:ioredis',
     './Scanner',
     './RequestAcceptor'
-], function (chokidar, fs, Scanner, RequestAcceptor) {
+], function (chokidar, fs, ioredis, Scanner, RequestAcceptor) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
