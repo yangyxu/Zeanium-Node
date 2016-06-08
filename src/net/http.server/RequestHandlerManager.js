@@ -14,8 +14,6 @@ zn.define(function () {
             init: function (argv, context){
                 this._requests = [];
                 this._handlers = [];
-                this._previous = null;
-                this._next = null;
                 this._context = context;
                 this.sets(argv);
                 var _min = this._min;
@@ -26,18 +24,14 @@ zn.define(function () {
             },
             match: function (url){
                 var _mapping = this.mapping || function () { return true; };
-                var _result = _mapping(url, this._context, this);
-                if(_result !== false){
-                    _result = true;
-                }
-                return _result;
+                return _mapping(url, this._context, this);
             },
-            accept: function (serverRequest, serverResponse){
+            accept: function (serverRequest, serverResponse, chain){
                 /*
                 var _handler = new this.handlerClass(this._context);
                 _handler.reset(serverRequest, serverResponse);
                 _handler.doRequest(_handler._request, _handler._response, this);*/
-                this._requests.push([serverRequest, serverResponse]);
+                this._requests.push([serverRequest, serverResponse, chain]);
                 this.doRequest();
             },
             doRequest: function (handler){
@@ -49,7 +43,7 @@ zn.define(function () {
                 var _handler = handler || this.__getHandler();
                 if(_handler){
                     var _request = this._requests.shift();
-                    _handler.reset(_request[0], _request[1]);
+                    _handler.reset(_request[0], _request[1], _request[2]);
                     _handler.doRequest(_handler._request, _handler._response, this);
                 } else {
                     this.__createHandler();

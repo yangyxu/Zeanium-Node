@@ -1,5 +1,5 @@
 zn.define([
-    './http_server/exports'
+    './http.server/exports'
 ],function (http){
 
     return {

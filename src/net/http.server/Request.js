@@ -18,6 +18,7 @@ zn.define([
             $files: null,
             context: null,
             applicationContext: null,
+            chain: null,
             serverRequest: {
                 value: null,
                 get: function (){
@@ -27,6 +28,7 @@ zn.define([
                     if(!value){ return false; }
                     this._serverRequest = value;
                     this._errors = [];
+                    this._cookie = this.__parseCookie(value.headers.cookie);
                     this.__parseUrlData();
                     //this.__parseRequest();
                 }
@@ -177,6 +179,18 @@ zn.define([
                     _paths.push(this.uploadFile(file));
                 }, this);
                 return _paths;
+            },
+            __parseCookie: function (cookie){
+                var _data = {},
+                    _temp = null,
+                    _cookie = cookie || '';
+
+                _cookie && _cookie.split(';').forEach(function(temp) {
+                    _temp = temp.split('=');
+                    _data[_temp.shift().trim()] = decodeURI(_temp.join('='));
+                });
+
+                return _data;
             },
             __parseRequest: function (){
                 var _self = this,

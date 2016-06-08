@@ -34,8 +34,9 @@ zn.define([
                 delete this._response;
                 this.super();
             },
-            reset: function (serverRequest, serverResponse){
+            reset: function (serverRequest, serverResponse, chain){
                 this._request.serverRequest = serverRequest;
+                this._request.chain = chain;
                 this._response.serverResponse = serverResponse;
                 this._status = 1;
             },

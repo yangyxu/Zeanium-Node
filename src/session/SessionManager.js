@@ -6,16 +6,17 @@ zn.define([
 ],function (Session) {
 
     return zn.Class('SessionManager', {
-        static: true,
         properties: {
-            all: {},
-            counter: 0
+
         },
         methods: {
-            init: function (){
+            init: function (argv){
+                ///console.log();
+            },
+            createSession: function (){
 
             },
-            getSession: function (){
+            getSession: function (sessionid){
                 return new Session();
             }
         }

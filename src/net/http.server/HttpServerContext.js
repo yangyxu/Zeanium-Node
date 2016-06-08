@@ -6,8 +6,9 @@ zn.define([
     'node:fs',
     'node:ioredis',
     './Scanner',
-    './RequestAcceptor'
-], function (chokidar, fs, ioredis, Scanner, RequestAcceptor) {
+    './RequestAcceptor',
+    '../../session/SessionManager'
+], function (chokidar, fs, ioredis, Scanner, RequestAcceptor, SessionManager) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -45,6 +46,7 @@ zn.define([
                 this._uuid = zn.uuid();
                 this._prefix = _config.prefix || '@';
                 this._root = 'http://' + _config.host + ":" + _config.port;
+                this._sessionManager = new SessionManager(_config.session);
                 this._scanner = new Scanner(this);
                 this._requestAcceptor = new RequestAcceptor(this);
                 this.__scanWebPath();

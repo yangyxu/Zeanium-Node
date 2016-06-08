@@ -73,7 +73,8 @@ zn.define([
 
                 _args = zn.overwrite(_args, {
                     'Server-Version': _self.__getServerVersion(),
-                    'Content-Type': _self.__getContentType()
+                    'Content-Type': _self.__getContentType(),
+                    'Set-Cookie': 'SESSIONID=XXX;'
                 });
 
                 this._serverResponse.writeHead(httpState, _args);

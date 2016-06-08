@@ -151,8 +151,6 @@ zn.define([
                     zn.error(_str);
                     console.log(e.stack);
                     callback(_str);
-                } finally {
-
                 }
             },
             __getContext: function (data){

@@ -28,14 +28,14 @@ zn.define([
                 var _url = node_url.parse(serverRequest.url, true).pathname,
                     _handlerManager = null,
                     _result = null,
-                    _match = false;
+                    _chain = false;
 
                 for(var key in this._handlerManagers){
                     _handlerManager = this._handlerManagers[key];
-                    _match = _handlerManager.match(_url);
+                    _chain = _handlerManager.match(_url);
                     //zn.info('Do [' + key + '] request handler : ' + _match);
-                    if(_match){
-                        return _handlerManager.accept(serverRequest, serverResponse);
+                    if(_chain){
+                        return _handlerManager.accept(serverRequest, serverResponse, _chain);
                     }
                 }
                 // TODO:

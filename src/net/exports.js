@@ -1,3 +1,3 @@
 module.exports = {
-    http: require('./http_server/exports')
+    http: require('./http.server/exports')
 }

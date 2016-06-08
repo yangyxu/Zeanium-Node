@@ -1,6 +1,6 @@
 {
   "name": "zeanium-node",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "directories": {
@@ -24,11 +24,14 @@
   "author": "yangyxu",
   "license": "MIT",
   "dependencies": {
-    "casperjs": "^1.1.1",
+    "cheerio": "^0.20.0",
     "chokidar": "^1.4.3",
+    "crypto": "0.0.3",
     "formidable": "^1.0.17",
+    "iconv-lite": "^0.4.13",
     "ioredis": "^1.15.1",
-    "mysql": "^2.10.2"
+    "mysql": "^2.10.2",
+    "request": "^2.72.0"
   },
   "preferGlobal": "true",
   "bin": {

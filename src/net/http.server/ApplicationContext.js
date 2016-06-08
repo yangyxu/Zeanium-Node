@@ -10,6 +10,7 @@ zn.define([
         events: ['register'],
         properties: {
             deploy: null,
+            root: null,
             appRoot: null,
             appConfig: null,
             routers: null,
@@ -27,7 +28,7 @@ zn.define([
                 this._actions = {};
                 this._controllers = {};
                 this._appContexts= {};
-                this._appRoot = serverContext._root + zn.SLASH + this._deploy;
+                this._appRoot = this._root = serverContext._root + zn.SLASH + this._deploy;
                 this.__initDBStore(appConfig.databases);
                 this.__registerApplicationController();
             },
