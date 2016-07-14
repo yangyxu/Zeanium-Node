@@ -2,8 +2,8 @@
  * Created by yangyxu on 7/14/15.
  */
 zn.define([
-    'node:redis'
-],function (redis) {
+    'node:ioredis'
+],function (ioredis) {
 
     return zn.Class('Cache', {
         properties: {
@@ -14,7 +14,7 @@ zn.define([
         methods: {
             init: function (objs){
                 this.sets(objs);
-                this._client = redis.createClient(this.port, this.ip);
+                this._client = ioredis.createClient(this.port, this.ip);
                 this._client.on("connect", this.__onClientConnect.bind(this));
                 this._client.on("error", this.__onClientError);
             },

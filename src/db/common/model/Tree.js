@@ -32,6 +32,11 @@ zn.define('../action/Tree',function (TreeAction) {
                 ignore: true,
                 default: '0'
             },
+            ext: {
+                value: null,
+                type: ['varchar', 200],
+                default: '{}'
+            },
             parentPath: {
                 value: null,
                 type: ['varchar', 250],

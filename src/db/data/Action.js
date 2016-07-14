@@ -24,6 +24,44 @@ zn.define(function () {
                     .values(_fieldsValues[1])
                     .query();
             },
+            select: function (fields, inWhere){
+                var _where = inWhere || {1:1};
+                switch(zn.type(_where)){
+                    case 'number':
+                        _where = {};
+                        _where[this._ModelClass._primary] = inWhere;
+                        break;
+                }
+
+                return this._store.command
+                    .select(fields || this._ModelClass.getFields(false))
+                    .from(this._table)
+                    .where(_where)
+                    .query();
+            },
+            selectOne: function (inWhere, fields){
+                var _defer = zn.async.defer();
+                this.select(fields, inWhere)
+                    .then(function (rows){
+                        _defer.resolve(rows[0]);
+                    });
+
+                return _defer.promise;
+            },
+            paging: function (fields, where, order, pageIndex, pageSize){
+                var _index = pageIndex||1,
+                    _size = 20,
+                    _start = (_index - 1) * _size,
+                    _end = _index * _size;
+
+                return this._store.command
+                    .select(fields || this._ModelClass.getFields(false))
+                    .from(this._table)
+                    .where(where)
+                    .limit(_start, _end)
+                    .orderBy(order)
+                    .query();
+            },
             update: function (data, where){
                 var _model = this.fixModel(data),
                     _primary = this._ModelClass._primary,
@@ -43,21 +81,6 @@ zn.define(function () {
                 return this._store.command
                     .delete(this._table)
                     .where(where||{1:1})
-                    .query();
-            },
-            select: function (fields, inWhere){
-                var _where = inWhere || {1:1};
-                switch(zn.type(_where)){
-                    case 'number':
-                        _where = {};
-                        _where[this._ModelClass._primary] = inWhere;
-                        break;
-                }
-
-                return this._store.command
-                    .select(fields || this._ModelClass.getFields(false))
-                    .from(this._table)
-                    .where(_where)
                     .query();
             },
             fixModel: function (data){

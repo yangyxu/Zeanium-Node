@@ -7,7 +7,6 @@ zn.define(['node:url'], function (node_url) {
         methods: {
             doRequest: function (request, response){
                 try{
-
                     var _url = request.url,
                         _context = this._context,
                         _chain = request.chain;

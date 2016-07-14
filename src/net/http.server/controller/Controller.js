@@ -23,7 +23,7 @@ zn.define(function () {
                     if(_ctor){
                         return new _ctor(_store, _ctor.getMeta('model'));
                     }else {
-                        throw new Error('arguments error: The action for ' + _key + ' is not exist!');
+                        throw new Error('Arguments Error: The action for ' + _key + ' is not exist!');
                     }
                 }
             },

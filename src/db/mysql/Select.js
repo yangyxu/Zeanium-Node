@@ -134,11 +134,11 @@ zn.define([
                         _self._order.push(key+' '+value);
                     });
                 }
+
                 return this;
             },
             limit: function (){
-                this._limit = Array.prototype.slice.call(arguments);
-                return this;
+                return this._limit = Array.prototype.slice.call(arguments), this;
             },
             build: function (){
                 var _table = this._table;
@@ -147,14 +147,14 @@ zn.define([
                 }
                 var _fields = this._fields.join(',')||'*';
                 var _where = this._where.build();
-                _where = _where?' where '+_where:_where;
+                _where = (_where&&_where.length>2) ? (' where ' + _where) : '';
                 var _group = this._group.join(',');
-                _group = _group?' group by '+_group:_group;
+                _group = _group ? (' group by ' + _group) : _group;
                 var _order = this._order.join(',');
-                _order = _order?' order by '+_order:_order;
+                _order = _order ? (' order by ' + _order) : _order;
                 var _limit = this._limit.length?(' limit ' + this._limit[0] + ',' + this._limit[1]):'';
-                var _sql = 'select '+_fields+' from '+ _table + _where + _group + _order + _limit;
-                return this._as?('('+_sql+') as '+this._as):_sql;
+                var _sql = 'select ' + _fields + ' from ' + _table + _where + _group + _order + _limit;
+                return this._as ? ('('+_sql+') as '+this._as) : _sql;
             }
         }
     });

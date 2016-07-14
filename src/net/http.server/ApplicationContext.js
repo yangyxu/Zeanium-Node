@@ -54,6 +54,24 @@ zn.define([
 
                 //console.log;
             },
+            getModels: function (){
+                var _models = {};
+                zn.extend(_models, this._models);
+                zn.each(this._appContexts, function (appContext, index){
+                    zn.extend(_models, appContext.getModels());
+                });
+
+                return _models;
+            },
+            getActions: function (){
+                var _actions = {};
+                zn.extend(_actions, this._actions);
+                zn.each(this._appContexts, function (appContext, index){
+                    zn.extend(_actions, appContext.getActions());
+                });
+
+                return _actions;
+            },
             registerApplicationContext: function (appContext){
                 if(appContext){
                     this._appContexts[appContext._deploy] = appContext;

@@ -5,6 +5,12 @@ zn.define(function () {
 
     return zn.Action({
         methods: {
+            addNode: function (data){
+                return this.addTreeNode(data);
+            },
+            deleteNode: function (where){
+                return this.deleteTreeNode(where);
+            },
             addTreeNode: function (model){
                 var _defer = zn.async.defer();
                 var _model = model||{},

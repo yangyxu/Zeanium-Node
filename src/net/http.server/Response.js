@@ -24,7 +24,7 @@ zn.define([
         events: ['end','finish'],
         properties: {
             request: null,
-            contentType: 'DEFAULT',
+            contentType: 'JSON',
             context: null,
             applicationContext: {
                 value: null,
@@ -60,43 +60,51 @@ zn.define([
                 this._context = context;
                 this._request = request;
             },
-            writeHead: function (httpState, inArgs){
+            writeHead: function (httpStatus, inArgs){
                 var _self = this,
                     _args = inArgs || {};
                 var _crossSetting = {
                     'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'X-Requested-With',
+                    'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
                     'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
-                    'X-Powered-By': 'zeanium-node@version',
+                    'Access-Control-Max-Age': '3600',
+                    'X-Powered-By': 'zeanium-node@1.2.0',
                     'Content-Type': 'application/json;charset=utf-8'
                 };
 
                 _args = zn.overwrite(_args, {
                     'Server-Version': _self.__getServerVersion(),
-                    'Content-Type': _self.__getContentType(),
-                    'Set-Cookie': 'SESSIONID=XXX;'
-                });
+                    'Content-Type': _self.__getContentType()
+                }, _crossSetting);
 
-                this._serverResponse.writeHead(httpState, _args);
+                if(this._request._session){
+                    _args['Set-Cookie'] = this._request._session.serialize()
+                }
+
+                this._serverResponse.writeHead(httpStatus, _args);
             },
             write: function(inData, inEncode){
                 var _req = this._request;
                 var _callback = _req.getValue('callback'),
-                    _data = JSON.stringify(inData);
+                    _data = inData;
+                if(typeof _data === 'object'){
+                    _data = JSON.stringify(inData, null, '    ');
+                }
 
                 if(_callback){
                     _data = _callback+'('+_data+')';
                     this.contentType = 'JAVASCRIPT';
                 }
+
                 this.writeHead(200, {
                     'Content-Type': CONTENT_TYPE[this.contentType]
                 });
-                this._serverResponse.write(_data+'\n\n', inEncode);
+                this._serverResponse.write(_data, inEncode);
             },
-            writeContent: function (statue, content, contentType){
+            writeContent: function (status, content, contentType){
                 contentType = contentType.toLowerCase();
                 var _encode = (contentType=='.html'||contentType=='.htm') ? 'utf8' : 'binary';
-                this._serverResponse.writeHead(statue, {
+                this.writeHead(status, {
                     "Content-Type": mime[contentType]||'text/plain',
                     "Content-Length": Buffer.byteLength(content, _encode)
                 });

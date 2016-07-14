@@ -37,7 +37,6 @@ zn.define([
                 _httpServer.addListener("connection", this.__onConnection.bind(this));
                 _httpServer.addListener("close", this.__onClose.bind(this));
                 _httpServer.listen(port, host);
-
                 return _httpServer;
             },
             __onRequest: function(request, response){

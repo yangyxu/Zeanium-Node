@@ -1,30 +1,41 @@
 /**
  * Created by yangyxu on 7/14/15.
  */
-zn.define([
-    '../cache/index.js'
-],function (cache) {
+zn.define(['node:crypto'], function (crypto) {
 
-    var Cache = cache.Cache;
-
-    return zn.Class('Session', Cache, {
+    return zn.Class('Session', {
         properties: {
-
+            id: null,
+            name: null,
+            cookie: null
         },
         methods: {
-            init: function (objs){
-                this.sets(objs);
-                this.super(objs);
+            init: function (name, cookie){
+                this.updateId();
+                this._name = name;
+                this._cookie = cookie||{};
             },
-            serialize: function (name, value, option){
-                var _pairs = [name + '=' + encodeURIComponent(value)];
-                var _option = option || {};
-                if (_option.maxAge) _pairs.push('Max-Age=' + _option.maxAge);
-                if (_option.domain) _pairs.push('Domain=' + _option.domain);
-                if (_option.path) _pairs.push('Path=' + _option.path);
-                if (_option.expires) _pairs.push('Expires=' + _option.expires);
-                if (_option.httpOnly) _pairs.push('HttpOnly');
-                if (_option.secure) _pairs.push('Secure');
+            setCookie: function (key, value){
+                this._cookie[key] = value;
+            },
+            generateId: function (){
+                var _currDate = (new Date()).valueOf().toString(),
+                    _random = Math.random().toString();
+                return crypto.createHash('sha1').update(_currDate + _random).digest('hex');
+            },
+            updateId: function (){
+                this._id = this.generateId();
+            },
+            serialize: function (){
+                var _pairs = [this._name + '=' + encodeURIComponent(this._id)];
+                var _cookie = this._cookie;
+                if (_cookie.maxAge) _pairs.push('Max-Age=' + _cookie.maxAge);
+                if (_cookie.domain) _pairs.push('Domain=' + _cookie.domain);
+                if (_cookie.path) _pairs.push('Path=' + _cookie.path);
+                if (_cookie.expires) _pairs.push('Expires=' + _cookie.expires);
+                if (_cookie.httpOnly) _pairs.push('HttpOnly');
+                if (_cookie.secure) _pairs.push('Secure');
+
 
                 return _pairs.join('; ');
             }

@@ -5,10 +5,12 @@ zn.define([
     'node:chokidar',
     'node:fs',
     'node:ioredis',
+    'node:os',
+    'node:path',
     './Scanner',
     './RequestAcceptor',
-    '../../session/SessionManager'
-], function (chokidar, fs, ioredis, Scanner, RequestAcceptor, SessionManager) {
+    '../../session/MemorySessionManager'
+], function (chokidar, fs, ioredis, os, path, Scanner, RequestAcceptor, MemorySessionManager) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -30,7 +32,6 @@ zn.define([
             prefix: null,
             webPath: null,
             serverPath: null
-            //requestAcceptor: null
         },
         methods: {
             init: function (args){
@@ -46,12 +47,13 @@ zn.define([
                 this._uuid = zn.uuid();
                 this._prefix = _config.prefix || '@';
                 this._root = 'http://' + _config.host + ":" + _config.port;
-                this._sessionManager = new SessionManager(_config.session);
+                this._sessionManager = new MemorySessionManager(_config.session);
                 this._scanner = new Scanner(this);
                 this._requestAcceptor = new RequestAcceptor(this);
                 this.__scanWebPath();
             },
             accept: function (serverRequest, serverResponse){
+                serverRequest.url = path.normalize(serverRequest.url);
                 this._requestAcceptor.accept(serverRequest, serverResponse);
             },
             matchRouter: function (url){
@@ -116,6 +118,18 @@ zn.define([
                 if(path){
                     //this.__watch(path);
                 }
+                var _interfaces = os.networkInterfaces(),
+                    _interface = null,
+                    _config = this._config;
+                for(var key in _interfaces){
+                    _interface = _interfaces[key];
+                    _interface.forEach(function (value, index){
+                        if(value.family == 'IPv4'){
+                            zn.info('http://' + value.address + ":" + _config.port);
+                        }
+                    });
+                }
+
                 zn.info(this._root);
                 this.fire('loaded');
             }

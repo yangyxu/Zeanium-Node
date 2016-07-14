@@ -19,6 +19,7 @@ zn.define([
             context: null,
             applicationContext: null,
             chain: null,
+            session: null,
             serverRequest: {
                 value: null,
                 get: function (){
@@ -28,7 +29,7 @@ zn.define([
                     if(!value){ return false; }
                     this._serverRequest = value;
                     this._errors = [];
-                    this._cookie = this.__parseCookie(value.headers.cookie);
+                    this.__doSession();
                     this.__parseUrlData();
                     //this.__parseRequest();
                 }
@@ -44,8 +45,22 @@ zn.define([
                 this._context = context;
                 this.serverRequest = serverRequest;
             },
+            getJSON: function (inName){
+                var _value = this.getValue(inName);
+                if(_value){
+                    return JSON.parse(_value);
+                }else {
+                    //throw new Error('The parameter is not exist!');
+                    zn.error('Request.js line:54 The value of ' + inName + ' is ' + this.getValue(inName) + ', it is not json format.');
+                    return {};
+                }
+            },
             getValue: function (inName) {
-                return this._$data[inName];
+                if(inName){
+                    return this._$data[inName];
+                } else {
+                    return this._$data;
+                }
             },
             setValue: function (inKey, inValue){
                 return this._$data[inKey] = inValue, this;
@@ -71,7 +86,7 @@ zn.define([
                     _defaultValue = args[_key];
                     _newValue = _values[_key];
 
-                    if (_defaultValue === undefined && _newValue === undefined){
+                    if (_defaultValue == undefined && _newValue === undefined){
                         response.error('The value of ' + _key + ' is Required.');
                         return false;
                     }
@@ -80,7 +95,7 @@ zn.define([
                         var _value = _defaultValue.value,
                             _reg = _defaultValue.regexp;
 
-                        if(!_reg.test(_value)){
+                        if(_reg && !_reg.test(_value)){
                             response.error('The value of ' + _key + ' is Invalid.');
                             return false;
                         }
@@ -91,10 +106,30 @@ zn.define([
                     }
                 }
 
+                //TODO: This have to discuss
+                if(this._session&&this._session.user){
+                    _values.$userId = this._session.user.id;
+                }
+
                 return this._$data = _values, _values;
             },
             parse: function (callback){
                 this.__parseFormData(callback);
+            },
+            __doSession: function (){
+                this._cookie = this.__parseCookie(this._serverRequest.headers.cookie);
+                if(this._cookie){
+                    var _value = this._cookie[this._context._sessionManager.name];
+                    this._session = this._context._sessionManager.getSession(_value);
+                    if(!this._session){
+                        this._session = this._context._sessionManager.createSession();
+                    }
+                } else {
+                    this._session = this._context._sessionManager.createSession();
+                }
+
+                this._session.cookie.maxAge = this._session.cookie.maxAge || 3600000;
+                this._session.cookie.expires = new Date(Date.now() + this._session.cookie.maxAge);
             },
             __getUploadInfo: function (){
                 var _config = this.applicationContext._config,

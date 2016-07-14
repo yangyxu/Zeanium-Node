@@ -7,17 +7,15 @@ zn.define([
 
     return zn.Class('SessionManager', {
         properties: {
-
+            name: null,
+            cookie: null
         },
         methods: {
-            init: function (argv){
-                ///console.log();
+            init: function (config){
+                this.sets(config);
             },
-            createSession: function (){
-
-            },
-            getSession: function (sessionid){
-                return new Session();
+            __createSession: function (cookie){
+                return new Session(this.name, zn.overwrite(cookie||{}, this.cookie));
             }
         }
     });

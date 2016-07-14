@@ -1,11 +1,9 @@
 zn.define([
-    './Session',
-    './SessionManager'
-],function (Session, SessionManager){
+    './MemorySessionManager'
+],function (MemorySessionManager){
 
     return {
-        Session: Session,
-        SessionManager: SessionManager
+        MemorySessionManager: MemorySessionManager
     }
 
 });
