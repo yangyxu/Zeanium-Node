@@ -24,20 +24,23 @@ zn.define([
         methods: {
             init: function (args){
                 var _config = zn.overwrite(args, config);
-                this._context = new HttpServerContext({
-                    config: _config,
-                    webPath: process.cwd() + (_config.catalog||''),
-                    serverPath: __dirname
-                });
-                this.__createServer(_config.port, _config.host);
+                this.__createHttpServer(_config.port, _config.host);
+                this.__createHttpServerContext(_config);
             },
-            __createServer: function (port, host){
+            __createHttpServer: function (port, host){
                 var _httpServer = new http.Server();
                 _httpServer.addListener('request', this.__onRequest.bind(this));
                 _httpServer.addListener("connection", this.__onConnection.bind(this));
                 _httpServer.addListener("close", this.__onClose.bind(this));
                 _httpServer.listen(port, host);
                 return _httpServer;
+            },
+            __createHttpServerContext: function (config){
+                this._context = new HttpServerContext({
+                    config: config,
+                    webPath: process.cwd() + (config.catalog||''),
+                    serverPath: __dirname
+                });
             },
             __onRequest: function(request, response){
                 try{

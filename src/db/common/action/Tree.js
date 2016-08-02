@@ -57,12 +57,12 @@ zn.define(function () {
                 var _where = where||{},
                     _table = this._table;
 
-                /*
                 if(zn.is(_where, 'number')){
                     _where = { id: _where };
-                }*/
+                }
+
                 this.beginTransaction()
-                    .query('select {0} from {1} where id={2};'.format('id,pid,treeOrder', _table, _where))
+                    .query(zn.sql.select('id,pid,treeOrder').from(_table).where(_where).build())
                     .query('delete', function (sql, rows, fields, tran){
                         var _model = rows[0];
                         if(_model){

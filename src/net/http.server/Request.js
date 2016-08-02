@@ -47,11 +47,19 @@ zn.define([
             },
             getJSON: function (inName){
                 var _value = this.getValue(inName);
-                if(_value){
-                    return JSON.parse(_value);
+                if(typeof _value == 'object'){
+                    return _value;
+                }
+
+                if(_value && typeof _value == 'string'){
+                    try {
+                        return JSON.parse(_value);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }else {
                     //throw new Error('The parameter is not exist!');
-                    zn.error('Request.js line:54 The value of ' + inName + ' is ' + this.getValue(inName) + ', it is not json format.');
+                    zn.error('Request.js line:54   Value of http request parameter(\'' + inName + '\') is ' + this.getValue(inName) + ', it is not json format.');
                     return {};
                 }
             },
@@ -87,7 +95,7 @@ zn.define([
                     _newValue = _values[_key];
 
                     if (_defaultValue == undefined && _newValue === undefined){
-                        response.error('The value of ' + _key + ' is Required.');
+                        response.error('Value of http request parameter(\'' + _key + '\') is Required.');
                         return false;
                     }
 
@@ -96,7 +104,7 @@ zn.define([
                             _reg = _defaultValue.regexp;
 
                         if(_reg && !_reg.test(_value)){
-                            response.error('The value of ' + _key + ' is Invalid.');
+                            response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
                             return false;
                         }
                     }

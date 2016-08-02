@@ -2,6 +2,16 @@ zn.define(function () {
 
     return zn.Controller('', {
         methods: {
+            initDataBase: {
+                method: 'GET/POST',
+                value: function (request, response, $data, $post, $get, $files){
+                    this.store().setup().then(function (data){
+                        response.success(data);
+                    }, function (error){
+                        response.error(error);
+                    });
+                }
+            },
             setup: {
                 method: 'GET/POST',
                 value: function (request, response, $data, $post, $get, $files){

@@ -65,7 +65,7 @@ zn.define([
                 }
 
                 zn.load(_configPath, function (appConfig){
-                    appConfig.deploy = appConfig.deploy || file;
+                    var _deploy = appConfig.deploy || file;
                     appConfig.root = appConfig.APP_PATH = _appPath;
                     if(appConfig.view){
                         appConfig.view.absolutePath = _appPath;
@@ -74,10 +74,10 @@ zn.define([
                         if(!appConfig.databases){
                             appConfig.databases = applicationContext._appConfig.databases;
                         }
-                        appConfig.deploy = applicationContext._deploy+ zn.SLASH + 'plugins' + zn.SLASH + appConfig.deploy;
+                        _deploy = applicationContext._deploy+ zn.SLASH + 'plugins' + zn.SLASH + _deploy;
                     }
 
-                    _appContext = new ApplicationContext(appConfig, _serverContext);
+                    _appContext = new ApplicationContext(zn.overwrite(appConfig, { deploy: _deploy }), _serverContext);
                     _self.scanPackage(_appPath, appConfig.models, appConfig.controllers, _appContext, function (applicationContext){
                         if(appConfig.plugin){
                             _self.scanPlugin(appConfig.root + appConfig.plugin, applicationContext, callback);

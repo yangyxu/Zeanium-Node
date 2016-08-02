@@ -12,14 +12,27 @@ zn.define('../action/Base', function (BaseAction) {
             title: {
                 value: null,
                 type: ['varchar', 100],
-                default: ''
+                default: '',
+                common: {
+                    title: '标题'
+                },
+                header: {
+                    width: 150
+                },
+                input: {
+                    type: 'text'
+                }
             },
             createTime: {
                 value: null,
                 type: ['timestamp'],
                 ignore: true,
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
-                default: 'now()'
+                default: 'now()',
+                header: {
+                    title: '创建时间'
+                    width: 150
+                }
             },
             createPerson: {
                 value: null,
@@ -50,7 +63,16 @@ zn.define('../action/Base', function (BaseAction) {
             note: {
                 value: null,
                 type: ['varchar', 250],
-                default: ''
+                default: '',
+                common: {
+                    title: '备注'
+                },
+                header: {
+
+                },
+                input: {
+                    type: 'textarea'
+                }
             }
         }
     });

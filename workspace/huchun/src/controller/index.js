@@ -1,9 +1,9 @@
 zn.define([
-
-], function () {
+    './KylinUser'
+], function (KylinUser) {
 
     return {
-
+        KylinUser: KylinUser
     }
 
 });

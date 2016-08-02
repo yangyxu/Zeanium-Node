@@ -46,8 +46,26 @@ zn.define([
             setDataBase: function (value){
                 this._config.database = value;
             },
-            create: function (name){
-                return this.query('CREATE DATABASE ' + name);
+            setup: function (){
+                var _defer = zn.async.defer();
+                var _sql = 'drop database if exists ' + this._config.database + ';'
+                _sql += 'create database if not exists ' + this._config.database + ';';
+                var _config = zn.extend({}, this._config);
+                _config.database = null;
+                delete _config.database;
+                _config.dateStrings = true;
+                _config.multipleStatements = true;
+                var connection = mysql.createConnection(_config).query(_sql, function (err, rows){
+                    if(err){
+                        _defer.reject(err);
+                    }else {
+                        _defer.resolve(rows);
+                    }
+                });
+                return _defer.promise;
+            },
+            create: function (){
+
             },
             drop: function (){
                 return this.query('DROP DATABASE ' + name);

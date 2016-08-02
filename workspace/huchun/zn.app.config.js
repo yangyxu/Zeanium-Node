@@ -32,7 +32,7 @@ zn.define({
             host: '127.0.0.1',
             user: 'root',
             password: '123456',
-            database:'zeanium',
+            database:'zn_kylin',
             port: 3306
         },
         'mongo': {
@@ -40,7 +40,7 @@ zn.define({
             host: '127.0.0.1',
             user: 'root',
             password: '123456',
-            database:'zn_mongo',
+            database:'zn_kylin',
             port: 27017
         }
     }

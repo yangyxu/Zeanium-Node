@@ -22,11 +22,19 @@ zn.define(function () {
                 return this.andWhere.apply(this, arguments), this;
             },
             andWhere: function (){
-                var _and = (this._where.length?'and ':'')+this.__toWhere.apply(this, arguments);
+                var _whereSql = this.__toWhere.apply(this, arguments);
+                if(!_whereSql || _whereSql=='{}'){
+                    return this;
+                }
+                var _and = (this._where.length?'and ':'') + _whereSql;
                 return this._where.push(_and), this;
             },
             orWhere: function (){
-                var _or = (this._where.length?'or ':'')+this.__toWhere.apply(this, arguments);
+                var _whereSql = this.__toWhere.apply(this, arguments);
+                if(!_whereSql || _whereSql == '{}'){
+                    return this;
+                }
+                var _or = (this._where.length?'or ':'') + _whereSql;
                 return this._where.push(_or), this;
             },
             in: function (key, values) {
@@ -128,7 +136,9 @@ zn.define(function () {
                             break;
                     }
                 });
-                return '('+_ands.join(' and ')+')';
+                if(_ands.length){
+                    return '('+_ands.join(' and ')+')';
+                }
             },
             __format: function (args){
                 var _args = args||[];

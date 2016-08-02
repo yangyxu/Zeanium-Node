@@ -9,7 +9,7 @@ zn.define(function () {
                 return this.getMeta('table');
             },
             getFields: function (ifFilterPrimary, onCheckItem) {
-                var _properties = this.getProperties(this);
+                var _properties = this.getProperties();
                 var _fields = [],
                     _self = this,
                     _onCheckItem = onCheckItem||function (){};

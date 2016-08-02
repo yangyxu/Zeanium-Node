@@ -63,6 +63,7 @@ zn.define([
                 if(!app){ return }
                 var _deploy = app._deploy;
                 var _app = this._apps[_deploy];
+
                 if(_app){
                     zn.extend(app._routers, _app._routers);
                 } else {
@@ -70,12 +71,11 @@ zn.define([
                 }
 
                 zn.extend(this._routers, app._routers);
-
                 //console.log(Object.keys(this._routers));
                 //app.fire('register', this);
                 zn.info('Register Project(Application): ' + _deploy);
             },
-            __scanWebPath: function (){
+            __scanWebPath: function (isRedeploy){
                 var _config = this._config,
                     _webPath = this._webPath;
 
@@ -85,16 +85,24 @@ zn.define([
                         this.__onLoaded(_webPath);
                     }.bind(this));
                 } else {
-                    this.__scanWebRoot(this._serverPath + zn.SLASH + 'www' + zn.SLASH, function (){
+                    if(isRedeploy){
                         this.__scanWebRoot(_webPath, function (){
                             this.__onLoaded(_webPath);
                         }.bind(this));
-                    }.bind(this));
+                    } else {
+                        this.__scanWebRoot(this._serverPath + zn.SLASH + 'www' + zn.SLASH, function (){
+                            this.__scanWebRoot(_webPath, function (){
+                                this.__onLoaded(_webPath);
+                            }.bind(this));
+                        }.bind(this));
+                    }
                 }
             },
             __scanWebRoot: function (path, callback){
                 var _defer = zn.async.defer(),
                     _self = this;
+                this._apps = {};
+                this._routers = {};
                 this._scanner.scanWebRoot(path, function (appContext){
                     _self.registerApplication(appContext);
                 }).then(function (apps){
@@ -106,17 +114,24 @@ zn.define([
                 return _defer.promise;
             },
             __watch: function (path){
+                if(this._watching){
+                    return false;
+                }
+                this._watching = true;
                 chokidar.watch('.', {
                     ignored: /[\/\\]\./
                 }).on('raw', function(event, path, details) {
                     if(path.substr(-3, 3)=='.js'){
-                        this.__scanWebPath();
+                        zn.debug('[' + path + '] Changed.');
+                        zn.info('Redeploying......');
+                        zn.module.unloadModule(path);
+                        this.__scanWebPath(true);
                     }
                 }.bind(this));
             },
             __onLoaded: function(path){
                 if(path){
-                    //this.__watch(path);
+                    this.__watch(path);
                 }
                 var _interfaces = os.networkInterfaces(),
                     _interface = null,

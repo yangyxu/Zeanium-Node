@@ -49,18 +49,21 @@ zn.define(function () {
                 return _defer.promise;
             },
             paging: function (fields, where, order, pageIndex, pageSize){
-                var _index = pageIndex||1,
-                    _size = 20,
+                var _defer = zn.async.defer();
+                var _index = pageIndex || 1,
+                    _size = pageSize || 10,
                     _start = (_index - 1) * _size,
-                    _end = _index * _size;
-
-                return this._store.command
-                    .select(fields || this._ModelClass.getFields(false))
-                    .from(this._table)
-                    .where(where)
-                    .limit(_start, _end)
-                    .orderBy(order)
-                    .query();
+                    _end = _index * _size,
+                    _fields = fields || this._ModelClass.getFields(false),
+                    _table = this._table;
+                var _sql = zn.sql.select(_fields)
+                            .from(_table)
+                            .where(where)
+                            .limit(_start, _size)
+                            .orderBy(order)
+                            .build() + ';';
+                    _sql += zn.sql.select('count(id) as count').from(_table).where(where).build();
+                return this._store.command.query(_sql);
             },
             update: function (data, where){
                 var _model = this.fixModel(data),

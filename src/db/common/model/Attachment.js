@@ -7,12 +7,6 @@ zn.define(function () {
                 type: ['varchar', 250],
                 ignore: true,
                 default: ','
-            },
-            links: {
-                value: null,
-                type: ['varchar', 250],
-                ignore: true,
-                default: ','
             }
         }
     });
