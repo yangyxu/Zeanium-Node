@@ -2,27 +2,25 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_rights_role", {
+    return zn.Model("zn_kylin_user_worker_comment", {
         mixins: [
-            model.Base,
-            model.Tag,
-            model.Tree
+            model.Base
         ],
         properties: {
-            code: {
+            userId: {
                 value: null,
-                type: ['varchar', 100],
-                default: ''
-            },
-            groupId: {
-                value: null,
-                type: ['int', 11],
+                type: ['int', 10],
                 default: '0'
             },
-            userIds: {
+            projectItemId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            comment: {
                 value: null,
                 type: ['varchar', 500],
-                default: ','
+                default: ''
             }
         }
     });

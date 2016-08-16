@@ -51,6 +51,9 @@ zn.define([
                     if(!_values){
                         return false;
                     }
+                    if(_handler.validate && !request.session.hasItem()){
+                        return response.error('Session is invalid. Please login into system first.');
+                    }
                     _controller[_action].call(_controller, request, response, this);
                 } catch (e) {
                     zn.error('RequestHandlerChain doRequest line 45 Error: ' + e.message);

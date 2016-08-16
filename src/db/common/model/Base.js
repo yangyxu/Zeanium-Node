@@ -30,7 +30,7 @@ zn.define('../action/Base', function (BaseAction) {
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: 'now()',
                 header: {
-                    title: '创建时间'
+                    title: '创建时间',
                     width: 150
                 }
             },

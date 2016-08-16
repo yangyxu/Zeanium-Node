@@ -95,6 +95,7 @@ zn.define([
                     _stores = this._stores,
                     _self = this,
                     _key,
+                    _validate = false,
                     _controller,
                     _routers = {},
                     _router = null,
@@ -102,17 +103,20 @@ zn.define([
 
                 zn.each(controllers, function (controller, name){
                     _key = controller.getMeta('controller') || name;
+                    _validate = (controller.getMeta('validate') !== undefined) ? controller.getMeta('validate') : _validate;
                     _controller = new controller(_self, _stores);
                     controller._methods_.forEach(function (method, index){
                         _member = controller.member(method);
                         if(_member.meta.router!==null){
+                            _validate = (_member.meta.validate !== undefined) ? _member.meta.validate : _validate;
                             _router = _member.meta.router || _member.name;
                             _router = node_path.normalize(zn.SLASH + (_config.deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
                             _routers[_router] = {
                                 controller: _controller,
                                 action: method,
                                 handler: _member,
-                                appContext: _self
+                                appContext: _self,
+                                validate: _validate
                             };
                         }
                     });

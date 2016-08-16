@@ -128,6 +128,7 @@ zn.define(function () {
                 value: function (request, response, chain){
                     var _action = this.__getModelAction(request, request.getValue('model'));
                     if(_action){
+                        console.log(request.session.user);
                         _action.paging(request.getValue('fields'), request.getJSON('where'), request.getJSON('order'), request.getInt('pageIndex'), request.getInt('pageSize')).then(function(data){
                             response.success(data);
                         });

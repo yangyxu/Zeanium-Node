@@ -12,6 +12,18 @@ zn.define(['./SessionManager'],function (SessionManager) {
                 this._sessions = {};
                 this.super(config);
             },
+            clearSession: function (){
+                var _sessions = this._sessions,
+                    _session = null,
+                    _now = (new Date()).getTime();
+                for(var key in _sessions){
+                    _session = _sessions[key];
+                    if(_session._expiresTime < _now){
+                        this._sessions[_session._id] = null;
+                        delete this._sessions[_session._id];
+                    }
+                }
+            },
             createSession: function (cookie){
                 var _session = this.__createSession(cookie);
                 this._sessions[_session.id] = _session;
@@ -25,7 +37,7 @@ zn.define(['./SessionManager'],function (SessionManager) {
                         _session = this.createSession();
                     }
                 }
-
+                this.clearSession();
                 return _session;
             },
             clear: function (){
@@ -34,6 +46,9 @@ zn.define(['./SessionManager'],function (SessionManager) {
             remove: function (sessionid){
                 this._sessions[sessionid] = null;
                 delete this._sessions[sessionid];
+            },
+            size: function (){
+                return Object.keys(this._sessions).length;
             },
             update: function (sessionid){
                 var _session = this.getSession();

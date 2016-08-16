@@ -6,6 +6,7 @@ zn.define(function () {
         mixins: [
             model.Base,
             model.Tag,
+            model.Tree,
             model.Rights
         ],
         properties: {

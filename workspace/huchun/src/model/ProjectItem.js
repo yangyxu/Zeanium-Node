@@ -20,17 +20,17 @@ zn.define(function () {
             },
             region: {
                 value: null,
-                type: ['int', 10],
+                type: ['varchar', 50],
                 default: '0'
             },
             province: {
                 value: null,
-                type: ['int', 10],
+                type: ['varchar', 50],
                 default: '0'
             },
             city: {
                 value: null,
-                type: ['int', 10],
+                type: ['varchar', 50],
                 default: '0'
             },
             progress: {

@@ -62,7 +62,8 @@ zn.define([
             },
             writeHead: function (httpStatus, inArgs){
                 var _self = this,
-                    _args = inArgs || {};
+                    _args = inArgs || {},
+                    _session = this._request._session;
                 var _crossSetting = {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
@@ -77,8 +78,12 @@ zn.define([
                     'Content-Type': _self.__getContentType()
                 }, _crossSetting);
 
-                if(this._request._session){
-                    _args['Set-Cookie'] = this._request._session.serialize()
+                if(_session){
+                    if(_session.hasItem()){
+                        _args['Set-Cookie'] = this._request._session.serialize();
+                    } else {
+                        this._context._sessionManager.remove(_session.getId());
+                    }
                 }
 
                 this._serverResponse.writeHead(httpStatus, _args);

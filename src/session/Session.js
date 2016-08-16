@@ -11,20 +11,54 @@ zn.define(['node:crypto'], function (crypto) {
         },
         methods: {
             init: function (name, cookie){
-                this.updateId();
+                this._createdTime = new Date();
                 this._name = name;
                 this._cookie = cookie||{};
+                this._data = {};
+                this._id = this.generateId();
             },
             setCookie: function (key, value){
                 this._cookie[key] = value;
             },
+            getCreatedTime: function (){
+                return this._createdTime;
+            },
+            getLastAccessedTime: function (){
+                return this._updatedTime;
+            },
+            getExpiresTime: function (){
+                return this._expiresTime;
+            },
+            getId: function (){
+                return this._id;
+            },
+            setItem: function (name, value){
+                this._data[name] = value;
+            },
+            getItem: function (name){
+                return this._data[name];
+            },
+            getItems: function (){
+                return this._data;
+            },
+            getKeys: function (){
+                return Object.keys(this._data);
+            },
+            hasItem: function (){
+                return !!this.getKeys().length;
+            },
+            isNew: function (){
+                return !!!this._updatedTime;
+            },
             generateId: function (){
                 var _currDate = (new Date()).valueOf().toString(),
                     _random = Math.random().toString();
+                this._expiresTime = (new Date()).getTime() + (this._cookie.maxAge || 0);
                 return crypto.createHash('sha1').update(_currDate + _random).digest('hex');
             },
             updateId: function (){
                 this._id = this.generateId();
+                this._updatedTime = new Date();
             },
             serialize: function (){
                 var _pairs = [this._name + '=' + encodeURIComponent(this._id)];

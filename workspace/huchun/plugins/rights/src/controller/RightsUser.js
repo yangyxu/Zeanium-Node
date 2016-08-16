@@ -21,10 +21,7 @@ zn.define(function () {
                     password: null
                 },
                 value: function (request, response, chain){
-                    this._action.findOne({
-                        name: request.getValue('username'),
-                        pwd: request.getValue('password')
-                    }).then(function (user){
+                    this._action.selectOne(request.getValue()).then(function (user){
                         if(user){
                             request.session.user = user;
                             response.success(user);
