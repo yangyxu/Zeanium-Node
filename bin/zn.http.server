@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+'use strict';
+var zn = require('../src/zn.core.minx');
+var info = require('../package.json');
+zn.define([
+    'net',
+    'io',
+    'node:path',
+    'node:child_process',
+    'node:os',
+    'node:fs'
+], function (net, io, path, child_process, os, fs) {
+
+    var argv = process.argv;
+    //var execPath = argv[1].split(zn.SLASH).pop();
+    var _argv = {};
+    argv = argv.slice(2);
+
+    switch (argv[0]) {
+        case 'help':
+            console.log(info);
+            break;
+        case 'create':
+            var _type = argv[1] || 'workspace';
+            var _name = argv[2] || '';
+            var _target = __dirname + '/../src/net/http.server/inits/' + _type;
+            var _source = process.cwd();
+            if(_name){
+                _source = _source + zn.SLASH + _name;
+            }
+            zn.info('Creating ' + _type + ': ' + _name + '.');
+            io.FileUtil.copyDir(path.normalize(_target), path.normalize(_source), function (){
+                zn.info('Creating end.');
+            });
+            break;
+        case 'install':
+            var _appConfig = process.cwd() + zn.SLASH + 'zn.app.config.js';
+            var _name = argv[1];
+            if(!_name){
+                zn.error('The plugin name is required.');
+                return;
+            }
+            if(fs.existsSync(_appConfig)){
+                var _target = __dirname + '/../src/net/http.server/inits/plugins/' + _name;
+                io.FileUtil.copyDir(path.normalize(_target), path.normalize(process.cwd() + zn.SLASH + 'plugins' + zn.SLASH), function (){
+                    zn.info('Creating end.');
+                });
+            } else {
+                zn.error('The current directory is not an zn app, the file “zn.app.config.js” is required.');
+            }
+            break;
+        default :
+            zn.each(argv, function (value){
+                var _temps = value.split(':');
+                _argv[_temps[0]] = _temps[1];
+            });
+
+            var _host = os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0';
+            var _configPath = process.cwd() + zn.SLASH + 'zn.server.config.js';
+
+            var _serverConfig = {
+                host: _argv.host || _host,
+                port: _argv.port || 8080,
+                debug: false,
+                catalog: '/',
+                currentPath: true,
+                __dirname: process.cwd() || __dirname,
+                onLoaded: function (){
+                    zn.info('You can press [ control + c ] to stop current zeanium server.');
+                }
+            };
+
+            if(fs.existsSync(_configPath)){
+                zn.load(_configPath, function (data) {
+                    zn.extend(_serverConfig, data);
+                    net.http.HttpServer.createServer(_serverConfig);
+                });
+            } else {
+                net.http.HttpServer.createServer(_serverConfig);
+            }
+            break;
+    }
+
+}).exec();

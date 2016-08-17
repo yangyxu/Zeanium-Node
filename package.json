@@ -1,14 +1,13 @@
 {
   "name": "zeanium-node",
-  "version": "0.1.16",
+  "version": "0.2.1",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "start": "node ./bin/zn",
-    "test": "qunit"
+    "start": "node ./bin/zn.http.server"
   },
   "repository": {
     "type": "git",
@@ -35,8 +34,6 @@
   },
   "preferGlobal": "true",
   "bin": {
-    "zn": "./bin/zn",
-    "zeanium-node": "./bin/zn",
-    "zn-server": "./bin/znserver"
+    "zn": "./bin/zn.http.server"
   }
 }

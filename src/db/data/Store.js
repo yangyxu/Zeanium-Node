@@ -55,6 +55,7 @@ zn.define([
                 delete _config.database;
                 _config.dateStrings = true;
                 _config.multipleStatements = true;
+                zn.info(_sql);
                 var connection = mysql.createConnection(_config).query(_sql, function (err, rows){
                     if(err){
                         _defer.reject(err);
