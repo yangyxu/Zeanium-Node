@@ -84,6 +84,7 @@ zn.define([
                         _chain = new RequestHandlerChain(),
                         _handler = null;
                     for(var key in _routers) {
+                        console.log(key);
                         _handler = zn.extend({}, _routers[key]);
                         if(_util.test(key, url)){
                             if(key.indexOf('/:') != -1){
