@@ -25,6 +25,9 @@ zn.define([
             if (typeof router != 'string') {
                 return false;
             }
+            if(router == path){
+                return true;
+            }
 
             var __all = Boolean(router == '*');  //
             var _reg = router.replace(/\/:\w[^\/]+/g, '\/([^\/]+)');
@@ -84,7 +87,6 @@ zn.define([
                         _chain = new RequestHandlerChain(),
                         _handler = null;
                     for(var key in _routers) {
-                        console.log(key);
                         _handler = zn.extend({}, _routers[key]);
                         if(_util.test(key, url)){
                             if(key.indexOf('/:') != -1){
