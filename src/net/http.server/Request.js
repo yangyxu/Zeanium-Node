@@ -254,13 +254,16 @@ zn.define([
             __parseUrlData: function (){
                 var _req = this._serverRequest,
                     _parse = url.parse(_req.url, true),
+                    _query = _parse.query,
                     _paths = _parse.pathname.split('/');
 
                 _paths.shift();
                 if(_paths[0]==''){
                     _paths.shift();
                 }
-                this._$get = _parse.query;
+                for(var _key in _query){
+                    this._$get[_key] = _query[_key];
+                }
                 this._paths = _paths;
                 this._uri = '/'+_paths.slice(1).join('/');
                 this._pathname = _parse.pathname;
