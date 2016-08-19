@@ -32,7 +32,7 @@ zn.define(['./SessionManager'],function (SessionManager) {
             getSession: function (sessionid){
                 var _session = this._sessions[sessionid];
                 if(_session){
-                    if(new Date(_session.cookie.expires).getTime() < new Date().getTime()){
+                    if(_session._expiresTime < (new Date()).getTime()){
                         this.remove(sessionid);
                         _session = this.createSession();
                     }

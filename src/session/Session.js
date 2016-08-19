@@ -53,7 +53,10 @@ zn.define(['node:crypto'], function (crypto) {
             generateId: function (){
                 var _currDate = (new Date()).valueOf().toString(),
                     _random = Math.random().toString();
-                this._expiresTime = (new Date()).getTime() + (this._cookie.maxAge || 0);
+                if(this._cookie.maxAge){
+                    this._expiresTime = (new Date()).getTime() + this._cookie.maxAge;
+                }
+
                 return crypto.createHash('sha1').update(_currDate + _random).digest('hex');
             },
             updateId: function (){
@@ -63,10 +66,13 @@ zn.define(['node:crypto'], function (crypto) {
             serialize: function (){
                 var _pairs = [this._name + '=' + encodeURIComponent(this._id)];
                 var _cookie = this._cookie;
+                if(!_cookie.expires && this._expiresTime) {
+                    _cookie.expires = this._expiresTime;
+                }
                 if (_cookie.maxAge) _pairs.push('Max-Age=' + _cookie.maxAge);
                 if (_cookie.domain) _pairs.push('Domain=' + _cookie.domain);
                 if (_cookie.path) _pairs.push('Path=' + _cookie.path);
-                if (_cookie.expires) _pairs.push('Expires=' + _cookie.expires);
+                if (_cookie.expires) _pairs.push('Expires=' + (new Date(_cookie.expires).toISOString()));
                 if (_cookie.httpOnly) _pairs.push('HttpOnly');
                 if (_cookie.secure) _pairs.push('Secure');
 

@@ -44,6 +44,8 @@ zn.define(function () {
                 this.select(fields, inWhere)
                     .then(function (rows){
                         _defer.resolve(rows[0]);
+                    }, function (error){
+                        _defer.reject(error);
                     });
 
                 return _defer.promise;
