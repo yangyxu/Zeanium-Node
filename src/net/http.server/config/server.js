@@ -25,6 +25,7 @@ zn.define([
             if (typeof router != 'string') {
                 return false;
             }
+
             if(router == path){
                 return true;
             }
@@ -89,7 +90,7 @@ zn.define([
                     for(var key in _routers) {
                         _handler = zn.extend({}, _routers[key]);
                         if(_util.test(key, url)){
-                            if(key.indexOf('/:') != -1){
+                            if(key.indexOf('/:') != -1 || key.indexOf('\:') != -1){
                                 _handler.pathArgv = _util.parseParam(key, url);
                             }
                             _chain.push(_handler);

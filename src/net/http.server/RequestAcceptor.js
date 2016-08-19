@@ -30,7 +30,9 @@ zn.define([
                     _result = null,
                     _chain = false;
 
-                _url = _url.replace(/\//g,'\\');
+                if(zn.SLASH!='/'){
+                    _url = _url.replace(/\//g,'\\');
+                }
                 for(var key in this._handlerManagers){
                     _handlerManager = this._handlerManagers[key];
                     _chain = _handlerManager.match(_url);
