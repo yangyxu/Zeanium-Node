@@ -17,6 +17,10 @@ zn.define(['node:crypto'], function (crypto) {
                 this._data = {};
                 this._id = this.generateId();
             },
+            clear: function (){
+                this._data = {};
+                this._cookie.expires = this._expiresTime = this._createdTime.getTime() - 1;
+            },
             setCookie: function (key, value){
                 this._cookie[key] = value;
             },
@@ -75,7 +79,6 @@ zn.define(['node:crypto'], function (crypto) {
                 if (_cookie.expires) _pairs.push('Expires=' + (new Date(_cookie.expires).toISOString()));
                 if (_cookie.httpOnly) _pairs.push('HttpOnly');
                 if (_cookie.secure) _pairs.push('Secure');
-
 
                 return _pairs.join('; ');
             }
