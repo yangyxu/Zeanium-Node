@@ -29,7 +29,7 @@ zn.define([
         host: _argv.host || '0.0.0.0',
         port: _argv.port || 8080,
         debug: false,
-        catalog: '/',
+        catalog: '/webapps/',
         onLoaded: function (){
             zn.info('You can press [ control + c ] to stop current zeanium server.');
         }

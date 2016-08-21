@@ -69,7 +69,7 @@ zn.define([
             cookie: {
                 // cookie maxAge defaults to 14400000, path defaults to '/' and
                 // httpOnly defaults to true.
-                maxAge: 60 * 1000,
+                maxAge: 60 * 60 * 1000,
                 //domain: '/',
                 path: '/',
                 expires: '',

@@ -42,7 +42,9 @@ zn.define([
                 return;
             }
             if(fs.existsSync(_appConfig)){
-                var _target = __dirname + '/../src/net/http.server/inits/plugins/' + _name;
+                var _pluginsDir = __dirname + '/../src/net/http.server/inits/plugins';
+                var _target =  _pluginsDir + '/' + _name;
+                fs.mkdirSync(_pluginsDir);
                 io.FileUtil.copyDir(path.normalize(_target), path.normalize(process.cwd() + zn.SLASH + 'plugins' + zn.SLASH + _name), function (){
                     zn.info('Creating end.');
                 });

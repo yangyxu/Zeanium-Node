@@ -20,7 +20,8 @@ zn.define(function () {
             status: {
                 value: null,
                 type: ['int', 10],
-                default: '0',
+                default: '19',
+                convert: 'ZN_PARSE_VAR({})',
                 header: {
                     title: '',
                     width: 200
@@ -36,7 +37,7 @@ zn.define(function () {
                 type: ['datetime'],
                 ignore: true,
                 auto_update: 'now()',
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             planEndTime: {
@@ -44,7 +45,7 @@ zn.define(function () {
                 type: ['datetime'],
                 ignore: true,
                 auto_update: 'now()',
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             customer: {

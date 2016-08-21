@@ -16,8 +16,8 @@ zn.define({
         cookie: {
             // cookie maxAge defaults to 14400000, path defaults to '/' and
             // httpOnly defaults to true.
-            maxAge: 60 * 1000,
-            domain: 'www.youyang-info.com',
+            maxAge: 60 * 60 * 1000,
+            //domain: 'www.youyang-info.com',
             path: '/',
             expires: '',
             httpOnly: true,
@@ -28,10 +28,10 @@ zn.define({
         'mysql': {
             default: true,
             type: 'mysql',
-            host: '0.0.0.0',
+            host: '139.196.34.116',
             user: 'root',
             password: '123456',
-            database:'zn_demo',
+            database:'zn_kylin',
             port: 3306
         }
     }

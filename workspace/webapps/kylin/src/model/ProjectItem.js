@@ -13,14 +13,16 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
-            projectItemStatus: {
+            status: {
                 value: null,
                 type: ['int', 10],
+                //convert: 'ZN_PARSE_VAR({})',
                 default: '0'
             },
             region: {
                 value: null,
-                type: ['varchar', 50],
+                type: ['int', 11],
+                convert: 'ZN_PARSE_VAR({})',
                 default: '0'
             },
             province: {

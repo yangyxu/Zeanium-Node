@@ -24,6 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "cheerio": "^0.20.0",
+    "chinese-to-pinyin": "^0.1.4",
     "chokidar": "^1.4.3",
     "crypto": "0.0.3",
     "formidable": "^1.0.17",

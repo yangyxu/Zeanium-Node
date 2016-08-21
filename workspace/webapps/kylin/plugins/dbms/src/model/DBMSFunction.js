@@ -2,27 +2,20 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_rights_var", {
+    return zn.Model("zn_dbms_function", {
         mixins: [
             model.Base,
-            model.Tag,
-            model.Tree,
             model.Rights
         ],
         properties: {
-            url: {
+            name: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
             },
-            icon: {
+            defineSql: {
                 value: null,
-                type: ['varchar', 100],
-                default: ''
-            },
-            path: {
-                value: null,
-                type: ['varchar', 100],
+                type: ['varchar', 200],
                 default: ''
             }
         }

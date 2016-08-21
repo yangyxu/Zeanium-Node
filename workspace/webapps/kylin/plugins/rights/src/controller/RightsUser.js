@@ -17,8 +17,8 @@ zn.define(function () {
             login: {
                 method: 'GET/POST',
                 argv: {
-                    username: null,
-                    password: null
+                    name: null,
+                    pwd: null
                 },
                 value: function (request, response, chain){
                     this._action.selectOne(request.getValue()).then(function (user){

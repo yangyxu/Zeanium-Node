@@ -27,8 +27,8 @@ zn.define([
                 },
                 set: function (value){
                     if(!value){ return false; }
+                    this.reset();
                     this._serverRequest = value;
-                    this._errors = [];
                     this.__doSession();
                     this.__parseUrlData();
                     //this.__parseRequest();
@@ -37,13 +37,16 @@ zn.define([
         },
         methods: {
             init: function (context, serverRequest){
+                this.reset();
+                this._context = context;
+                this.serverRequest = serverRequest;
+            },
+            reset: function (){
                 this._$data = {};
                 this._$post = {};
                 this._$get = {};
                 this._$files = {};
                 this._errors = [];
-                this._context = context;
-                this.serverRequest = serverRequest;
             },
             getJSON: function (inName){
                 var _value = this.getValue(inName);

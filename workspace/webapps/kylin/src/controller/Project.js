@@ -1,12 +1,13 @@
 zn.define(function () {
 
-    return zn.Controller('projectitem',{
+    return zn.Controller('project',{
+        validate: true,
         properties: {
 
         },
         methods: {
             init: function (args){
-                this._action = this.action('ProjectItem');
+                this._action = this.action('Project');
             },
             create: {
                 method: 'GET/POST',
@@ -14,7 +15,7 @@ zn.define(function () {
 
                 },
                 value: function (request, response, chain){
-                    var _userId = request.session.user.id;
+                    var _userId = request.session.getItem('user').id;
                     this._action.addNode(request.getValue()).then(function (info){
                         this._action.selectOne({id: info.insertId}).then(function (user){
                             response.success(user);
@@ -24,19 +25,6 @@ zn.define(function () {
                     }.bind(this), function (error){
                         response.error(error.message);
                     });
-                }
-            },
-            getitems: {
-                method: 'GET/POST',
-                argv: {
-                    userId: null
-                },
-                value: function (request, response, chain){
-                    this._action.select('*', {}).then(function (){
-
-                    }.bind(this), function (error){
-                        response.error(error.message);
-                    }.bind(this));
                 }
             }
         }

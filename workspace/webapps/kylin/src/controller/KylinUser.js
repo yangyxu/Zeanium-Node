@@ -1,4 +1,4 @@
-zn.define(function () {
+zn.define(['node:chinese-to-pinyin'],function (pinyin) {
 
     return zn.Controller('kylinuser',{
         properties: {
@@ -8,6 +8,17 @@ zn.define(function () {
             init: function (args){
                 this._action = this.action('KylinUser');
             },
+            pinyin: function (request, response, chain){
+                response.success(pinyin('徐洋洋-yangyxu', {filterChinese: true}));
+            },
+            logout: {
+                validate: true,
+                method: 'GET/POST',
+                value: function (request, response, chain){
+                    request.session.clear();
+                    response.success('注销成功');
+                }
+            },
             login: {
                 method: 'GET/POST',
                 argv: {
@@ -15,8 +26,10 @@ zn.define(function () {
                     password: null
                 },
                 value: function (request, response, chain){
+                    console.log(request.getValue());
                     this._action.selectOne(request.getValue()).then(function (user){
                         if(user){
+                            console.log(user);
                             request.session.setItem('user', user);
                             response.success(user);
                         } else {
@@ -55,6 +68,7 @@ zn.define(function () {
                 }
             },
             getSession: {
+                validate: true,
                 method: 'GET/POST',
                 value: function (request, response, chain){
                     response.success(request.session.getItem('user'));
