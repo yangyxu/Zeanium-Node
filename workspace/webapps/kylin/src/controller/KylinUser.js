@@ -26,7 +26,6 @@ zn.define(['node:chinese-to-pinyin'],function (pinyin) {
                     password: null
                 },
                 value: function (request, response, chain){
-                    console.log(request.getValue());
                     this._action.selectOne(request.getValue()).then(function (user){
                         if(user){
                             console.log(user);
@@ -67,11 +66,42 @@ zn.define(['node:chinese-to-pinyin'],function (pinyin) {
                     });
                 }
             },
+            getUser: {
+                method: 'GET/POST',
+                argv: {
+                    userId: null
+                },
+                value: function (request, response, chain){
+                    this._action.selectOne({id: request.getValue("userId")}).then(function (user){
+                        if(user){
+                            response.success(user);
+                        } else {
+                            response.error('未查到该用户信息');
+                        }
+                    }, function (error){
+                        response.error(error.message);
+                    });
+                }
+            },
             getSession: {
                 validate: true,
                 method: 'GET/POST',
                 value: function (request, response, chain){
                     response.success(request.session.getItem('user'));
+                }
+            },
+            update: {
+                method: 'GET/POST',
+                argv: {
+                    data: null,
+                    userId: null
+                },
+                value: function (request, response, chain){
+                    this._action.updateNode(request.getValue('data'), { id: request.getValue('userId') }).then(function (data){
+                        response.success(data);
+                    }.bind(this), function (error){
+                        response.error(error.message);
+                    });
                 }
             },
             authenticate: {
