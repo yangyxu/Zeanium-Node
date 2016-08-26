@@ -18,11 +18,6 @@ zn.define(function () {
                 value: null,
                 type: ['int', 11],
                 default: '0'
-            },
-            userIds: {
-                value: null,
-                type: ['varchar', 500],
-                default: ','
             }
         }
     });

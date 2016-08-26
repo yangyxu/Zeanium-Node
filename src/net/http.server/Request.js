@@ -16,6 +16,7 @@ zn.define([
             $post: null,
             $get: null,
             $files: null,
+            $uploadConfig: null,
             context: null,
             applicationContext: null,
             chain: null,
@@ -145,66 +146,91 @@ zn.define([
             __getUploadInfo: function (){
                 var _config = this.applicationContext._config,
                     _upload = _config.upload || {},
-                    _root = (_config.root || __dirname)+'/uploads/';
+                    _root = (_config.root || __dirname) + zn.SLASH + 'uploads' + zn.SLASH;
 
                 return zn.extend(_upload, {
                     root: _root,
-                    temp: 'temp/',
-                    catalog: 'catalog/',
+                    temp: 'temp' + zn.SLASH,
+                    catalog: 'catalog' + zn.SLASH,
                     forward: '',
-                    server: 'http://localhost:8888/tj/'
+                    fileServer: null
                 });
             },
             __parseFormData: function (callback){
                 var _request = this._serverRequest,
-                    _upload = this.__getUploadInfo(),
-                    _incomingForm = new formidable.IncomingForm();
+                    _data = _request.data;
 
-                this._upload = _upload;
-                _incomingForm.uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径
-                if(_request.data){
-                    var _data = _request.data;
+                if(_data){
                     this._$post = _data.fields;
                     this._$files = _data.files;
-                    callback(zn.extend({ upload: _upload }, _data));
+                    this._$uploadConfig = _data.uploadConfig;
+                    callback(_data);
                 } else {
+                    var _upload = this.__getUploadInfo(),
+                        _incomingForm = new formidable.IncomingForm(),
+                        _uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径;
+
+                    if(!fs.existsSync(_upload.root)){
+                        fs.mkdirSync(_upload.root);
+                    }
+
+                    if(!fs.existsSync(_uploadDir)){
+                        fs.mkdirSync(_uploadDir);
+                    }
+
+                    _incomingForm.uploadDir = _uploadDir;
                     _incomingForm.parse(_request,function(error, fields, files){
                         if(error){
                             zn.error('Request.js   --  line 110 message:  formidable.IncomingForm parse error.  ' + error.toString());
                         } else {
-                            _request.data = {
+                            _data = _request.data = {
                                 fields: fields,
-                                files: files
+                                files: files,
+                                uploadConfig: _upload
                             };
                             this._$post = fields;
                             this._$files = files;
-                            callback({ upload: _upload, fields: fields, files: files });
+                            this._$uploadConfig = _upload;
+                            callback(_data);
                         }
                     }.bind(this));
                 }
             },
             uploadFile: function (file, upload){
                 var _name = file.path.split(path.sep).pop(),
-                    _ext = file.type.split('/').pop(),
+                    _ext = file.type.split(path.sep).pop(),
                     _file = _name + '.' + _ext,
-                    _upload = upload || this._upload,
-                    _root = _upload.root;
+                    _upload = upload || this._$uploadConfig,
+                    _root = _upload.root,
+                    _fileServer = _upload.fileServer,
+                    _sourceFile = _root + _upload.temp + _name,
+                    _targetDir = _root + _upload.catalog;
 
-                var _path = _root + _upload.temp + _name,
-                    _newPath = _root + _upload.catalog + _file;
+                if(!fs.existsSync(_targetDir)){
+                    fs.mkdirSync(_targetDir);
+                }
+                var _targetFile = _targetDir + _file;
+                _targetFile = _targetFile.replace(/\\/g, '/');
+                _sourceFile = _sourceFile.replace(/\\/g, '/');
 
-                _path = _path.replace(/\\/g, '/');
-                _newPath = _newPath.replace(/\\/g, '/');
-                fs.renameSync(_path, _newPath);
-
+                fs.renameSync(_sourceFile, _targetFile);
+                var _paths = this.paths.slice(0);
+                _paths.pop();
+                _paths.pop();
+                var _wwwAry = [this._context._root].concat(_paths).concat(['uploads', _upload.catalog, _file]);
+                if(!_fileServer){
+                    _fileServer = _wwwAry.join(zn.SLASH);
+                }else {
+                    _fileServer = _fileServer + zn.SLASH + _upload.catalog + zn.SLASH + _file;
+                }
                 return {
-                    path: _newPath,
+                    name: file.name,
                     size: file.size,
                     fileType: file.type,
                     file: _file,
-                    name: file.name,
                     ext: _ext,
-                    url: path.normalize(_upload.server + '/' + _upload.catalog + '/' + _file),
+                    path: _targetFile,
+                    url: _fileServer,
                     lastModifiedDate: file.lastModifiedDate.toISOString().slice(0, 19)
                 };
             },
@@ -218,6 +244,16 @@ zn.define([
                 }
 
                 return this.__uploadFiles(files);
+            },
+            clearTempFiles: function (){
+                var _data = this._serverRequest.data;
+                if(_data && _data.files){
+                    zn.each(_data.files, function (file){
+                        if(fs.existsSync(file.path)){
+                            fs.unlinkSync(file.path);
+                        }
+                    });
+                }
             },
             __uploadFiles: function (files){
                 var _paths = [];

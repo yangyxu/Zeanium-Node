@@ -86,6 +86,7 @@ zn.define([
                     }
                 }
 
+                this._request.clearTempFiles();
                 this._serverResponse.writeHead(httpStatus, _args);
             },
             write: function(inData, inEncode){

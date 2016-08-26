@@ -30,7 +30,6 @@ zn.define(function () {
                 if(!_paths.length){
                     return response.doIndex(), false;
                 }
-
                 return response.writePath(_app._config.root + zn.SLASH + _paths.join(zn.SLASH)), false;
             },
             __200: function (){

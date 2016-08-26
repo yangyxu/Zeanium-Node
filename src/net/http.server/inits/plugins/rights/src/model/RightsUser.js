@@ -12,6 +12,11 @@ zn.define(function () {
                 type: ['varchar', 100],
                 default: ''
             },
+            roleIds: {
+                value: null,
+                type: ['varchar', 500],
+                default: ','
+            },
             name: {
                 value: null,
                 type: ['varchar', 100],
