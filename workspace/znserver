@@ -23,7 +23,7 @@ zn.define([
     var _host = os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0';
     var _configPath = process.cwd() + zn.SLASH + 'zn.server.config.js';
 
-    /*
+
     var os = require('os');
     zn.each(os.networkInterfaces(), function (en){
         zn.each(en, function (item){
@@ -31,7 +31,7 @@ zn.define([
                 _host = item.address;
             }
         })
-    });*/
+    });
 
     var _serverConfig = {
         host: _host || '0.0.0.0',
