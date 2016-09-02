@@ -1,4 +1,4 @@
-zn.define(function () {
+zn.define(['node:chinese-to-pinyin'],function (pinyin) {
 
     return zn.Controller('user',{
         properties: {
@@ -23,7 +23,15 @@ zn.define(function () {
                 value: function (request, response, chain){
                     this._action.selectOne(request.getValue()).then(function (user){
                         if(user){
-                            request.session.user = user;
+                            /*
+                            console.log(new Date().toDateString());
+                            this._action.update({ lastLoginTime: new Date().toDateString()}, { id: user.id }).then(function (data){
+                                console.log(data);
+                            }, function (){
+                                console.log(data);
+                            });*/
+                            //user['@session'] = request.session.serialize();
+                            request.session.setItem('@AdminUser', user);
                             response.success(user);
                         } else {
                             response.error('用户名或密码不对');
@@ -33,16 +41,10 @@ zn.define(function () {
                     });
                 }
             },
-            addUser: {
-                method: 'POST',
-                argv: {
-
-                },
+            getSession: {
+                method: 'GET',
                 value: function (request, response, chain){
-
-                    this._action.insert(request.getValue()).then(function (rows, fields, command){
-                        response.error('add success');
-                    });
+                    response.success(request.session.getItem('@AdminUser'));
                 }
             },
             updateUser: {
@@ -52,7 +54,7 @@ zn.define(function () {
                     userId: null
                 },
                 value: function (request, response, chain){
-                    this._action.update({ name: 'name_'+$data.userId, pwd: 'pwd_'+$data.userId }, { id: $data.userId }).then(function (a, b, c){
+                    this._action.update(request.getValue('data'), { id: request.getValue('userId') }).then(function (a, b, c){
                         response.success('update success');
                     });
                 }
@@ -63,7 +65,7 @@ zn.define(function () {
                     userId: null
                 },
                 value: function (request, response, chain){
-                    this._action.findOne({ id: $data.userId }).then(function (data){
+                    this._action.selectOne({ id: request.getValue('userId') }).then(function (data){
                         if(!data){
                             response.error('query no data');
                         }else {

@@ -146,12 +146,20 @@ zn.define(function () {
                     model: null,
                     fields: '*',
                     where: '',
-                    order: ''
+                    ifEnabledRights: 0
                 },
                 value: function (request, response, chain){
                     var _action = this.__getModelAction(request, request.getValue('model'));
                     if(_action){
-                        _action.select(request.getValue('fields'), request.getJSON('where'), request.getJSON('order')).then(function(data){
+                        var _where = request.getJSON('where');
+                        if(+request.getValue('ifEnabledRights')){
+                            if(request.session.hasItem()){
+                                _where['0&<>'] = 'zn_user_exist(' + request.session.getItem('@AdminUser').id + ', users, roles)';
+                            }else {
+                                return response.sessionTimeout('Login Session Timeout.');
+                            }
+                        }
+                        _action.select(request.getValue('fields'), _where).then(function(data){
                             response.success(data);
                         });
                     }else {
@@ -164,19 +172,28 @@ zn.define(function () {
                 argv: {
                     model: null,
                     fields: '*',
-                    where: '',
-                    order: '',
+                    where: '{}',
+                    order: '{}',
                     pageIndex: 1,
-                    pageSize: 10
+                    pageSize: 10,
+                    ifEnabledRights: 0
                 },
                 value: function (request, response, chain){
                     var _action = this.__getModelAction(request, request.getValue('model'));
                     if(_action){
                         var _fields = request.getValue('fields');
+                        var _where = request.getJSON('where');
                         if(_fields=='*'){
-                            _fields = _action._ModelClass.getFields().join(',');
+                            _fields = null;
                         }
-                        _action.paging(_fields, request.getJSON('where'), request.getJSON('order'), request.getInt('pageIndex'), request.getInt('pageSize')).then(function(data){
+                        if(+request.getValue('ifEnabledRights')){
+                            if(request.session.hasItem()){
+                                _where['0&<>'] = 'zn_user_exist(' + request.session.getItem('@AdminUser').id + ', users, roles)';
+                            }else {
+                                return response.sessionTimeout('Login Session Timeout.');
+                            }
+                        }
+                        _action.paging(_fields, _where, request.getJSON('order'), request.getInt('pageIndex'), request.getInt('pageSize')).then(function(data){
                             response.success(data);
                         });
                     }else {
@@ -246,7 +263,11 @@ zn.define(function () {
                 value: function (request, response, chain){
                     var _action = this.__getModelAction(request, request.getValue('model'));
                     if(_action){
-                        _action.deleteNode('id in ('+request.getValue('ids')+')').then(function (){
+                        var _ids = request.getValue('ids');
+                        if(_ids[0]==','){
+                            _ids = '0' + _ids + '0';
+                        }
+                        _action.deleteNode('id in (' + _ids + ')').then(function (){
                             response.success('删除成功');
                         });
                     }else {

@@ -198,7 +198,7 @@ zn.define([
             },
             uploadFile: function (file, upload){
                 var _name = file.path.split(path.sep).pop(),
-                    _ext = file.type.split(path.sep).pop(),
+                    _ext = file.type.split('/').pop(),
                     _file = _name + '.' + _ext,
                     _upload = upload || this._$uploadConfig,
                     _root = _upload.root,

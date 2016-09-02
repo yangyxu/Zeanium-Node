@@ -8,6 +8,11 @@ zn.define(function () {
             model.Rights
         ],
         properties: {
+            roles: {
+                value: null,
+                type: ['varchar', 250],
+                default: ',4,13,'
+            },
             projectId: {
                 value: null,
                 type: ['int', 10],
@@ -16,23 +21,25 @@ zn.define(function () {
             status: {
                 value: null,
                 type: ['int', 10],
-                //convert: 'ZN_PARSE_VAR({})',
-                default: '0'
+                convert: 'zn_convert_var({})',
+                default: '14'
             },
             region: {
                 value: null,
-                type: ['int', 11],
-                convert: 'ZN_PARSE_VAR({})',
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
                 default: '0'
             },
             province: {
                 value: null,
-                type: ['varchar', 50],
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
                 default: '0'
             },
             city: {
                 value: null,
-                type: ['varchar', 50],
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
                 default: '0'
             },
             progress: {
@@ -43,17 +50,11 @@ zn.define(function () {
             planStartTime: {
                 value: null,
                 type: ['datetime'],
-                ignore: true,
-                auto_update: 'now()',
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             planEndTime: {
                 value: null,
                 type: ['datetime'],
-                ignore: true,
-                auto_update: 'now()',
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             shopCode: {
@@ -81,9 +82,10 @@ zn.define(function () {
                 type: ['varchar', 100],
                 default: ''
             },
-            regionContactId: {
+            taskType: {
                 value: null,
                 type: ['int', 10],
+                convert: 'zn_convert_var({})',
                 default: '0'
             },
             supplier: {
@@ -120,6 +122,17 @@ zn.define(function () {
                 value: null,
                 type: ['varchar', 200],
                 default: ''
+            },
+            workerId: {
+                value: null,
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
+                default: '0'
+            },
+            workerIds: {
+                value: null,
+                type: ['varchar', 50],
+                default: ','
             }
         }
     });

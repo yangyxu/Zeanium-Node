@@ -34,7 +34,7 @@ zn.define(function () {
                 }
 
                 return this._store.command
-                    .select(fields || this._ModelClass.getFields(false))
+                    .select(((!fields||fields=='*')?this._ModelClass.getFields(false):fields))
                     .from(this._table)
                     .where(_where)
                     .query();
@@ -56,7 +56,7 @@ zn.define(function () {
                     _size = pageSize || 10,
                     _start = (_index - 1) * _size,
                     _end = _index * _size,
-                    _fields = fields || this._ModelClass.getFields(false),
+                    _fields = ((!fields||fields=='*')?this._ModelClass.getFields(false):fields),
                     _table = this._table;
                 var _sql = zn.sql.select(_fields)
                             .from(_table)

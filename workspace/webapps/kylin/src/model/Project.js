@@ -8,24 +8,21 @@ zn.define(function () {
             model.Rights
         ],
         properties: {
+            roles: {
+                value: null,
+                type: ['varchar', 250],
+                default: ',4,13,'
+            },
             name: {
                 value: null,
                 type: ['varchar', 100],
-                default: '',
-                header: {
-                    title: '项目名称',
-                    width: 200
-                }
+                default: ''
             },
             status: {
                 value: null,
                 type: ['int', 10],
                 default: '19',
-                convert: 'ZN_PARSE_VAR({})',
-                header: {
-                    title: '',
-                    width: 200
-                }
+                convert: 'zn_convert_var({})'
             },
             progress: {
                 value: null,
@@ -35,17 +32,11 @@ zn.define(function () {
             planStartTime: {
                 value: null,
                 type: ['datetime'],
-                ignore: true,
-                auto_update: 'now()',
-                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             planEndTime: {
                 value: null,
                 type: ['datetime'],
-                ignore: true,
-                auto_update: 'now()',
-                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             customer: {

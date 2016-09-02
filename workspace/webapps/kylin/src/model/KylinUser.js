@@ -7,6 +7,12 @@ zn.define(function () {
             model.Base
         ],
         properties: {
+            userId: {
+                value: null,
+                type: ['int', 10],
+                convert: 'zn_convert_user({})',
+                default: '0'
+            },
             name: {
                 value: null,
                 type: ['varchar', 100],
@@ -25,19 +31,49 @@ zn.define(function () {
             status: {
                 value: null,
                 type: ['int', 10],
+                convert: 'zn_convert_var({})',
                 default: '0'
             },
-            roleId: {
+            region: {
                 value: null,
                 type: ['int', 10],
-                default: '0'
+                convert: 'zn_convert_var({})',
+                default: ''
             },
-            roleName: {
+            province: {
+                value: null,
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
+                default: ''
+            },
+            city: {
+                value: null,
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
+                default: ''
+            },
+            address: {
                 value: null,
                 type: ['varchar', 50],
                 default: ''
             },
+            workType: {
+                value: null,
+                type: ['int', 10],
+                convert: 'zn_convert_var({})',
+                default: ''
+            },
+            roleType: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
             star: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            workAge: {
                 value: null,
                 type: ['int', 10],
                 default: '0'
@@ -49,7 +85,7 @@ zn.define(function () {
             },
             sex: {
                 value: null,
-                type: ['int', 10],
+                type: ['varchar', 4],
                 default: '0'
             },
             mobilePhone: {

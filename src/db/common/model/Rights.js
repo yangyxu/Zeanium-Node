@@ -6,6 +6,7 @@ zn.define('../action/Rights',function (RightsAction) {
             ownerId: {
                 value: null,
                 type: ['int', 11],
+                convert: 'zn_convert_user({})',
                 default: '0'
             },
             ifEnabledRights: {
@@ -17,19 +18,17 @@ zn.define('../action/Rights',function (RightsAction) {
             users: {
                 value: null,
                 type: ['varchar', 250],
-                ignore: true,
+                convert: 'zn_convert_users({})',
                 default: ','
             },
             roles: {
                 value: null,
                 type: ['varchar', 250],
-                ignore: true,
                 default: ','
             },
             observers: {
                 value: null,
                 type: ['varchar', 250],
-                ignore: true,
                 default: ','
             }
         }

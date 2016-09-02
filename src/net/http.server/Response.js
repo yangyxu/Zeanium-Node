@@ -65,10 +65,11 @@ zn.define([
                     _args = inArgs || {},
                     _session = this._request._session;
                 var _crossSetting = {
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Headers': 'Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With',
-                    'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
-                    'Access-Control-Max-Age': '3600',
+                    'Access-Control-Allow-Origin': this._request._serverRequest.headers.origin,
+                    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
+                    'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
+                    "Access-Control-Allow-Credentials": true,
+                    'Access-Control-Max-Age': '3600',//一个小时时间
                     'X-Powered-By': 'zeanium-node@1.2.0',
                     'Content-Type': 'application/json;charset=utf-8'
                 };
@@ -106,6 +107,8 @@ zn.define([
                     'Content-Type': CONTENT_TYPE[this.contentType]
                 });
                 this._serverResponse.write(_data, inEncode);
+                zn._request = null;
+                zn._response = null;
             },
             writeContent: function (status, content, contentType){
                 contentType = contentType.toLowerCase();
@@ -234,9 +237,17 @@ zn.define([
                 }, inEncode);
             },
             error: function (inData, inEncode){
+                this.writeHead(500,{});
                 this.__writeJson({
                     result: inData,
                     status: 500
+                }, inEncode);
+            },
+            sessionTimeout: function (inData, inEncode){
+                this.writeHead(401,{});
+                this.__writeJson({
+                    result: inData,
+                    status: 401
                 }, inEncode);
             },
             forword: function (url, isInternal){

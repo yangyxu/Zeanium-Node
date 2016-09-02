@@ -51,14 +51,16 @@ zn.define([
                     if(!_values){
                         return false;
                     }
-                    //console.log(_handler);
                     if(!!_handler.validate && !_request.session.hasItem()){
-                        return response.error('Session is invalid. Please login into system first.');
+                        return response.sessionTimeout('Session is invalid. Please login into system first.');
                     }
+                    zn._request = _request;
+                    zn._response = _response;
                     _controller[_action].call(_controller, request, response, this);
                 } catch (e) {
                     zn.error('RequestHandlerChain doRequest line 45 Error: ' + e.message);
                     console.log(e.stack);
+                    response.error(e.message);
                 }
             },
             __checkMeta: function (_meta, request, response){

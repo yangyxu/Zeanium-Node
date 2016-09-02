@@ -48,11 +48,11 @@ zn.define([
     };
 
     var time = {
-        s: '1000',
-        n: '60000',
-        h: '3600000',
-        d: '86400000',
-        w: '86400000 * 7'
+        s: 1000,
+        n: 60000,
+        h: 3600000,
+        d: 86400000,
+        w: 86400000 * 7
     }
 
 
@@ -69,11 +69,11 @@ zn.define([
             cookie: {
                 // cookie maxAge defaults to 14400000, path defaults to '/' and
                 // httpOnly defaults to true.
-                maxAge: 60 * 60 * 1000,
+                maxAge: 1 * (time.h),
                 //domain: '/',
                 path: '/',
                 expires: '',
-                httpOnly: true,
+                httpOnly: false,
                 secure: false
             }
         },

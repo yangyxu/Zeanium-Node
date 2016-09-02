@@ -9,6 +9,7 @@ zn.define(function () {
                 this._action = this.action('ProjectItem');
             },
             create: {
+                validate: true,
                 method: 'GET/POST',
                 argv: {
 
@@ -41,16 +42,18 @@ zn.define(function () {
                     }.bind(this));
                 }
             },
-            getitems: {
+            getItemsByLoginSessionForMobile: {
+                validate: true,
                 method: 'GET/POST',
                 argv: {
-                    userId: null,
                     status: 0
                 },
                 value: function (request, response, chain){
-                    this._action.select('*', {
-                        status: request.getValue('status')
-                    }).then(function (data){
+                    var _where = { workerId: request.session.getItem('@KylinUser').id };
+                    if(request.getInt('status')){
+                        _where.status = request.getInt('status');
+                    }
+                    this._action.select(null, _where).then(function (data){
                         response.success(data);
                     }.bind(this), function (error){
                         response.error(error.message);

@@ -1,4 +1,4 @@
-zn.define(['node:chinese-to-pinyin'],function (pinyin) {
+zn.define(function () {
 
     return zn.Controller('kylinuser',{
         properties: {
@@ -7,9 +7,6 @@ zn.define(['node:chinese-to-pinyin'],function (pinyin) {
         methods: {
             init: function (args){
                 this._action = this.action('KylinUser');
-            },
-            pinyin: function (request, response, chain){
-                response.success(pinyin('徐洋洋-yangyxu', {filterChinese: true}));
             },
             logout: {
                 validate: true,
@@ -22,14 +19,13 @@ zn.define(['node:chinese-to-pinyin'],function (pinyin) {
             login: {
                 method: 'GET/POST',
                 argv: {
-                    email: null,
+                    name: null,
                     password: null
                 },
                 value: function (request, response, chain){
                     this._action.selectOne(request.getValue()).then(function (user){
                         if(user){
-                            console.log(user);
-                            request.session.setItem('user', user);
+                            request.session.setItem('@KylinUser', user);
                             response.success(user);
                         } else {
                             response.error('用户名或密码不对');

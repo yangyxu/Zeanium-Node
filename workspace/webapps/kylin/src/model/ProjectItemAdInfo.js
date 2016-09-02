@@ -28,7 +28,7 @@ zn.define(function () {
                 default: '0'
             },
             area: {
-                value: null,
+                value: '123',
                 type: ['int', 10],
                 default: '0'
             },

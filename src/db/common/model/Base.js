@@ -27,7 +27,7 @@ zn.define('../action/Base', function (BaseAction) {
                 value: null,
                 type: ['timestamp'],
                 ignore: true,
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: 'now()',
                 header: {
                     title: '创建时间',
@@ -37,22 +37,36 @@ zn.define('../action/Base', function (BaseAction) {
             createPerson: {
                 value: null,
                 type: ['int', 11],
+                convert: 'zn_convert_user({})',
                 //ignore: true,
-                default: '0'
+                default: function (){
+                    if(zn._request.session.hasItem()){
+                        return zn._request.session.getItem('@AdminUser').id;
+                    }else {
+                        return 0;
+                    }
+                }
             },
             modifyTime: {
                 value: null,
                 type: ['datetime'],
                 ignore: true,
                 auto_update: 'now()',
-                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                //format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 default: null
             },
             modifyPerson: {
                 value: null,
                 type: ['int', 11],
+                convert: 'zn_convert_user({})',
                 ignore: true,
-                default: '0'
+                default: function (){
+                    if(zn._request.session.hasItem()){
+                        return zn._request.session.getItem('@AdminUser').id;
+                    }else {
+                        return 0;
+                    }
+                }
             },
             delFlag: {
                 value: null,
@@ -63,16 +77,7 @@ zn.define('../action/Base', function (BaseAction) {
             note: {
                 value: null,
                 type: ['varchar', 250],
-                default: '',
-                common: {
-                    title: '备注'
-                },
-                header: {
-
-                },
-                input: {
-                    type: 'textarea'
-                }
+                default: ''
             }
         }
     });

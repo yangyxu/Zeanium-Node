@@ -16,22 +16,27 @@ zn.define([
     argv = argv.slice(2);
 
     zn.each(argv, function (value){
-        var _temps = value.split(':');
-        _argv[_temps[0]] = _temps[1];
+        var _temps = value.split(':'),
+            _value = _temps[1];
+        if(_value===undefined){
+            _value = true;
+        }
+        _argv[_temps[0]] = _value;
     });
 
     var _host = os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0';
     var _configPath = process.cwd() + zn.SLASH + 'zn.server.config.js';
 
-
-    var os = require('os');
-    zn.each(os.networkInterfaces(), function (en){
-        zn.each(en, function (item){
-            if(item.family=='IPv4'&&!item.internal){
-                _host = item.address;
-            }
-        })
-    });
+    if(!_argv.debug){
+        var os = require('os');
+        zn.each(os.networkInterfaces(), function (en){
+            zn.each(en, function (item){
+                if(item.family=='IPv4'&&!item.internal){
+                    _host = item.address;
+                }
+            })
+        });
+    }
 
     var _serverConfig = {
         host: _host || '0.0.0.0',

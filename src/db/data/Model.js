@@ -126,15 +126,22 @@ zn.define(function () {
             },
             __getInsertFieldsValues: function () {
                 var _kAry = [],
-                    _vAry = [];
+                    _vAry = [],
+                    _self = this;
 
                 this.constructor.getFields(true, function (field, key){
                     var _value = this.get(key);
                     if(zn.is(_value, 'object')){
                         _value = _value.value;
                     }
-                    _value = _value || field.default;
-                    if(_value!=null&&!field.ignore){
+                    if(_value === undefined || _value === null){
+                        var _default = field.default;
+                        if(zn.is(_default, 'function')){
+                            _default = _default.call(_self, field, key);
+                        }
+                        _value = _default;
+                    }
+                    if(_value !== null && !field.ignore){
                         _kAry.push(key);
                         _vAry.push(_value);
                     }
@@ -146,8 +153,11 @@ zn.define(function () {
                 var _self = this,
                     _updates = {};
                 this.constructor.getFields(true, function (field, key){
-                    var _value = _self.get(key)||_self.__formatAutoUpdate(field.auto_update);
-                    if(_value!=null&&_value!=field.default){
+                    var _value = _self.get(key);
+                    if(_value===undefined||_value===null){
+                        _value = _self.__formatAutoUpdate(field.auto_update);
+                    }
+                    if(_value!=null){
                         _updates[key] = _value;
                     }
                 });

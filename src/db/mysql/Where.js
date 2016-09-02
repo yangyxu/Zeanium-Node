@@ -132,7 +132,14 @@ zn.define(function () {
 
                             break;
                         case 'string':
-                            _ands.push(_self.__format([key, value]));
+                            var _argv = [];
+                            if(key.indexOf('&')!=-1){
+                                _argv = key.split('&');
+                                _argv.push(value);
+                            } else {
+                                _argv = [key, value];
+                            }
+                            _ands.push(_self.__format(_argv));
                             break;
                     }
                 });
@@ -145,7 +152,9 @@ zn.define(function () {
                 if (_args.length==2){
                     _args.splice(1, 0, '=');
                 }
-                var _key = _args.shift(), _operate = _args.shift(), _val = _args[0];
+                var _key = _args.shift(),
+                    _operate = _args.shift(),
+                    _val = _args[0];
                 if(zn.type(_val)=='function'){
                     _val = '('+_val.apply(this._context)+')';
                 }else {

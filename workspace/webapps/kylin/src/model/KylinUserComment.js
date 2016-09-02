@@ -2,7 +2,7 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_kylin_user_worker", {
+    return zn.Model("zn_kylin_user_comment", {
         mixins: [
             model.Base
         ],
@@ -12,19 +12,14 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
-            status: {
+            projectItemId: {
                 value: null,
                 type: ['int', 10],
                 default: '0'
             },
-            star: {
+            comment: {
                 value: null,
-                type: ['int', 10],
-                default: '0'
-            },
-            cardId: {
-                value: null,
-                type: ['varchar', 50],
+                type: ['varchar', 500],
                 default: ''
             }
         }

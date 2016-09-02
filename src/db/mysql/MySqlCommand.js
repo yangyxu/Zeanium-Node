@@ -40,14 +40,18 @@ zn.define([
                 this._pool.getConnection(function (err, connection){
                     if(connection){
                         connection.query(_query, function(err, rows, fields) {
-                            if (err){
-                                zn.error(err.message);
-                                _defer.reject(err, _self);
-                                zn.async.catch(err, _self);
-                            }else {
-                                _defer.resolve(rows, fields, _self);
+                            try {
+                                if (err){
+                                    zn.error(err.message);
+                                    _defer.reject(err, _self);
+                                    zn.async.catch(err, _self);
+                                }else {
+                                    _defer.resolve(rows, fields, _self);
+                                }
+                                connection.release();
+                            } catch (e) {
+                                _defer.reject(e, _self);
                             }
-                            connection.release();
                         });
                     }else {
                         zn.error(err.message);

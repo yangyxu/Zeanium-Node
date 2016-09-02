@@ -4,7 +4,7 @@ zn.define(function () {
         methods: {
             initDataBase: {
                 method: 'GET/POST',
-                value: function (request, response, $data, $post, $get, $files){
+                value: function (request, response, chain){
                     this.store().setup().then(function (data){
                         response.success(data);
                     }, function (error){
@@ -12,9 +12,32 @@ zn.define(function () {
                     });
                 }
             },
+            initModel: {
+                method: 'GET/POST',
+                argv: {
+                    model: null
+                },
+                value: function (request, response, chain){
+                    var _modelName = request.getValue('model');
+                    var model = null,
+                        models = this._context._models;
+                    for(var key in models){
+                        model = models[_modelName];
+                        if(model){
+                            var _table = model.getMeta('table');
+                            if (_table&&!models[_table]){
+                                this.store().createModel(model);
+                                break;
+                            }
+                        }
+                    }
+
+                    response.success("init model [" + _modelName + "] successful!!!");
+                }
+            },
             setup: {
                 method: 'GET/POST',
-                value: function (request, response, $data, $post, $get, $files){
+                value: function (request, response, chain){
 
                     var model = null,
                         models = this._context._models;
@@ -26,12 +49,12 @@ zn.define(function () {
                         }
                     }
 
-                    response.success("setup success!!!");
+                    response.success("setup successful!!!");
                 }
             },
             apis: {
                 method: 'GET/POST',
-                value: function (request, response, $data, $post, $get, $files){
+                value: function (request, response, chain){
                     var _routers = this._context._routers,
                         _router = null,
                         _data = [],
@@ -47,7 +70,7 @@ zn.define(function () {
             },
             plugins: {
                 method: 'GET/POST',
-                value: function (request, response, $data, $post, $get, $files){
+                value: function (request, response, chain){
                     response.success(Object.keys(this._context._appContexts));
                 }
             }

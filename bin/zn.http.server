@@ -60,14 +60,18 @@ zn.define([
 
             var _host = os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0';
             var _configPath = process.cwd() + zn.SLASH + 'zn.server.config.js';
-            var os = require('os');
-            zn.each(os.networkInterfaces(), function (en){
-                zn.each(en, function (item){
-                    if(item.family=='IPv4'&&!item.internal){
-                        _host = item.address;
-                    }
-                })
-            });
+
+            if(!_argv.debug){
+                var os = require('os');
+                zn.each(os.networkInterfaces(), function (en){
+                    zn.each(en, function (item){
+                        if(item.family=='IPv4'&&!item.internal){
+                            _host = item.address;
+                        }
+                    })
+                });
+            }
+
             var _serverConfig = {
                 host: _host,
                 port: _argv.port || 8080,

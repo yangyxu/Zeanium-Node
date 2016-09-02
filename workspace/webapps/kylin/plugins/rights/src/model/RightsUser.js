@@ -1,4 +1,4 @@
-zn.define(function () {
+zn.define(['node:chinese-to-pinyin'], function (pinyin) {
 
     var model = zn.db.common.model;
 
@@ -11,6 +11,31 @@ zn.define(function () {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
+            },
+            pinYin: {
+                value: null,
+                type: ['varchar', 20],
+                default: function (){
+                    return pinyin(this.get('name'), { noTone: true, filterChinese: true });
+                }
+            },
+            pinYinFirstChar: {
+                value: null,
+                type: ['varchar', 20],
+                default: function (){
+                    var _firsts = [];
+                    zn.each(pinyin(this.get('name'), { noTone: true, filterChinese: true }).split(' '), function (value, index){
+                        _firsts.push(value[0].toUpperCase());
+                    });
+                    return _firsts.join('');
+                }
+            },
+            firstChar: {
+                value: null,
+                type: ['varchar', 2],
+                default: function (){
+                    return pinyin(this.get('name'), { noTone: true, filterChinese: true })[0].toUpperCase();
+                }
             },
             roleIds: {
                 value: null,
@@ -25,7 +50,7 @@ zn.define(function () {
             pwd: {
                 value: null,
                 type: ['varchar', 100],
-                default: ''
+                default: '1234'
             },
             email: {
                 value: null,
