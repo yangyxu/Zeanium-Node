@@ -14,7 +14,7 @@ zn.define(function () {
                 type: ['varchar', 100],
                 default: ''
             },
-            groupId: {
+            roleType: {
                 value: null,
                 type: ['int', 11],
                 default: '0'

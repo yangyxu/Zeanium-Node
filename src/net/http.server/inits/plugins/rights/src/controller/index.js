@@ -1,13 +1,13 @@
 zn.define([
-    './RightsGroup',
     './RightsMenu',
-    './RightsUser'
-], function (RightsGroup, RightsMenu, RightsUser) {
+    './RightsUser',
+    './RightsVar'
+], function (RightsMenu, RightsUser, RightsVar) {
 
     return {
-        RightsGroup: RightsGroup,
         RightsMenu: RightsMenu,
-        RightsUser: RightsUser
+        RightsUser: RightsUser,
+        RightsVar: RightsVar
     }
 
 });

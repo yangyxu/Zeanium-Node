@@ -10,6 +10,11 @@ zn.define(function () {
             model.Rights
         ],
         properties: {
+            menuId: {
+                value: null,
+                type: ['int', 11],
+                default: '0'
+            },
             url: {
                 value: null,
                 type: ['varchar', 100],
