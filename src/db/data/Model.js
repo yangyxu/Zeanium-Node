@@ -79,7 +79,7 @@ zn.define(function () {
                 if(_isnull){
                     _keys.push(_isnull);
                 }
-                var _default = this.__getDefaultValue(property);
+                var _default = this.__getDefaultValue(property, key);
 
                 if(_default){
                     _keys.push(_default);
@@ -92,10 +92,13 @@ zn.define(function () {
 
                 return _keys.join(' ');
             },
-            __getDefaultValue: function (property) {
+            __getDefaultValue: function (property, key) {
                 if(property.default !== undefined){
                     var _type = property.type[0],
                         _value = property.default;
+                    if(zn.is(_value, 'function')){
+                        _value = _value.call(this, property, key);
+                    }
                     switch(_type){
                         case 'nvarchar':
                         case 'varchar':

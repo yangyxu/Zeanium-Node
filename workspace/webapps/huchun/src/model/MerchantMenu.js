@@ -13,7 +13,7 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
-            lineStatus: {
+            status: {
                 value: null,
                 type: ['int', 10],
                 default: '0'

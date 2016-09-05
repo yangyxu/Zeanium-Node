@@ -21,7 +21,7 @@ zn.define([
     var _htmlRender = new html.Render();
 
     return zn.Class({
-        events: ['end','finish'],
+        events: ['end', 'finish', 'timeout'],
         properties: {
             request: null,
             contentType: 'JSON',
@@ -47,8 +47,11 @@ zn.define([
                     if(!value){ return; }
                     this._serverResponse = value;
                     value.setTimeout(12000, function (){
-                        value.end('[ request timeout ]');
-                    });
+                        this.writeEnd('[ request timeout ]');
+                    }.bind(this));
+                    value.on('timeout', function (){
+                        this.fire('timeout');
+                    }.bind(this));
                     value.on('finish', function (){
                         this.fire('finish');
                     }.bind(this));
@@ -91,24 +94,31 @@ zn.define([
                 this._serverResponse.writeHead(httpStatus, _args);
             },
             write: function(inData, inEncode){
-                var _req = this._request;
-                var _callback = _req.getValue('callback'),
-                    _data = inData;
-                if(typeof _data === 'object'){
-                    _data = JSON.stringify(inData, null, '    ');
-                }
+                try {
+                    if(this._serverResponse.finished){
+                        return;
+                    }
+                    var _req = this._request;
+                    var _callback = _req.getValue('callback'),
+                        _data = inData;
+                    if(typeof _data === 'object'){
+                        _data = JSON.stringify(inData, null, '    ');
+                    }
 
-                if(_callback){
-                    _data = _callback+'('+_data+')';
-                    this.contentType = 'JAVASCRIPT';
-                }
+                    if(_callback){
+                        _data = _callback+'('+_data+')';
+                        this.contentType = 'JAVASCRIPT';
+                    }
 
-                this.writeHead(200, {
-                    'Content-Type': CONTENT_TYPE[this.contentType]
-                });
-                this._serverResponse.write(_data, inEncode);
-                zn._request = null;
-                zn._response = null;
+                    this.writeHead(200, {
+                        'Content-Type': CONTENT_TYPE[this.contentType]
+                    });
+                    this._serverResponse.write(_data, inEncode);
+                    zn._request = null;
+                    zn._response = null;
+                } catch (e) {
+                    console.log(e.message);
+                }
             },
             writeContent: function (status, content, contentType){
                 contentType = contentType.toLowerCase();
@@ -118,7 +128,7 @@ zn.define([
                     "Content-Length": Buffer.byteLength(content, _encode)
                 });
 
-                this.end(content, _encode);
+                this.writeEnd(content, _encode);
             },
             writePath: function (_path, _encoding){
                 _path = path.normalize(_path).split('?')[0];
@@ -222,8 +232,8 @@ zn.define([
                     }
                 }.bind(this));
             },
-            end: function (inData, inEncode) {
-                this._serverResponse.end(inData, inEncode);
+            end: function () {
+                this._serverResponse.end();
                 this.fire('end', this);
             },
             writeEnd: function (inData, inEncode){

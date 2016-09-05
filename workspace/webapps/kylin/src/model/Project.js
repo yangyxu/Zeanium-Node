@@ -21,8 +21,8 @@ zn.define(function () {
             status: {
                 value: null,
                 type: ['int', 10],
-                default: '19',
-                convert: 'zn_convert_var({})'
+                convert: 'zn_convert_var({})',
+                default: '19'
             },
             progress: {
                 value: null,

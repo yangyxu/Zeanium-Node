@@ -38,19 +38,19 @@ zn.define(function () {
                 value: null,
                 type: ['int', 10],
                 convert: 'zn_convert_var({})',
-                default: ''
+                default: '0'
             },
             province: {
                 value: null,
                 type: ['int', 10],
                 convert: 'zn_convert_var({})',
-                default: ''
+                default: '0'
             },
             city: {
                 value: null,
                 type: ['int', 10],
                 convert: 'zn_convert_var({})',
-                default: ''
+                default: '0'
             },
             address: {
                 value: null,
@@ -61,7 +61,7 @@ zn.define(function () {
                 value: null,
                 type: ['int', 10],
                 convert: 'zn_convert_var({})',
-                default: ''
+                default: '0'
             },
             roleType: {
                 value: null,
@@ -86,7 +86,7 @@ zn.define(function () {
             sex: {
                 value: null,
                 type: ['varchar', 4],
-                default: '0'
+                default: '男'
             },
             mobilePhone: {
                 value: null,

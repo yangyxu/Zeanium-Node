@@ -26,7 +26,12 @@ zn.define('../action/Rights',function (RightsAction) {
                 type: ['varchar', 250],
                 default: ','
             },
-            observers: {
+            observeUsers: {
+                value: null,
+                type: ['varchar', 250],
+                default: ','
+            },
+            observeRoles: {
                 value: null,
                 type: ['varchar', 250],
                 default: ','

@@ -2,12 +2,12 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_huchun_merchant_dishes", {
+    return zn.Model("zn_huchun_message", {
         mixins: [
             model.Base
         ],
         properties: {
-            menuId: {
+            userId: {
                 value: null,
                 type: ['int', 10],
                 default: '0'
@@ -17,30 +17,20 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
-            salePrice: {
-                value: null,
-                type: ['float', 4],
-                default: '0.0'
-            },
-            price: {
-                value: null,
-                type: ['float', 4],
-                default: '0.0'
-            },
-            img: {
+            link: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
             },
-            remainNum: {
+            content: {
                 value: null,
-                type: ['int', 10],
-                default: '0'
+                type: ['varchar', 200],
+                default: ''
             },
-            status: {
+            type: {
                 value: null,
-                type: ['int', 10],
-                default: '0'
+                type: ['varchar', 100],
+                default: 'warning'
             }
         }
     });

@@ -2,12 +2,12 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_huchun_merchant", {
+    return zn.Model("zn_rights_user", {
         mixins: [
             model.Base
         ],
         properties: {
-            code: {
+            uid: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
@@ -17,39 +17,9 @@ zn.define(function () {
                 type: ['varchar', 100],
                 default: ''
             },
-            password: {
+            pwd: {
                 value: null,
                 type: ['varchar', 100],
-                default: ''
-            },
-            status: {
-                value: null,
-                type: ['int', 10],
-                default: '0'
-            },
-            status: {
-                value: null,
-                type: ['int', 10],
-                default: '0'
-            },
-            lng: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            lat: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            address: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            contact: {
-                value: null,
-                type: ['varchar', 15],
                 default: ''
             },
             email: {
@@ -57,10 +27,26 @@ zn.define(function () {
                 type: ['varchar', 50],
                 default: ''
             },
-            avatarImage: {
+            phone: {
                 value: null,
-                type: ['varchar', 50],
+                type: ['varchar', 20],
                 default: ''
+            },
+            address: {
+                value: null,
+                type: ['varchar', 250],
+                default: ''
+            },
+            avatarImg: {
+                value: null,
+                type: ['varchar', 100],
+                default: ''
+            },
+            lastLoginTime: {
+                value: null,
+                type: ['datetime'],
+                format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                default: null
             }
         }
     });

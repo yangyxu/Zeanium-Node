@@ -17,9 +17,30 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
+            merchantUserId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            couponId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
             price: {
                 value: null,
-                type: ['int', 10]
+                type: ['float', 4],
+                default: '0'
+            },
+            discount: {
+                value: null,
+                type: ['float', 4],
+                default: '0'
+            },
+            discountPrice: {
+                value: null,
+                type: ['float', 4],
+                default: '0'
             }
         }
     });

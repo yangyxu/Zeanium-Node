@@ -2,45 +2,50 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_huchun_merchant_dishes", {
+    return zn.Model("zn_huchun_merchant_user", {
         mixins: [
             model.Base
         ],
         properties: {
-            menuId: {
-                value: null,
-                type: ['int', 10],
-                default: '0'
-            },
             merchantId: {
                 value: null,
                 type: ['int', 10],
                 default: '0'
             },
-            salePrice: {
-                value: null,
-                type: ['float', 4],
-                default: '0.0'
-            },
-            price: {
-                value: null,
-                type: ['float', 4],
-                default: '0.0'
-            },
-            img: {
+            merchantCode: {
                 value: null,
                 type: ['varchar', 100],
                 default: ''
             },
-            remainNum: {
+            name: {
                 value: null,
-                type: ['int', 10],
-                default: '0'
+                type: ['varchar', 100],
+                default: ''
+            },
+            password: {
+                value: null,
+                type: ['varchar', 100],
+                default: ''
             },
             status: {
                 value: null,
                 type: ['int', 10],
                 default: '0'
+            },
+            phone: {
+                value: null,
+                type: ['varchar', 15],
+                default: ''
+            },
+            email: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            avatarImage: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
             }
         }
     });
