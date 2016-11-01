@@ -1,0 +1,40 @@
+2016-09-16 21:10:24.317 [[38mINFO[0m] [ Begin ] Scanning Path:/Code/Git/Lib/github/zeanium-node/src/net/http.server/www/
+2016-09-16 21:10:24.324 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/src/net/http.server/www/__zn__
+2016-09-16 21:10:24.370 [[38mINFO[0m] Register Project(Application): __zn__
+2016-09-16 21:10:24.370 [[38mINFO[0m] [ End ] Scanning Path(Application:1):/Code/Git/Lib/github/zeanium-node/src/net/http.server/www/
+2016-09-16 21:10:24.371 [[38mINFO[0m] [ Begin ] Scanning Path:/Code/Git/Lib/github/zeanium-node/workspace/
+2016-09-16 21:10:24.373 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/hcorder
+2016-09-16 21:10:24.391 [[38mINFO[0m] Register Project(Application): hcorder
+2016-09-16 21:10:24.392 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/klproject
+2016-09-16 21:10:24.408 [[38mINFO[0m] Register Project(Application): klproject
+2016-09-16 21:10:24.409 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/znadmin
+2016-09-16 21:10:24.523 [[38mINFO[0m] Register Project(Application): znadmin
+2016-09-16 21:10:24.524 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/zndbms
+2016-09-16 21:10:24.535 [[38mINFO[0m] Register Project(Application): zndbms
+2016-09-16 21:10:24.535 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/znfs
+2016-09-16 21:10:24.539 [[38mINFO[0m] Register Project(Application): znfs
+2016-09-16 21:10:24.539 [[38mINFO[0m] [ End ] Scanning Path(Application:5):/Code/Git/Lib/github/zeanium-node/workspace/
+2016-09-16 21:10:24.544 [[38mINFO[0m] http://127.0.0.1:8888
+2016-09-16 21:10:24.544 [[38mINFO[0m] http://192.168.0.100:8888
+2016-09-16 21:10:24.544 [[38mINFO[0m] http://127.0.0.1:8888
+2016-09-16 21:10:24.545 [[38mINFO[0m] You can press [ control + c ] to stop current zeanium server.
+2016-09-16 21:16:59.408 [[38mINFO[0m] [ Begin ] Scanning Path:/Code/Git/Lib/github/zeanium-node/src/net/http.server/www/
+2016-09-16 21:16:59.415 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/src/net/http.server/www/__zn__
+2016-09-16 21:16:59.457 [[38mINFO[0m] Register Project(Application): __zn__
+2016-09-16 21:16:59.457 [[38mINFO[0m] [ End ] Scanning Path(Application:1):/Code/Git/Lib/github/zeanium-node/src/net/http.server/www/
+2016-09-16 21:16:59.458 [[38mINFO[0m] [ Begin ] Scanning Path:/Code/Git/Lib/github/zeanium-node/workspace/
+2016-09-16 21:16:59.459 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/hcorder
+2016-09-16 21:16:59.473 [[38mINFO[0m] Register Project(Application): hcorder
+2016-09-16 21:16:59.474 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/klproject
+2016-09-16 21:16:59.487 [[38mINFO[0m] Register Project(Application): klproject
+2016-09-16 21:16:59.488 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/znadmin
+2016-09-16 21:16:59.590 [[38mINFO[0m] Register Project(Application): znadmin
+2016-09-16 21:16:59.590 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/zndbms
+2016-09-16 21:16:59.600 [[38mINFO[0m] Register Project(Application): zndbms
+2016-09-16 21:16:59.600 [[38mINFO[0m] Loading Application: /Code/Git/Lib/github/zeanium-node/workspace/znfs
+2016-09-16 21:16:59.604 [[38mINFO[0m] Register Project(Application): znfs
+2016-09-16 21:16:59.605 [[38mINFO[0m] [ End ] Scanning Path(Application:5):/Code/Git/Lib/github/zeanium-node/workspace/
+2016-09-16 21:16:59.607 [[38mINFO[0m] http://127.0.0.1:8888
+2016-09-16 21:16:59.608 [[38mINFO[0m] http://192.168.0.100:8888
+2016-09-16 21:16:59.608 [[38mINFO[0m] http://127.0.0.1:8888
+2016-09-16 21:16:59.608 [[38mINFO[0m] You can press [ control + c ] to stop current zeanium server.

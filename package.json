@@ -1,0 +1,43 @@
+{
+  "name": "zeanium-node",
+  "version": "0.3.0",
+  "description": "Zeanium for Node.js, simple http server and custome your business.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node ./bin/zn.http.server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yangyxu/Zeanium-Node.git"
+  },
+  "keywords": [
+    "cli",
+    "command",
+    "Javascript",
+    "OOP",
+    "Framework"
+  ],
+  "author": "yangyxu",
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "chinese-to-pinyin": "^0.1.4",
+    "chokidar": "^1.4.3",
+    "crypto": "0.0.3",
+    "formidable": "^1.0.17",
+    "iconv-lite": "^0.4.13",
+    "ioredis": "^1.15.1",
+    "mysql": "^2.10.2",
+    "nodemailer": "^2.6.4",
+    "officegen": "^0.4.0",
+    "request": "^2.72.0",
+    "xlsx": "^0.8.0"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "zn": "./bin/zn.http.server"
+  }
+}

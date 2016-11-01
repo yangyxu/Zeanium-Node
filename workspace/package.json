@@ -1,0 +1,25 @@
+{
+  "name": "workspace",
+  "version": "0.0.1",
+  "description": "project workspace",
+  "main": "index.js",
+  "scripts": {
+    "dev-huchun": "node start config:zn.hc.config.js",
+    "dev-kylin": "node start config:zn.kl.config.js",
+    "huchun": "nohup node start config:zn.hc.config.js",
+    "kylin": "nohup node start config:zn.kl.config.js",
+    "publish": "nohup node start config:zn.kl.config.js; nohup node start config:zn.hc.config.js"
+  },
+  "keywords": [
+    "cli",
+    "command",
+    "Project",
+    "workspace"
+  ],
+  "author": "yangyxu",
+  "license": "MIT",
+  "dependencies": {
+    "zeanium-node": "^0.3.0"
+  },
+  "preferGlobal": "true"
+}

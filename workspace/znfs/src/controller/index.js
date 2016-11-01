@@ -1,0 +1,4 @@
+zn.define([
+    './Writer',
+    './Reader'
+]);

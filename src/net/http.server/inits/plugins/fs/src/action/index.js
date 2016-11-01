@@ -1,0 +1,8 @@
+zn.define([
+],function (){
+
+    return {
+
+    }
+
+});
