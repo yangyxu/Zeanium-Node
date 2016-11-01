@@ -31,10 +31,14 @@
     "iconv-lite": "^0.4.13",
     "ioredis": "^1.15.1",
     "mysql": "^2.10.2",
+<<<<<<< HEAD
     "nodemailer": "^2.6.4",
     "officegen": "^0.4.0",
     "request": "^2.72.0",
     "xlsx": "^0.8.0"
+=======
+    "request": "^2.72.0"
+>>>>>>> 5dcf935bd6d3c15b0e7ef527f4739b8917110c75
   },
   "preferGlobal": "true",
   "bin": {
