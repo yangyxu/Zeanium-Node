@@ -1,6 +1,6 @@
 {
   "name": "zeanium-node",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "directories": {
@@ -31,14 +31,11 @@
     "iconv-lite": "^0.4.13",
     "ioredis": "^1.15.1",
     "mysql": "^2.10.2",
-<<<<<<< HEAD
     "nodemailer": "^2.6.4",
     "officegen": "^0.4.0",
     "request": "^2.72.0",
-    "xlsx": "^0.8.0"
-=======
+    "xlsx": "^0.8.0",
     "request": "^2.72.0"
->>>>>>> 5dcf935bd6d3c15b0e7ef527f4739b8917110c75
   },
   "preferGlobal": "true",
   "bin": {
