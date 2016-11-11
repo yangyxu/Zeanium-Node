@@ -103,14 +103,24 @@ zn.define([
                         return false;
                     }
 
-                    if(zn.type(_defaultValue)=='object'){
-                        var _value = _defaultValue.value,
-                            _reg = _defaultValue.regexp;
+                    switch (zn.type(_defaultValue)) {
+                        case 'object':
+                            var _value = _defaultValue.value,
+                                _reg = _defaultValue.regexp;
 
-                        if(_reg && !_reg.test(_value)){
-                            response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
-                            return false;
-                        }
+                            if(_reg && !_reg.test(_value)){
+                                response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
+                                return false;
+                            }
+                            break;
+                        case 'function':
+                            var _temp = _defaultValue(this.getValue(_key), this);
+                            if(_temp===false){
+                                response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
+                                return false;
+                            }
+
+                            break;
                     }
 
                     if(_newValue === undefined && _defaultValue){

@@ -140,12 +140,14 @@ zn.define([
                         if(index > (_splitIndex - 1)){
                             var _item = null,
                                 _action = null,
-                                _table = null;
+                                _table = null,
+                                _name = null;
                             for(var key in items){
                                 _item = items[key];
+                                _name = _item.$path.split(zn.SLASH).pop().split('.').shift();
                                 _action = _self.getAction(_item);
                                 _table = _item.getTable();
-                                __actions[key] = _action;
+                                __actions[key] = __actions[_name] = _action;
                                 if(_table){
                                     __actions[_table] = _action;
                                 }

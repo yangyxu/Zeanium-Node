@@ -18,7 +18,7 @@ zn.define([
     argv = argv.slice(2);
 
     switch (argv[0]) {
-        case 'help':
+        case 'info':
             console.log(info);
             break;
         case 'create':
@@ -54,13 +54,15 @@ zn.define([
             break;
         default :
             zn.each(argv, function (value){
-                var _temps = value.split(':');
-                _argv[_temps[0]] = _temps[1];
+                var _temps = value.split(':'),
+                    _value = _temps[1];
+                if(_value===undefined){
+                    _value = true;
+                }
+                _argv[_temps[0]] = _value;
             });
 
             var _host = os.platform() === 'darwin'?'127.0.0.1':'0.0.0.0';
-            var _configPath = process.cwd() + zn.SLASH + 'zn.server.config.js';
-
             if(!_argv.debug){
                 var os = require('os');
                 zn.each(os.networkInterfaces(), function (en){
@@ -73,23 +75,29 @@ zn.define([
             }
 
             var _serverConfig = {
-                host: _host,
+                host: '0.0.0.0',
                 port: _argv.port || 8080,
-                debug: false,
                 catalog: '/',
-                currentPath: true,
-                __dirname: process.cwd() || __dirname,
                 onLoaded: function (){
                     zn.info('You can press [ control + c ] to stop current zeanium server.');
                 }
             };
+            var _config = _argv.config || 'zn.server.config.js';
+            var _configPath = process.cwd() + zn.SLASH + _config;
 
             if(fs.existsSync(_configPath)){
-                zn.load(_configPath, function (data) {
-                    zn.extend(_serverConfig, data);
-                    net.http.HttpServer.createServer(_serverConfig);
+                zn.load(_configPath, function (data){
+                    var _config = zn.overwrite(data, _serverConfig);
+                    if(_argv.debug){
+                        console.log('config: ', _config);
+                    }
+
+                    net.http.HttpServer.createServer(_config);
                 });
-            } else {
+            }else {
+                if(_argv.debug){
+                    console.log('config: ', _serverConfig);
+                }
                 net.http.HttpServer.createServer(_serverConfig);
             }
             break;

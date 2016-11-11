@@ -1,9 +1,3 @@
 zn.define([
 
-], function () {
-
-    return {
-
-    }
-
-});
+]);

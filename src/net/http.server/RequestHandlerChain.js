@@ -67,7 +67,7 @@ zn.define([
 
                         for(var i=0, _len = _ary.length; i < _len; i++){
                             if(!_request.session.getItem(_ary[i])){
-                                return response.sessionTimeout('Session ' + _ary[i] + ' is invalid.');
+                                return response.sessionTimeout('Session [' + _ary[i] + '] is invalid.');
                             }
                         }
                     }
