@@ -99,7 +99,7 @@ zn.define(function () {
                 validate: true,
                 method: 'GET/POST',
                 value: function (request, response, chain){
-                    response.success(request.session.getItem('user'));
+                    response.success(request.session);
                 }
             },
             update: {
