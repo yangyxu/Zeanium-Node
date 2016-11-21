@@ -27,12 +27,13 @@ zn.define(['node:xlsx'], function (xlsx) {
                             var _table = model.getMeta('table');
                             if (_table&&!models[_table]){
                                 this.store().createModel(model);
-                                break;
+                                response.success("init model [" + _modelName + "] successful!!!");
+                                return ;
                             }
                         }
                     }
 
-                    response.success("init model [" + _modelName + "] successful!!!");
+                    response.error("model [" + _modelName + "] is not exist!");
                 }
             },
             setup: {

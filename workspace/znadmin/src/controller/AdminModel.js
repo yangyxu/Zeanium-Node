@@ -92,8 +92,7 @@ zn.define(function () {
                 method: 'GET/POST',
                 value: function (request, response, chain){
                     var _action = this.__getModelAction(request, request.getValue('name'));
-
-                    response.success('xxx');
+                    response.success(_action);
                 }
             },
             selectAllChildByPid: {
@@ -116,6 +115,8 @@ zn.define(function () {
                     if(_action){
                         _action.select(request.getValue('fields'), _whereSql, request.getJSON('order')).then(function(data){
                             response.success(data);
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -135,6 +136,8 @@ zn.define(function () {
                     if(_action){
                         _action.select(request.getValue('fields'), request.getJSON('where'), request.getJSON('order')).then(function(data){
                             response.success(data.length?data[0]:null);
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -162,6 +165,8 @@ zn.define(function () {
                         }
                         _action.select(request.getValue('fields'), _where).then(function(data){
                             response.success(data);
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -196,6 +201,8 @@ zn.define(function () {
                         }
                         _action.paging(_fields, _where, request.getJSON('order'), request.getInt('pageIndex'), request.getInt('pageSize')).then(function(data){
                             response.success(data);
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -214,6 +221,9 @@ zn.define(function () {
                         _action.addNode(request.getJSON('data')).then(function (data){
                             _action = null;
                             response.success(data);
+                        }, function (data){
+                            console.log('xxx');
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -232,6 +242,8 @@ zn.define(function () {
                     if(_action){
                         _action.updateNode(request.getJSON('data'), request.getJSON('where')).then(function (data){
                             response.success(data);
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -249,6 +261,8 @@ zn.define(function () {
                     if(_action){
                         _action.deleteNode({ id: request.getValue('id') }).then(function (){
                             response.success('删除成功');
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');
@@ -270,6 +284,8 @@ zn.define(function () {
                         }
                         _action.deleteNode('id in (' + _ids + ')').then(function (){
                             response.success('删除成功');
+                        }, function (data){
+                            response.error(data);
                         });
                     }else {
                         response.error('Model is not exist!');

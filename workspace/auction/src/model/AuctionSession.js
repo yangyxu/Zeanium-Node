@@ -1,11 +1,11 @@
 zn.define(function () {
 
     var model = zn.db.common.model;
-    return zn.Model("zn_auction_product_type", {
+
+    return zn.Model("zn_auction_session", {
         mixins: [
             model.Base,
-            model.Tag,
-            model.Tree
+            model.Tag
         ],
         properties: {
             typeId: {
@@ -18,7 +18,7 @@ zn.define(function () {
                 type: ['varchar', 200],
                 default: ''
             },
-            descript: {
+            description: {
                 value: null,
                 type: ['varchar', 500],
                 default: ''
@@ -29,6 +29,11 @@ zn.define(function () {
                 default: ''
             },
             imgs: {
+                value: null,
+                type: ['varchar', 3000],
+                default: ','
+            },
+            videos: {
                 value: null,
                 type: ['varchar', 3000],
                 default: ','
@@ -48,7 +53,22 @@ zn.define(function () {
                 type: ['varchar', 500],
                 default: ','
             },
+            beginTime: {
+                value: null,
+                type: ['datetime'],
+                default: null
+            },
+            endTime: {
+                value: null,
+                type: ['datetime'],
+                default: null
+            },
             status: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            watchCount: {
                 value: null,
                 type: ['int', 10],
                 default: '0'

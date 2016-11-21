@@ -135,24 +135,29 @@ zn.define([
                     __models = {},
                     __actions = {},
                     __controllers= {};
+                console.log(_controllers.concat(_models));
                 zn.define(_controllers.concat(_models), function (){
                     zn.each(arguments, function (items, index){
                         if(index > (_splitIndex - 1)){
                             var _item = null,
+                                _items = {},
                                 _action = null,
                                 _table = null,
                                 _name = null;
+
                             for(var key in items){
                                 _item = items[key];
                                 _name = _item.$path.split(zn.SLASH).pop().split('.').shift();
                                 _action = _self.getAction(_item);
                                 _table = _item.getTable();
                                 __actions[key] = __actions[_name] = _action;
+                                _items[_name] = _item;
                                 if(_table){
                                     __actions[_table] = _action;
                                 }
                             }
-                            zn.extend(__models, items);
+
+                            zn.extend(__models, _items);
                         } else {
                             zn.extend(__controllers, items);
                         }

@@ -2,7 +2,7 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_auction_product", {
+    return zn.Model("zn_auction_product_bids", {
         mixins: [
             model.Base
         ],

@@ -22,7 +22,6 @@ zn.define(function () {
                     _fields.push(key);
                     _values.push(model[key]);
                 }
-
                 this.beginTransaction()
                     .query('select {0} from {1} where id={2};select max(treeOrder)+1 as treeOrder from {1} where delFlag=0 and pid={2};'.format('id,depth,parentPath,treeOrder', _table, _model.pid||0))
                     .query('insert into {0} ({1}) values ({2});update {0} set {3} where id={4};', function (sql, rows, fields, tran){
@@ -50,7 +49,7 @@ zn.define(function () {
                         }
                     });
 
-                    return _defer.promise;
+                return _defer.promise;
             },
             deleteTreeNode: function (where){
                 var _defer = zn.async.defer();
