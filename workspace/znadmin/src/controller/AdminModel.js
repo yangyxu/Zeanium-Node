@@ -158,7 +158,11 @@ zn.define(function () {
                         var _where = request.getJSON('where');
                         if(+request.getValue('ifEnabledRights')){
                             if(request.session.hasItem()){
-                                _where['0&<>'] = 'zn_user_exist(' + request.session.getItem('@AdminUser').id + ', users, roles)';
+                                if(request.session.getItem('@AdminUser')){
+                                    _where['0&<>'] = 'zn_user_exist(' + request.session.getItem('@AdminUser').id + ', users, roles)';
+                                }else {
+                                    return response.sessionTimeout('Login Session Timeout.');
+                                }
                             }else {
                                 return response.sessionTimeout('Login Session Timeout.');
                             }
@@ -222,7 +226,6 @@ zn.define(function () {
                             _action = null;
                             response.success(data);
                         }, function (data){
-                            console.log('xxx');
                             response.error(data);
                         });
                     }else {

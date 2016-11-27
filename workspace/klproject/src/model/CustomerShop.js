@@ -12,11 +12,6 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
-            uuid: {
-                value: null,
-                type: ['varchar', 50],
-                default: 'uuid()'
-            },
             name: {
                 value: null,
                 type: ['varchar', 15],

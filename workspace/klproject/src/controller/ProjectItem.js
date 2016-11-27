@@ -24,6 +24,23 @@ zn.define(function () {
                     });
                 }
             },
+            deleteTask: {
+                validate: true,
+                method: 'GET/POST',
+                argv: {
+                    taskId: null,
+                    projectId: null
+                },
+                value: function (request, response, chain){
+                    this._action.deleteNode({ id: request.getValue('taskId') }).then(function (info){
+                        this._store.query("update zn_kylin_project set taskAllCount=taskAllCount-1 where id={0}".format(request.getValue('projectId'))).then(function (){
+                            response.success(info);
+                        });
+                    }.bind(this), function (error){
+                        response.error(error.message);
+                    });
+                }
+            },
             finishTask: {
                 validate: true,
                 method: 'GET/POST',
@@ -32,7 +49,7 @@ zn.define(function () {
                     id: null
                 },
                 value: function (request, response, chain){
-                    this._action.updateNode({ status: 35 }, request.getValue()).then(function (info){
+                    this._action.updateNode({ status: 34 }, request.getValue()).then(function (info){
                         this._store.query("update zn_kylin_project set taskFinishedCount=taskFinishedCount+1 where id={0}".format(request.getValue('projectId'))).then(function (){
                             response.success(info);
                         });
@@ -52,6 +69,21 @@ zn.define(function () {
                     var _sql = 'select ' + _fields + ' from ' + _table + ' where zn_kylin_project_item.id={0};';
                     _sql += "select * from zn_kylin_project_item_attach where projectItemId={0};";
 
+                    this._store.query(_sql.format(request.getInt('itemId'))).then(function (data){
+                        response.success(data);
+                    }.bind(this), function (error){
+                        response.error(error.message);
+                    }.bind(this));
+                }
+            },
+            getItemFeedback: {
+                method: 'GET/POST',
+                argv: {
+                    itemId: null
+                },
+                value: function (request, response, chain){
+                    var _sql = 'select * from zn_kylin_project_item where id={0};';
+                    _sql += "select *, zn_convert_user(adminId) as adminId_convert, zn_convert_kylin_user(userId) as userId_convert from zn_kylin_project_item_feedback where projectItemId={0};";
                     this._store.query(_sql.format(request.getInt('itemId'))).then(function (data){
                         response.success(data);
                     }.bind(this), function (error){
@@ -96,7 +128,7 @@ zn.define(function () {
                 }
             },
             getItemsByLoginSessionForMobile: {
-                validate: true,
+                validate: ['@KylinUser'],
                 method: 'GET/POST',
                 argv: {
                     status: 0

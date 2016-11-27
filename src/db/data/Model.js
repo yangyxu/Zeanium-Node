@@ -99,13 +99,19 @@ zn.define(function () {
                     if(zn.is(_value, 'function')){
                         _value = _value.call(this, property, key);
                     }
+
                     switch(_type){
                         case 'nvarchar':
                         case 'varchar':
-                            if(_value.indexOf('{') === 0 && _value.indexOf('}') === (_value.length-1)){
-                                _value = _value.substring(1, _value.length-1);
-                            }else {
-                                _value = "'"+_value+"'";
+                        case 'char':
+                            if(zn.is(_value, 'string')){
+                                /*
+                                if(_value.indexOf('{') === 0 && _value.indexOf('}') === (_value.length-1)){
+                                    _value = _value.substring(1, _value.length-1);
+                                }else {
+                                    _value = "'" + _value + "'";
+                                }*/
+                                _value = "'" + _value + "'";
                             }
                             break;
                         case 'date':
@@ -153,7 +159,6 @@ zn.define(function () {
                         _vAry.push(_value);
                     }
                 }.bind(this));
-
                 return [_kAry, _vAry];
             },
             __getUpdateFieldsValues: function () {

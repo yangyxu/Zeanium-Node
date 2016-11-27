@@ -18,25 +18,29 @@ zn.define(function () {
             login: {
                 method: 'GET/POST',
                 argv: {
-                    name: null,
+                    token: null,
                     password: null
                 },
                 value: function (request, response, chain){
-                    this._store.command.query("select * from zn_kylin_user where (phone='{0}' or name='{0}' or email='{0}') and password='{1}'".format(request.getValue('name'),request.getValue('password'))).then(function (data){
+                    this._store.command.query("select * from zn_kylin_user where (phone='{0}' or name='{0}' or email='{0}') and password='{1}'".format(request.getValue('token'),request.getValue('password'))).then(function (data){
                         var user = data[0];
                         if(user){
                             if(+user.status==32){
                                 response.error('您账户已经被锁定, 请联系公司后勤人员！');
                             }else {
                                 user.isAdmin = false;
+                                user.password = null;
+                                delete user.password;
                                 request.session.setItem('@KylinUser', user);
                                 response.success(user);
                             }
                         } else {
-                            this._store.command.query("select * from zn_admin_user where (phone='{0}' or name='{0}' or email='{0}') and password='{1}'".format(request.getValue('name'),request.getValue('password'))).then(function(data){
+                            this._store.command.query("select * from zn_admin_user where (phone='{0}' or name='{0}' or email='{0}') and password='{1}'".format(request.getValue('token'),request.getValue('password'))).then(function(data){
                                 if(data.length){
                                     var _user = data[0];
                                     _user.isAdmin = true;
+                                    _user.password = null;
+                                    delete _user.password;
                                     this._store.command.query("select * from zn_admin_menu where zn_user_exist(" + _user.id + ", users, roles)<>0 and url<>'';").then(function (menu){
                                         _user.menu = menu;
                                         request.session.setItem('@AdminUser', _user);
@@ -67,7 +71,7 @@ zn.define(function () {
                         if(user){
                             response.error('该手机号已经注册过，请重新输入！');
                         } else {
-                            this._action.addNode(request.getValue()).then(function (info){
+                            this._action.addNode(zn.extend(request.getValue(), { status: 31 })).then(function (info){
                                 response.success('恭喜您, 成为我们大家庭的一员哦！');
                             }.bind(this), function (error){
                                 response.error(error.message);

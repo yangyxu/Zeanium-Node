@@ -9,6 +9,12 @@ zn.define('../action/Base', function (BaseAction) {
                 ignore: true,
                 primary: true
             },
+            /*
+            _id: {
+                value: null,
+                type: ['char', 36],
+                default: '{uuid()}'
+            },*/
             title: {
                 value: null,
                 type: ['varchar', 100],

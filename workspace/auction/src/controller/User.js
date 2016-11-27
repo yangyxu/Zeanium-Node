@@ -19,13 +19,15 @@ zn.define(function () {
                 }
             },
             login: {
-                method: 'GET/POST',
+                method: 'POST/GET',
                 argv: {
-                    name: null,
-                    password: null
+
                 },
                 value: function (request, response, chain){
-
+                    response.success({
+                        name: 'yangyxu',
+                        pass: '1234'
+                    });
                 }
             }
         }

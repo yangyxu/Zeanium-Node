@@ -135,7 +135,7 @@ zn.define([
                     __models = {},
                     __actions = {},
                     __controllers= {};
-                console.log(_controllers.concat(_models));
+
                 zn.define(_controllers.concat(_models), function (){
                     zn.each(arguments, function (items, index){
                         if(index > (_splitIndex - 1)){
@@ -147,6 +147,10 @@ zn.define([
 
                             for(var key in items){
                                 _item = items[key];
+                                if(!_item){
+                                    zn.error('The model ['+key+'] is not exist.');
+                                    continue;
+                                }
                                 _name = _item.$path.split(zn.SLASH).pop().split('.').shift();
                                 _action = _self.getAction(_item);
                                 _table = _item.getTable();

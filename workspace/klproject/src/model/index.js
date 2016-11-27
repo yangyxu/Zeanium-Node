@@ -8,7 +8,8 @@ zn.define([
     './Project',
     './ProjectItem',
     './ProjectItemAdInfo',
-    './ProjectItemAttach'
+    './ProjectItemAttach',
+    './ProjectItemFeedback'
 ], function (
     Customer,
     CustomerShop,
@@ -19,7 +20,8 @@ zn.define([
     Project,
     ProjectItem,
     ProjectItemAdInfo,
-    ProjectItemAttach
+    ProjectItemAttach,
+    ProjectItemFeedback
 ){
 
     return {
@@ -32,7 +34,8 @@ zn.define([
         Project: Project,
         ProjectItem: ProjectItem,
         ProjectItemAdInfo: ProjectItemAdInfo,
-        ProjectItemAttach: ProjectItemAttach
+        ProjectItemAttach: ProjectItemAttach,
+        ProjectItemFeedback: ProjectItemFeedback
     }
 
 });

@@ -45,7 +45,23 @@ zn.define([
             __onRequest: function(request, response){
                 try{
                     this.fire('request',request, response);
-                    this._context.accept(request, response);
+                    if('OPTIONS' == request.method){
+                        response.writeHead(200, {
+                            'Access-Control-Allow-Origin': request.headers.origin,
+                            'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
+                            'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
+                            "Access-Control-Allow-Credentials": true,
+                            'Access-Control-Max-Age': '3600',//一个小时时间
+                            'X-Powered-By': 'zeanium-node@1.2.0',
+                            'Content-Type': 'text/html;charset=utf-8',
+                            'Trailer': 'Content-MD5'
+                        });
+                        response.write('<a href="https://github.com/yangyxu/Zeanium-Node">zeanium-node@1.2.0</a>');
+                        response.addTrailers({'Content-MD5': zn.uuid()});
+                        response.end();
+                    }else {
+                        this._context.accept(request, response);
+                    }
                 } catch (e){
                     zn.error('HttpServer.js  Line - 61 ' + e.message);
                     console.log(e.stack);

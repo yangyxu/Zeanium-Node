@@ -53,7 +53,12 @@ zn.define([
                 zn.each(ary, function (value, key){
                     switch(zn.type(value)){
                         case 'string':
-                            ary[key] = "'"+value+"'";
+                            if(value.indexOf('{') === 0 && value.indexOf('}') === (value.length-1)){
+                                value = value.substring(1, value.length-1);
+                            }else {
+                                value = "'" + value + "'";
+                            }
+                            ary[key] = value;
                             break;
                         case 'object':
 

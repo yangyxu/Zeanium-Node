@@ -10,9 +10,9 @@ zn.define(function (){
             'mysql': {
                 default: true,
                 type: 'mysql',
-                host: '120.55.85.162',
+                host: '106.14.41.74',
                 user: 'root',
-                password: 'youyang2016',
+                password: 'Kylin2016',
                 database:'zn_kylin',
                 port: 3306
             }

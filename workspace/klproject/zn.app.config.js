@@ -13,16 +13,5 @@ zn.define({
             httpOnly: true,
             secure: false
         }
-    },
-    databases: {
-        'mysql': {
-            default: true,
-            type: 'mysql',
-            host: '120.55.85.162',
-            user: 'root',
-            password: 'youyang2016',
-            database:'zn_kylin',
-            port: 3306
-        }
     }
 });

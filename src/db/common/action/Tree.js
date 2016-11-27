@@ -31,16 +31,22 @@ zn.define(function () {
                             _depth = (_pidModel?_pidModel.depth:0) + 1,
                             _parentPath = (_pidModel?_pidModel.parentPath:'') + (_pid === 0 ? '' : _pid) + ',';
 
-                        _fields = _fields.concat(['parentPath', 'treeOrder', 'depth']).join(',');
-                        _values = _values.concat([_parentPath, _treeOrder, _depth]);
+                        _fields = _fields.concat(['_id', 'parentPath', 'treeOrder', 'depth']).join(',');
+                        _values = _values.concat(['{uuid()}', _parentPath, _treeOrder, _depth]);
 
                         _values.forEach(function (value, index){
                             if(zn.is(value, 'string')){
-                                _values[index] = "'"+_values[index]+"'";
+                                if(value.indexOf('{') === 0 && value.indexOf('}') === (value.length-1)){
+                                    _values[index] = value.substring(1, value.length-1);
+                                }else {
+                                    _values[index] = "'" + value + "'";
+                                }
                             }
                         });
                         _values = _values.join(',');
-                        return sql.format(_table, _fields, _values, 'sons=sons+1', _pid);
+                        sql = sql.format(_table, _fields, _values, 'sons=sons+1', _pid);
+                        zn.debug(sql);
+                        return sql;
                     }).commit().on('finally', function (sender, data){
                         if(data.rows){
                             _defer.resolve(data.rows);
