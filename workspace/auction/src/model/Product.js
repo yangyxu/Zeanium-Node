@@ -12,6 +12,11 @@ zn.define(function () {
                 type: ['varchar', 100],
                 default: ','
             },
+            sessionId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
             masterId: {
                 value: null,
                 type: ['int', 10],
@@ -25,6 +30,7 @@ zn.define(function () {
             typeId: {
                 value: null,
                 type: ['int', 10],
+                convert: 'zn_convert_product_type({})',
                 default: '0'
             },
             types: {
@@ -47,7 +53,22 @@ zn.define(function () {
                 type: ['float', 4],
                 default: '0.0'
             },
-            price: {
+            reservePrice: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            beginPrice: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            endPrice: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            brokerage: {
                 value: null,
                 type: ['float', 4],
                 default: '0.0'
@@ -131,6 +152,41 @@ zn.define(function () {
                 value: null,
                 type: ['int', 10],
                 default: '0'
+            },
+            delayPeriod: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            argv: {
+                value: null,
+                type: ['varchar', 5000],
+                default: '{}'
+            },
+            notifyUsers: {
+                value: null,
+                type: ['varchar', 2000],
+                default: ','
+            },
+            collectUsers: {
+                value: null,
+                type: ['varchar', 2000],
+                default: ','
+            },
+            gongGao: {
+                value: null,
+                type: ['LONGTEXT'],
+                default: ''
+            },
+            xuZhi: {
+                value: null,
+                type: ['LONGTEXT'],
+                default: ''
+            },
+            bangZhu: {
+                value: null,
+                type: ['LONGTEXT'],
+                default: ''
             }
         }
     });

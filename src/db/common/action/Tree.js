@@ -31,8 +31,8 @@ zn.define(function () {
                             _depth = (_pidModel?_pidModel.depth:0) + 1,
                             _parentPath = (_pidModel?_pidModel.parentPath:'') + (_pid === 0 ? '' : _pid) + ',';
 
-                        _fields = _fields.concat(['_id', 'parentPath', 'treeOrder', 'depth']).join(',');
-                        _values = _values.concat(['{uuid()}', _parentPath, _treeOrder, _depth]);
+                        _fields = _fields.concat(['parentPath', 'treeOrder', 'depth']).join(',');
+                        _values = _values.concat([_parentPath, _treeOrder, _depth]);
 
                         _values.forEach(function (value, index){
                             if(zn.is(value, 'string')){
@@ -79,6 +79,7 @@ zn.define(function () {
                             }
                             _sql += 'update {0} set treeOrder=treeOrder-1 where treeOrder>{1} and pid={2};'.format(_table, _model.treeOrder, _pid);
                             _sql += "delete from {0} where locate(',{1},',parentPath)<>0;".format(_table, _model.id);
+                            zn.debug(_sql);
                             return _sql;
                         } else {
                             return tran.rollback('The node is not exist!'), false;
@@ -121,7 +122,7 @@ zn.define(function () {
 
                             var _sql = 'update {0} set treeOrder={1} where treeOrder={2} and pid={3};'.format(_table, _treeOrder, _newOrder, _model.pid);
                             _sql += 'update {0} set treeOrder={1} where id={2};'.format(_table, _newOrder, _model.id);
-
+                            zn.debug(_sql);
                             return _sql;
                         } else {
                             return tran.rollback('The node is not exist!'), false;

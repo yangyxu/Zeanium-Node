@@ -2,14 +2,14 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_kylin_customer_shop", {
+    return zn.Model("zn_kylin_customer_shop_adv_frame", {
         mixins: [
             model.Base
         ],
         properties: {
             logo: {
                 value: null,
-                type: ['varchar', 100],
+                type: ['varchar', 500],
                 default: ''
             },
             customerId: {
@@ -17,14 +17,14 @@ zn.define(function () {
                 type: ['int', 10],
                 default: '0'
             },
+            customerShopId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
             name: {
                 value: null,
-                type: ['varchar', 15],
-                default: ''
-            },
-            password: {
-                value: null,
-                type: ['varchar', 15],
+                type: ['varchar', 50],
                 default: ''
             },
             status: {
@@ -33,67 +33,59 @@ zn.define(function () {
                 convert: 'zn_convert_var({})',
                 default: '0'
             },
-            region: {
+            code: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            position: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            jiCeng: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            caiZhi: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            jingChiCunKuang: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            jingChiCunGao: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            bianYuanChiCunKuang: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            bianYuanChiCunGao: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            count: {
                 value: null,
                 type: ['int', 10],
-                convert: 'zn_convert_var({})',
                 default: '0'
             },
-            province: {
+            installGuide: {
                 value: null,
-                type: ['int', 10],
-                convert: 'zn_convert_var({})',
-                default: '0'
-            },
-            city: {
-                value: null,
-                type: ['int', 10],
-                convert: 'zn_convert_var({})',
-                default: '0'
-            },
-            address: {
-                value: null,
-                type: ['varchar', 50],
+                type: ['varchar', 2000],
                 default: ''
             },
-            lng: {
+            damaged: {  //是否破损
                 value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            lat: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            zipCode: {
-                value: null,
-                type: ['varchar', 15],
-                default: ''
-            },
-            contact: {
-                value: null,
-                type: ['varchar', 15],
-                default: ''
-            },
-            phone: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            telephone: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            email: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            images: {
-                value: null,
-                type: ['varchar', 300],
+                type: ['varchar', 500],
                 default: ''
             },
             comment: {

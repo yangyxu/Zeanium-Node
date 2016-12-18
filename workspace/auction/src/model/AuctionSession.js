@@ -11,6 +11,7 @@ zn.define(function () {
             typeId: {
                 value: null,
                 type: ['int', 10],
+                convert: 'zn_convert_product_type({})',
                 default: '0'
             },
             alias: {

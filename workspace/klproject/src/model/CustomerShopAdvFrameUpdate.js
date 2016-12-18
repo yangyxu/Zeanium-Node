@@ -2,78 +2,80 @@ zn.define(function () {
 
     var model = zn.db.common.model;
 
-    return zn.Model("zn_kylin_customer", {
+    return zn.Model("zn_kylin_customer_shop_adv_frame", {
         mixins: [
             model.Base
         ],
         properties: {
+            customerShopAdvFrameId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            customerShopId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
+            customerId: {
+                value: null,
+                type: ['int', 10],
+                default: '0'
+            },
             name: {
                 value: null,
-                type: ['varchar', 15],
+                type: ['varchar', 50],
                 default: ''
             },
-            password: {
+            position: {
                 value: null,
-                type: ['varchar', 15],
+                type: ['varchar', 50],
                 default: ''
             },
-            status: {
+            jiCeng: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            caiZhi: {
+                value: null,
+                type: ['varchar', 50],
+                default: ''
+            },
+            jingChiCunKuang: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            jingChiCunGao: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            bianYuanChiCunKuang: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            bianYuanChiCunGao: {
+                value: null,
+                type: ['float', 4],
+                default: '0.0'
+            },
+            count: {
                 value: null,
                 type: ['int', 10],
-                convert: 'zn_convert_var({})',
                 default: '0'
             },
-            province: {
+            installGuide: {
                 value: null,
-                type: ['int', 10],
-                convert: 'zn_convert_var({})',
-                default: '0'
-            },
-            city: {
-                value: null,
-                type: ['int', 10],
-                convert: 'zn_convert_var({})',
-                default: '0'
-            },
-            address: {
-                value: null,
-                type: ['varchar', 50],
+                type: ['varchar', 2000],
                 default: ''
             },
-            lng: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            lat: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            contact: {
-                value: null,
-                type: ['varchar', 15],
-                default: ''
-            },
-            phone: {
-                value: null,
-                type: ['varchar', 15],
-                default: ''
-            },
-            email: {
-                value: null,
-                type: ['varchar', 50],
-                default: ''
-            },
-            logo: {
-                value: null,
-                type: ['varchar', 100],
-                default: ''
-            },
-            advTypeIds: {
+            damaged: {  //是否破损
                 value: null,
                 type: ['varchar', 500],
-                default: ','
+                default: ''
             },
             comment: {
                 value: null,
