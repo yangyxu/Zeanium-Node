@@ -1,3 +1,0 @@
-zn.define([
-    './Company'
-]);
