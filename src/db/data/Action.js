@@ -31,7 +31,7 @@ zn.define(function () {
                     .values(_fieldsValues[1])
                     .query();
             },
-            select: function (fields, inWhere){
+            select: function (fields, inWhere, inOrder){
                 var _where = inWhere || {1:1};
                 switch(zn.type(_where)){
                     case 'number':
@@ -44,6 +44,7 @@ zn.define(function () {
                     .select(((!fields||fields=='*')?this._ModelClass.getFields(false):fields))
                     .from(this._table)
                     .where(_where)
+                    .orderBy(inOrder)
                     .query();
             },
             selectOne: function (inWhere, fields){

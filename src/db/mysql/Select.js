@@ -127,6 +127,10 @@ zn.define([
             orderBy: function (){
                 var _order = Array.prototype.slice.call(arguments);
                 var _self = this;
+                if(!_order.length||!_order[0]){
+                    return this;
+                }
+
                 if(zn.type(_order[0])==='string'){
                     _self._order.push(_order.join(' '));
                 }else {
