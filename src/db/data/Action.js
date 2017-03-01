@@ -59,21 +59,8 @@ zn.define(function () {
                 return _defer.promise;
             },
             paging: function (fields, where, order, pageIndex, pageSize){
-                var _defer = zn.async.defer();
-                var _index = pageIndex || 1,
-                    _size = pageSize || 10,
-                    _start = (_index - 1) * _size,
-                    _end = _index * _size,
-                    _fields = ((!fields||fields=='*')?this._ModelClass.getFields(false):fields),
-                    _table = this._table;
-                var _sql = zn.sql.select(_fields)
-                            .from(_table)
-                            .where(where)
-                            .limit(_start, _size)
-                            .orderBy(order)
-                            .build() + ';';
-                    _sql += zn.sql.select('count(*) as count').from(_table).where(where).build();
-                return this._store.command.query(_sql);
+                fields = ((!fields||fields=='*')?this._ModelClass.getFields(false):fields)
+                return this._store.pagingTable(this._table, fields, where, order, pageIndex, pageSize);
             },
             update: function (data, where){
                 var _model = this.fixModel(data),

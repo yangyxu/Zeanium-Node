@@ -78,6 +78,18 @@ zn.define([
                 }
                 return this;
             },
+            data: function (value){
+                switch (zn.type(into)){
+                    case 'array':
+
+                        break;
+                    case 'object':
+
+                        break;
+                }
+
+                return this;
+            },
             as: function (alias){
                 this._as = alias;
                 return this;

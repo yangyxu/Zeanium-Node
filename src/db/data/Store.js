@@ -77,6 +77,30 @@ zn.define([
             query: function (sql){
                 return this.command.query(sql);
             },
+            paging: function (argv){
+                var _argv = zn.extend(argv, {
+                    pageIndex: 0,
+                    pageSize: 10
+                });
+            },
+            pagingTable: function (table, fields, where, order, pageIndex, pageSize){
+                var _defer = zn.async.defer();
+                console.log(arguments);
+                var _index = pageIndex || 1,
+                    _size = pageSize || 10,
+                    _start = (_index - 1) * _size,
+                    _end = _index * _size,
+                    _fields = fields,
+                    _table = table;
+                var _sql = zn.sql.select(_fields)
+                            .from(_table)
+                            .where(where)
+                            .limit(_start, _size)
+                            .orderBy(order)
+                            .build() + ';';
+                    _sql += zn.sql.select('count(*) as count').from(_table).where(where).build();
+                return this.command.query(_sql);
+            },
             createModel: function (inModelClass) {
                 var _defer = zn.async.defer();
                 this.command.query(inModelClass.getCreateSql())
