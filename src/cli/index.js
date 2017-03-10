@@ -1,3 +1,7 @@
-module.exports = {
-
-};
+zn.define([
+    './Create',
+    './Develop',
+    './Info',
+    './Install',
+    './Run'
+]);
