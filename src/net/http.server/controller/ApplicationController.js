@@ -1,4 +1,4 @@
-zn.define(['node:xlsx'], function (xlsx) {
+zn.define(function () {
 
     return zn.Controller('', {
         methods: {
@@ -103,6 +103,8 @@ zn.define(['node:xlsx'], function (xlsx) {
                         _fields = request.getValue('fields'),
                         _vars = JSON.parse(request.getValue('vars')||'{}'),
                         _len = _fields.split(',').length;
+
+                    var xlsx = require('xlsx');
 
                     zn.each(_files, function (file, key){
                         var _file = request.uploadFile(file);

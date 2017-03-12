@@ -2,9 +2,8 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    'node:chokidar',
     'node:fs'
-],function (chokidar, fs) {
+],function (fs) {
 
     return zn.Class('FileUtil', {
         static: true,

@@ -2,11 +2,9 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    './config/client',
-    'node:request'
+    './config/client'
 ],function (
-    config,
-    request
+    config
 ) {
 
     return zn.Class('HttpClient', {

@@ -59,8 +59,16 @@ zn.define(function () {
                 return _defer.promise;
             },
             paging: function (fields, where, order, pageIndex, pageSize){
-                fields = ((!fields||fields=='*')?this._ModelClass.getFields(false):fields)
-                return this._store.pagingTable(this._table, fields, where, order, pageIndex, pageSize);
+                fields = ((!fields||fields=='*')?this._ModelClass.getFields(false):fields);
+
+                return this._store.paging({
+                    table: this._table,
+                    fields: fields,
+                    where: where,
+                    order: order,
+                    pageIndex: pageIndex,
+                    pageSize: pageSize
+                });
             },
             update: function (data, where){
                 var _model = this.fixModel(data),
