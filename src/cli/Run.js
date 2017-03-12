@@ -24,7 +24,7 @@ zn.define([
                 if(fs.existsSync(_configFilePath)){
                     zn.load(_configFilePath, function (config){
                         this.createHttpServer(zn.overwrite(config, _config));
-                    });
+                    }.bind(this));
                 }else {
                     this.createHttpServer(_config);
                 }
