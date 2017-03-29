@@ -118,14 +118,17 @@ zn.define([
                     return false;
                 }
                 this._watching = true;
-
                 chokidar.watch('.', {
                     ignored: /[\/\\]\./,
+                    cwd: process.cwd() + (this._config.watchCwd||''),
+                    interval: 100,
+                    binaryInterval: 300,
+                    depth: 99,
                     persistent: true
                 }).on('raw', function(event, path, details) {
                     if(path.substr(-3, 3)=='.js'){
                         zn.debug(event + ': ' + path);
-                        this._deployDelay = 5000;
+                        this._deployDelay = 3000;
                         this.__doFileChange(path);
                     }
                 }.bind(this));
