@@ -4,13 +4,12 @@
 zn.define([
     'node:chokidar',
     'node:fs',
-    'node:ioredis',
     'node:os',
     'node:path',
     './Scanner',
     './RequestAcceptor',
     '../../session/MemorySessionManager'
-], function (chokidar, fs, ioredis, os, path, Scanner, RequestAcceptor, MemorySessionManager) {
+], function (chokidar, fs, os, path, Scanner, RequestAcceptor, MemorySessionManager) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -45,6 +44,7 @@ zn.define([
                 this._apps = {};
                 this._routers = {};
                 this._uuid = zn.uuid();
+                this._deployDelay = 0;
                 this._prefix = _config.prefix || '@';
                 this._root = 'http://' + _config.host + ":" + _config.port;
                 this._sessionManager = new MemorySessionManager(_config.session);
@@ -118,19 +118,43 @@ zn.define([
                     return false;
                 }
                 this._watching = true;
+
                 chokidar.watch('.', {
-                    ignored: /[\/\\]\./
+                    ignored: /[\/\\]\./,
+                    persistent: true
                 }).on('raw', function(event, path, details) {
                     if(path.substr(-3, 3)=='.js'){
                         zn.debug(event + ': ' + path);
-                        zn.module.unloadModule(path);
-                        this.__doFileChange();
+                        this._deployDelay = 5000;
+                        this.__doFileChange(path);
                     }
                 }.bind(this));
             },
-            __doFileChange: function (){
+            __delayDeploy: function (path){
+                if(this._interval){
+                    clearInterval(this._interval);
+                    this._interval = null;
+                }
                 zn.info('Redeploying......');
+                zn.module.unloadModule(path);
                 this.__scanWebPath(true);
+            },
+            __doFileChange: function (path){
+                var _self = this;
+                if(this._deployDelay>0){
+                    if(!this._interval){
+                        this._interval = setInterval(function (){
+                            //zn.debug('Deploy delay ' + _self._deployDelay + 'ms');
+                            if(_self._deployDelay>0){
+                                _self._deployDelay = _self._deployDelay - 1000;
+                            }else {
+                                _self.__delayDeploy(path);
+                            }
+                        }, 1000);
+                    }
+                }else {
+                    this.__delayDeploy(path);
+                }
             },
             __onLoaded: function(path){
                 if(path){

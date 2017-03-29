@@ -94,7 +94,7 @@ zn.define(function () {
             },
             __getDefaultValue: function (property, key) {
                 if(property.default !== undefined){
-                    var _type = property.type[0],
+                    var _type = property.type[0].toLowerCase(),
                         _value = property.default;
                     if(zn.is(_value, 'function')){
                         _value = _value.call(this, property, key);
@@ -103,6 +103,7 @@ zn.define(function () {
                     switch(_type){
                         case 'nvarchar':
                         case 'varchar':
+                        case 'longtext':
                         case 'char':
                             if(zn.is(_value, 'string')){
                                 /*
