@@ -46,11 +46,13 @@ zn.define([
                 set: function (value){
                     if(!value){ return; }
                     this._serverResponse = value;
+                    this._beginTimestamp = (new Date()).getTime();
                     value.on('timeout', function (){
-                        this.fire('timeout');
+                        this.fire('timeout', this);
                     }.bind(this));
                     value.on('finish', function (){
-                        this.fire('finish');
+                        this._endTimestamp = (new Date()).getTime();
+                        this.fire('finish', this);
                     }.bind(this));
                 }
             }
@@ -59,6 +61,9 @@ zn.define([
             init: function (context, request){
                 this._context = context;
                 this._request = request;
+            },
+            getTimestamp: function (){
+                return this._endTimestamp - this._beginTimestamp;
             },
             writeHead: function (httpStatus, inArgs){
                 var _self = this,

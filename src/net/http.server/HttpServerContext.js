@@ -43,6 +43,7 @@ zn.define([
                 this.on('loaded', _config.onLoaded || zn.idle);
                 this._apps = {};
                 this._routers = {};
+                this._changedFiles = [];
                 this._uuid = zn.uuid();
                 this._deployDelay = 0;
                 this._prefix = _config.prefix || '@';
@@ -128,23 +129,29 @@ zn.define([
                 }).on('raw', function(event, path, details) {
                     var _path = details.path || details.watchedPath;
                     if(_path.substr(-3, 3)=='.js'){
-                        zn.debug(event + ': ' + _path);
-                        this._deployDelay = 3000;
-                        this.__doFileChange(_path);
+                        if(this._changedFiles.indexOf(_path)==-1 && event!=='unknown'){
+                            this._changedFiles.push(_path);
+                            zn.debug(event + ': ' + _path);
+                            this._deployDelay = 3000;
+                            this.__doFileChange(_path);
+                        }
                     }
                 }.bind(this));
             },
-            __delayDeploy: function (path){
+            __delayDeploy: function (){
                 if(this._interval){
                     clearInterval(this._interval);
                     this._interval = null;
                 }
                 zn.info('Redeploying......');
-                zn.module.unloadModule(path);
+                this._changedFiles = [];
                 this.__scanWebPath(true);
             },
             __doFileChange: function (path){
                 var _self = this;
+                if(fs.existsSync(path)){
+                    zn.module.unloadModule(path);
+                }
                 if(this._deployDelay>0){
                     if(!this._interval){
                         this._interval = setInterval(function (){
@@ -152,12 +159,12 @@ zn.define([
                             if(_self._deployDelay>0){
                                 _self._deployDelay = _self._deployDelay - 1000;
                             }else {
-                                _self.__delayDeploy(path);
+                                _self.__delayDeploy();
                             }
                         }, 1000);
                     }
                 }else {
-                    this.__delayDeploy(path);
+                    this.__delayDeploy();
                 }
             },
             __onLoaded: function(path){

@@ -1756,6 +1756,9 @@ if (__isServer) {
             preLoadedPackage: {},
             unloadModule: function (path){
                 try {
+                    if(!Module.all[path]){
+                        return this;
+                    }
                     path = require.resolve(path);
 
                     var module = require.cache[path];
