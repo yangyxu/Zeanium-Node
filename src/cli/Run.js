@@ -59,7 +59,16 @@ zn.define([
             createHttpServer: function (config){
                 if(this._argv.debug){
                     zn.debug('Config: ', _config);
+                }else {
+                    process.on('uncaughtException', function (err) {
+                        zn.error(err);
+                        zn.error(err.stack);
+                    });
+                    process.on('exit', (code) => {
+                        zn.info('Exit code: ', code);
+                    });
                 }
+
                 return net.http.HttpServer.createServer(config);
             }
         }
