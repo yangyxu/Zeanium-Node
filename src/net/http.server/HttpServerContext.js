@@ -126,10 +126,11 @@ zn.define([
                     depth: 99,
                     persistent: true
                 }).on('raw', function(event, path, details) {
-                    if(path.substr(-3, 3)=='.js'){
-                        zn.debug(event + ': ' + path);
+                    var _path = details.path || details.watchedPath;
+                    if(_path.substr(-3, 3)=='.js'){
+                        zn.debug(event + ': ' + _path);
                         this._deployDelay = 3000;
-                        this.__doFileChange(path);
+                        this.__doFileChange(_path);
                     }
                 }.bind(this));
             },

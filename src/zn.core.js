@@ -1756,13 +1756,8 @@ if (__isServer) {
             preLoadedPackage: {},
             unloadModule: function (path){
                 try {
-                    console.log(path);
                     path = require.resolve(path);
-                } catch (e) {
-                    zn.error(e.message);
-                }
 
-                try {
                     var module = require.cache[path];
                     // remove reference in module.parent
                     if (module && module.parent) {
@@ -2419,7 +2414,6 @@ if (__isServer) {
                 } catch(e) {
                     //console.log(e.stack);
                     var _pos = e.stack.split('\n')[5].replace(/\(/g, '').replace(/\)/g, '').split('/').pop();
-                    var _pos = e.stack.split('\n')[5].replace(/\(/g, '').replace(/\)/g, '');
                     return _pos;
                 }
             },

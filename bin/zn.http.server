@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 'use strict';
-var zn = require('../src/zn.core.minx');
+var zn = require('../index.js');
 
 zn.define([
     'cli'
@@ -43,6 +43,5 @@ zn.define([
             zn.error('The system can not handler this command.');
             break;
     }
-
 
 }).exec();
