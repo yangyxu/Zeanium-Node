@@ -2419,6 +2419,7 @@ if (__isServer) {
                 } catch(e) {
                     //console.log(e.stack);
                     var _pos = e.stack.split('\n')[5].replace(/\(/g, '').replace(/\)/g, '').split('/').pop();
+                    var _pos = e.stack.split('\n')[5].replace(/\(/g, '').replace(/\)/g, '');
                     return _pos;
                 }
             },
