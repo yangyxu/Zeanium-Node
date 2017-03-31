@@ -5,11 +5,6 @@ zn.define(['node:url'], function (node_url) {
 
     return zn.RequestHandler('RestfulRequestHandler', {
         methods: {
-            __onRequestFinish: function (request, response){
-                if(request.url){
-                    zn.debug(request.serverRequest.method, request.url, response.getTimestamp()+'ms');
-                }
-            },
             doRequest: function (request, response){
                 try{
                     var _url = request.url,

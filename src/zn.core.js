@@ -2107,6 +2107,82 @@ if (__isServer) {
 })(zn);
 
 /**
+ * Created by yangyxu on 8/20/14.
+ */
+(function (zn){
+
+    var DATE_FORMAT = {
+        ISO8601: "yyyy-MM-dd hh:mm:ss.SSS",
+        ISO8601_WITH_TZ_OFFSET: "yyyy-MM-ddThh:mm:ssO",
+        DATETIME: "dd MM yyyy hh:mm:ss.SSS",
+        ABSOLUTETIME: "hh:mm:ss.SSS"
+    };
+
+    /**
+     * Date: Date
+     * @class Date
+     * @namespace zn.util
+     **/
+    var ZNDate = zn.Class('zn.util.ZNDate', {
+        methods: {
+            asString: function (date){
+                var format = DATE_FORMAT.ISO8601;
+                if (typeof(date) === "string") {
+                    format = arguments[0];
+                    date = arguments[1];
+                }
+                var vDay = this.__addZero(date.getDate());
+                var vMonth = this.__addZero(date.getMonth()+1);
+                var vYearLong = this.__addZero(date.getFullYear());
+                var vYearShort = this.__addZero(date.getFullYear().toString().substring(2,4));
+                var vYear = (format.indexOf("yyyy") > -1 ? vYearLong : vYearShort);
+                var vHour  = this.__addZero(date.getHours());
+                var vMinute = this.__addZero(date.getMinutes());
+                var vSecond = this.__addZero(date.getSeconds());
+                var vMillisecond = this.__padWithZeros(date.getMilliseconds(), 3);
+                var vTimeZone = this.__offset(date);
+                var formatted = format
+                    .replace(/dd/g, vDay)
+                    .replace(/MM/g, vMonth)
+                    .replace(/y{1,4}/g, vYear)
+                    .replace(/hh/g, vHour)
+                    .replace(/mm/g, vMinute)
+                    .replace(/ss/g, vSecond)
+                    .replace(/SSS/g, vMillisecond)
+                    .replace(/O/g, vTimeZone);
+                return formatted;
+            },
+            __padWithZeros: function (vNumber, width){
+                var numAsString = vNumber + "";
+                while (numAsString.length < width) {
+                    numAsString = "0" + numAsString;
+                }
+                return numAsString;
+            },
+            __addZero: function(vNumber){
+                return this.__padWithZeros(vNumber, 2);
+            },
+            __offset: function (date){
+                // Difference to Greenwich time (GMT) in hours
+                var os = Math.abs(date.getTimezoneOffset());
+                var h = String(Math.floor(os/60));
+                var m = String(os%60);
+                if (h.length == 1) {
+                    h = "0" + h;
+                }
+                if (m.length == 1) {
+                    m = "0" + m;
+                }
+                return date.getTimezoneOffset() < 0 ? "+"+h+m : "-"+h+m;
+            }
+        }
+    });
+
+    zn.date = new ZNDate();
+
+})(zn);
+
+/**
  * Created by yangyxu on 2016/4/5.
  * Queue: Queue
  */
@@ -2299,90 +2375,16 @@ if (__isServer) {
  */
 (function (zn){
 
-    var DATE_FORMAT = {
-        ISO8601: "yyyy-MM-dd hh:mm:ss.SSS",
-        ISO8601_WITH_TZ_OFFSET: "yyyy-MM-ddThh:mm:ssO",
-        DATETIME: "dd MM yyyy hh:mm:ss.SSS",
-        ABSOLUTETIME: "hh:mm:ss.SSS"
-    };
-
-    /**
-     * Date: Date
-     * @class Date
-     * @namespace zn.util
-     **/
-    var DateUtil = zn.Class('zn.util.DateUtil', {
-        static: true,
-        properties: {
-
-        },
-        methods: {
-            init: function (args){
-
-            },
-            asString: function (date){
-                var format = DATE_FORMAT.ISO8601;
-                if (typeof(date) === "string") {
-                    format = arguments[0];
-                    date = arguments[1];
-                }
-                var vDay = this.__addZero(date.getDate());
-                var vMonth = this.__addZero(date.getMonth()+1);
-                var vYearLong = this.__addZero(date.getFullYear());
-                var vYearShort = this.__addZero(date.getFullYear().toString().substring(2,4));
-                var vYear = (format.indexOf("yyyy") > -1 ? vYearLong : vYearShort);
-                var vHour  = this.__addZero(date.getHours());
-                var vMinute = this.__addZero(date.getMinutes());
-                var vSecond = this.__addZero(date.getSeconds());
-                var vMillisecond = this.__padWithZeros(date.getMilliseconds(), 3);
-                var vTimeZone = this.__offset(date);
-                var formatted = format
-                    .replace(/dd/g, vDay)
-                    .replace(/MM/g, vMonth)
-                    .replace(/y{1,4}/g, vYear)
-                    .replace(/hh/g, vHour)
-                    .replace(/mm/g, vMinute)
-                    .replace(/ss/g, vSecond)
-                    .replace(/SSS/g, vMillisecond)
-                    .replace(/O/g, vTimeZone);
-                return formatted;
-            },
-            __padWithZeros: function (vNumber, width){
-                var numAsString = vNumber + "";
-                while (numAsString.length < width) {
-                    numAsString = "0" + numAsString;
-                }
-                return numAsString;
-            },
-            __addZero: function(vNumber){
-                return this.__padWithZeros(vNumber, 2);
-            },
-            __offset: function (date){
-                // Difference to Greenwich time (GMT) in hours
-                var os = Math.abs(date.getTimezoneOffset());
-                var h = String(Math.floor(os/60));
-                var m = String(os%60);
-                if (h.length == 1) {
-                    h = "0" + h;
-                }
-                if (m.length == 1) {
-                    m = "0" + m;
-                }
-                return date.getTimezoneOffset() < 0 ? "+"+h+m : "-"+h+m;
-            }
-        }
-    });
-
-    var TYPES = ['INFO', 'DEBUG', 'WARNING', 'ERROR', 'TRACE', '', 'INIT'];
-    var COLORS_VALUE = ['#100000', '#2125a0', '#a82c2c', '#c045b7', '1cb131', '', '#100000'];
+    var TYPES = ['INFO', 'DEBUG', 'WARN', 'ERROR', 'TRACE', 'ALL'];
+    var COLORS_VALUE = ['#100000', '#2125a0', '#a82c2c', '#c045b7', '1cb131', '#100000'];
     var COLORS = [38, 34, 35, 31, 32, 36, 33];
     var LEVELS = {
         INFO: 0,
         DEBUG: 1,
-        WARNING: 2,
+        WARN: 2,
         ERROR: 3,
         TRACE: 4,
-        INIT: 6
+        ALL: 6
     };
 
     /**
@@ -2391,8 +2393,24 @@ if (__isServer) {
      * @namespace zn.util
      **/
     var Logger = zn.Class({
-        static: true,
+        events: [
+            'info',
+            'debug',
+            'warn',
+            'error',
+            'trace',
+            'all'
+        ],
         methods: {
+            init: function (){
+                this._config = {
+                    only: null,
+                    levels: ['info', 'debug', 'warn', 'error', 'trace', 'all']
+                };
+            },
+            config: function (value){
+                this._config = zn.overwrite(value, this._config);
+            },
             info: function () {
                 this.__log.call(this, LEVELS.INFO, arguments);
             },
@@ -2400,7 +2418,7 @@ if (__isServer) {
                 this.__log.call(this, LEVELS.DEBUG, arguments);
             },
             warn: function () {
-                this.__log.call(this, LEVELS.WARNING, arguments);
+                this.__log.call(this, LEVELS.WARN, arguments);
             },
             trace: function () {
                 this.__log.call(this, LEVELS.TRACE, arguments);
@@ -2408,8 +2426,11 @@ if (__isServer) {
             error: function (obj) {
                 this.__log.call(this, LEVELS.ERROR, arguments);
             },
+            all: function (obj) {
+                this.__log.call(this, LEVELS.ALL, arguments);
+            },
             __getDateString: function (date) {
-                return DateUtil.asString(date||new Date());
+                return zn.date.asString(date||new Date());
             },
             __getPosition: function (){
                 try {
@@ -2468,44 +2489,72 @@ if (__isServer) {
                 ].join('');
             },
             __log: function (type, argv) {
-                var _argv = Array.prototype.slice.call(argv);
+                var _argv = Array.prototype.slice.call(argv),
+                    _data = _argv.slice(0),
+                    _type = TYPES[type].toLowerCase(),
+                    _time = this.__getDateString(),
+                    _pos = this.__getPosition();
+
+                _data.unshift(_pos);
+                _data.unshift(_type);
+                _data.unshift(_time);
                 if (typeof module !== 'undefined' && module.exports){
                     _argv.unshift(this.__formatLog4Server({
                         type: type,
-                        time: this.__getDateString(),
-                        pos: this.__getPosition()
+                        time: _time,
+                        pos: _pos
                     }, true));
                 }else {
                     _argv.unshift(this.__formatLog4Client({
                         type: type,
-                        time: this.__getDateString(),
-                        pos: this.__getPosition()
+                        time: _time,
+                        pos: _pos
                     }, true));
-
-                    _argv.unshift('color:'+COLORS_VALUE[type]);
+                    _argv.unshift('color:' + COLORS_VALUE[type]);
                 }
 
-                console.log.apply(this, _argv);
+                if(this.__isOk(_type)){
+                    var _result = this.fire(_type, _data);
+                    if(_result !== false){
+                        console.log.apply(this, _argv);
+                    }
+                }
+            },
+            __isOk: function (type){
+                if(this._config.only){
+                    if(this._config.only === type){
+                        return true;
+                    }
+                }else {
+                    var _include = (this._config.levels.indexOf(type) !== -1 );
+                    if(_include){
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
     });
 
+    zn.logger = new Logger();
+
     var __console = {
         info: function (){
-            Logger.info.apply(Logger, arguments);
+            zn.logger.info.apply(zn.logger, arguments);
         },
         debug: function (){
-            Logger.debug.apply(Logger, arguments);
+            zn.logger.debug.apply(zn.logger, arguments);
         },
         warn: function (){
-            Logger.warn.apply(Logger, arguments);
+            zn.logger.warn.apply(zn.logger, arguments);
         },
         trace: function (){
-            Logger.trace.apply(Logger, arguments);
+            zn.logger.trace.apply(zn.logger, arguments);
         },
         error: function (){
-            Logger.error.apply(Logger, arguments);
-        },
+            zn.logger.error.apply(zn.logger, arguments);
+        }
     };
 
     zn.extend(zn, __console);

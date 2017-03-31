@@ -43,6 +43,11 @@ zn.define([
             doRequest: function (request, response, chain) {
 
             },
+            __onRequestFinish: function (request, response){
+                if(request.url){
+                    zn.debug(request.serverRequest.method, request.url, response.getTimestamp()+'ms');
+                }
+            },
             __onFinish: function (){
                 this._status = 0;
                 this.fire('done', this);

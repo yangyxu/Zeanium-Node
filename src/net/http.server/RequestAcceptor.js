@@ -25,7 +25,6 @@ zn.define([
                 if(serverRequest.url === zn.SLASH + 'favicon.ico'){
                     return serverResponse.end();
                 }
-                console.log();
                 var _url = node_url.parse(serverRequest.url, true).pathname,
                     _handlerManager = null,
                     _result = null,

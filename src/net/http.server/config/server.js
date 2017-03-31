@@ -60,6 +60,7 @@ zn.define([
         host: '127.0.0.1',
         port: 8888,
         catalog: '/webapps/',
+        watchCwd: '/src/',
         timeout: 12000,
         mode: 'debug',     //release, debug, view,
         indexs: ['index.html', 'index.htm', 'default.html', 'default.htm'],
@@ -82,7 +83,7 @@ zn.define([
             {
                 name: 'restful',
                 min: 0,
-                max: 100,
+                max: 200,
                 handlerClass: RestfulRequestHandler,
                 mapping: function (url, context, handler){
                     var _routers = context._routers,

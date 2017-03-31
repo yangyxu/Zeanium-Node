@@ -51,8 +51,6 @@ zn.define([
                         };
                     }
                 });
-
-                //console.log;
             },
             getModels: function (){
                 var _models = {};

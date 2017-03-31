@@ -6,12 +6,12 @@ zn.define(function () {
     return zn.RequestHandler('ResourceRequestHandler', {
         methods: {
             doRequest: function (request, response){
-                zn.debug('Resource: ' + request.url);
                 var _paths = request.get('paths'),
                     _file = _paths[_paths.length-1],
                     _project = _paths.shift()||'',
                     _context = this._context;
 
+                response.upon('finish', ()=>this.__onRequestFinish(request, response));
                 if(request.url===zn.SLASH){
                     return response.doIndex(), false;
                 }
