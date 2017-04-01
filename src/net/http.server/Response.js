@@ -110,7 +110,7 @@ zn.define([
                     }
                     var _req = this._request;
                     var _callback = _req.getValue('callback'),
-                        _data = inData;
+                        _data = inData||'';
                     if(typeof _data === 'object'){
                         _data = JSON.stringify(inData, null, '    ');
                     }
@@ -119,7 +119,6 @@ zn.define([
                         _data = _callback+'('+_data+')';
                         this.contentType = 'JAVASCRIPT';
                     }
-
                     this.writeHead(200, {
                         'Content-Type': CONTENT_TYPE[this.contentType]
                     });
@@ -131,7 +130,7 @@ zn.define([
                 }
             },
             writeContent: function (status, content, contentType){
-                contentType = contentType.toLowerCase();
+                contentType = (contentType||'.html').toLowerCase();
                 var _encode = (contentType=='.html'||contentType=='.htm') ? 'utf8' : 'binary';
                 this.writeHead(status, {
                     "Content-Type": mime[contentType]||'text/plain',
