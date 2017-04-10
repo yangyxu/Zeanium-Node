@@ -40,7 +40,7 @@
     "mysql": "^2.10.2",
     "nodemailer": "^2.6.4",
     "officegen": "^0.4.0",
-    "request": "^2.81.1",
+    "request": "^2.81.0",
     "xlsx": "^0.9.1",
     "xml2js": "^0.4.17"
   },
