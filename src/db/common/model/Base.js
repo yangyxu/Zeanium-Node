@@ -72,7 +72,9 @@ zn.define('../action/Base', function (BaseAction) {
                 ignore: true,
                 default: function (){
                     if(zn._request.session.hasItem()){
-                        return zn._request.session.getItem('@AdminUser').id;
+                        if(zn._request.session.getItem('@AdminUser')){
+                            return zn._request.session.getItem('@AdminUser').id;
+                        }
                     }else {
                         return 0;
                     }

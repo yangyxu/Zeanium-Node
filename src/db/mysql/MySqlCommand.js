@@ -30,6 +30,9 @@ zn.define([
             delete: function (table){
                 return Delete.getInstance(null, this).from(table);
             },
+            pagingBackup: function (){
+                return this.query(zn.sql.paging.apply(this, arguments));
+            },
             paging: function (table, fields, where, order, pageIndex, pageSize){
                 var _table = table,
                     _fields = fields,
@@ -59,7 +62,7 @@ zn.define([
                     _sql += zn.sql.select('count(*) as count')
                             .from(_table)
                             .where(_where)
-                            .build()+';';
+                            .build() + ';';
 
                 return this.query(_sql);
             },

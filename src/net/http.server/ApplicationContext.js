@@ -88,6 +88,9 @@ zn.define([
 
                 return this;
             },
+            doLoaded: function (){
+
+            },
             __convertControllers: function (controllers) {
                 var _config = this._appConfig,
                     _stores = this._stores,

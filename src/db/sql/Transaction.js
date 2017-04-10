@@ -57,6 +57,7 @@ zn.define(function () {
                     if(_callback === false){
                         task.done(connection, rows, fields);
                     } else {
+                        zn.debug('Transaction Query SQL: ', query);
                         connection.query(query, function (err, rows, fields){
                             after && after(err, rows, fields, _self);
                             if(err){

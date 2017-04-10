@@ -169,6 +169,7 @@ zn.define([
                     applicationContext.registerModels(__models);
                     applicationContext.registerActions(__actions);
                     applicationContext.registerControllers(__controllers);
+                    applicationContext.doLoaded();
                     callback && callback(applicationContext);
                     _defer.resolve(applicationContext);
                 }).exec();
