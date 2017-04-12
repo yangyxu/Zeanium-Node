@@ -64,7 +64,7 @@ zn.define([
                         zn.error(err);
                         zn.error(err.stack);
                     });
-                    process.on('exit', (code) => {
+                    process.on('exit', function (code) {
                         zn.info('Exit code: ', code);
                     });
                 }
