@@ -4,8 +4,11 @@
 var zn = require('../index.js');
 
 zn.define([
-    'cli'
-], function (cli) {
+    'cli',
+    'node:path'
+], function (cli, path) {
+
+    path.join(process.cwd() + path.sep + 'node_modules');
 
     var argv = process.argv;
     var _env = {
