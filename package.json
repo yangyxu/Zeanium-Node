@@ -1,13 +1,13 @@
 {
   "name": "zeanium-node",
-  "version": "0.4.21",
+  "version": "0.4.22",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "start": "node ./bin/zn.http.server"
+    "start": "node ./bin/zn.http.server run"
   },
   "repository": {
     "type": "git",
@@ -31,11 +31,9 @@
   "license": "MIT",
   "dependencies": {
     "chokidar": "^1.6.1",
-    "crypto": "0.0.3",
     "formidable": "^1.0.17",
     "ioredis": "^1.15.1",
-    "mysql": "^2.10.2",
-    "xlsx": "^0.9.1"
+    "mysql": "^2.10.2"
   },
   "preferGlobal": "true",
   "bin": {

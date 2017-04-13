@@ -1,1 +1,1 @@
-module.exports = exports = require('./src/zn.core.js');
+module.exports = exports = require('./src/zn.core.minx.js');
