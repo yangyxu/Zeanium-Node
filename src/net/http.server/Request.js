@@ -176,35 +176,42 @@ zn.define([
                     this._$uploadConfig = _data.uploadConfig;
                     callback(_data);
                 } else {
-                    var _upload = this.__getUploadInfo(),
-                        _incomingForm = new formidable.IncomingForm(),
-                        _uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径;
+                    var _ct = _request.headers['content-type']||'';
+                    if(_ct.indexOf('text/xml')!=-1){
+                        this._$get = (url.parse(_request.url, true).query||{});
+                        callback(this._$get);
+                    }else {
+                        var _upload = this.__getUploadInfo(),
+                            _incomingForm = new formidable.IncomingForm(),
+                            _uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径;
 
-                    if(!fs.existsSync(_upload.root)){
-                        fs.mkdirSync(_upload.root);
-                    }
-
-                    if(!fs.existsSync(_uploadDir)){
-                        fs.mkdirSync(_uploadDir);
-                    }
-
-                    //_incomingForm.keepExtensions = true;        //使用文件的原扩展名
-                    _incomingForm.uploadDir = _uploadDir;
-                    _incomingForm.parse(_request,function(error, fields, files){
-                        if(error){
-                            zn.error('Request.js   --  line 110 message:  formidable.IncomingForm parse error.  ' + error.toString());
-                        } else {
-                            _data = _request.data = {
-                                fields: fields,
-                                files: files,
-                                uploadConfig: _upload
-                            };
-                            this._$post = fields;
-                            this._$files = files;
-                            this._$uploadConfig = _upload;
-                            callback(_data);
+                        if(!fs.existsSync(_upload.root)){
+                            fs.mkdirSync(_upload.root);
                         }
-                    }.bind(this));
+
+                        if(!fs.existsSync(_uploadDir)){
+                            fs.mkdirSync(_uploadDir);
+                        }
+
+                        //_incomingForm.keepExtensions = true;        //使用文件的原扩展名
+                        _incomingForm.uploadDir = _uploadDir;
+                        _incomingForm.parse(_request,function(error, fields, files){
+                            if(error){
+                                console.log(error);
+                                zn.error('Request.js:  formidable.IncomingForm parse error, ' + error.toString());
+                            } else {
+                                _data = _request.data = {
+                                    fields: fields,
+                                    files: files,
+                                    uploadConfig: _upload
+                                };
+                                this._$post = fields;
+                                this._$files = files;
+                                this._$uploadConfig = _upload;
+                                callback(_data);
+                            }
+                        }.bind(this));
+                    }
                 }
             },
             uploadFile: function (file, upload){
