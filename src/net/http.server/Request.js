@@ -178,8 +178,8 @@ zn.define([
                 } else {
                     var _ct = _request.headers['content-type']||'';
                     if(_ct.indexOf('text/xml')!=-1){
-                        this._$get = (url.parse(_request.url, true).query||{});
-                        callback(this._$get);
+                        this._$post = {};
+                        callback(this._$post);
                     }else {
                         var _upload = this.__getUploadInfo(),
                             _incomingForm = new formidable.IncomingForm(),
