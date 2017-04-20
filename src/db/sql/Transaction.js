@@ -55,6 +55,8 @@ zn.define(function () {
                         }
                     }
                     if(_callback === false){
+                        _self._queue.destroy();
+                    } else if(_callback === -1){
                         task.done(connection, rows, fields);
                     } else {
                         zn.debug('Transaction Query SQL: ', query);
