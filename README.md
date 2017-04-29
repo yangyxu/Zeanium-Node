@@ -139,6 +139,16 @@ zn.define(function () {
 });
 ```
 
+## Try it
+
+```sh
+npm install zeanium-node -g
+git clone https://github.com/yangyxu/zeanium-node-demo.git
+cd zeanium-node-demo
+zn run config:zn.workspace.config.js
+```
+The terminal will show the message for http server.
+
 ## Create Workspace
 
 ```sh
