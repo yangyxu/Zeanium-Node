@@ -2,12 +2,38 @@
 
 [简体中文文档](https://github.com/yangyxu/Zeanium-Node/blob/master/README_zh-CN.md)
 
+## Installation
 
-## Introduction
-
-Zeanium-Node is based on Zeanium-Core(https://github.com/yangyxu/Zeanium), it is back-end solution for node.js. Provide `cache`、`database`、`io`、`net`、`parser`、`session`、`template` features.
+zeanium-node is based on [zeanium](https://github.com/yangyxu/zeanium). Basic development grammar, please visit Website https://github.com/yangyxu/zeanium. It is back-end solution for node.js. Provide `cache`、`cli`、`database`、`io`、`net`、`parser`、`session`、`template` module.
 
 It's back-end mvc framework, provide integrated solutions.
+
+```bash
+$ npm install zeanium-node -g
+```
+
+Node.js >= 5.0.0 required.
+
+## Features
+
+- Http server base
+- Plugin customization
+- Dynamic development & deployment
+    >This is very important feature, developer don't need restart http server when develop mode or release mode. If you do any change for project, the system will auto reload the newly code.
+- Using event queue to solve asynchronous
+- Support promise
+- Support middleware
+- Support SQL transaction
+- Support some Class(Model, Controller) inherit.
+- Customize model(M)&view(V)&controller(C)
+- Customize http handler router
+
+## Docs & Community
+
+- [Website && Documentations](https://www.zeanium.com)
+- [plugins](https://github.com/search?q=topic%3Azeanium-node-plugin&type=Repositories)
+
+## Getting Started
 
 ```js
 //define database model
@@ -113,16 +139,6 @@ zn.define(function () {
 });
 ```
 
-## Features
-
-* Fully OOP.
-
-## Installation
-
-```sh
-npm install zeanium-node -g
-```
-
 ## Create Workspace
 
 ```sh
@@ -144,7 +160,7 @@ npm install
 ## Start Application
 
 ```sh
-npm start or zn
+zn run config:xxx.config.js
 ```
 
 If you start server you will see the detail on console:
