@@ -44,9 +44,10 @@ zn.define(function () {
                 return this;
             },
             query: function(query, before, after){
-                if(!query){ return this; }
+                if(!query&&!before){ return this; }
                 var _self = this,
-                    _callback = null;
+                    _callback = null,
+                    _tag = query;
                 this._queue.push(function (task, connection, rows, fields){
                     if(before){
                         _callback = before(query, rows, fields, _self);
@@ -59,13 +60,17 @@ zn.define(function () {
                     } else if(_callback === -1){
                         task.done(connection, rows, fields);
                     } else {
-                        zn.debug('Transaction Query SQL: ', query);
+                        zn.debug('Transaction Query SQL {0} : '.format(_tag!=query?'['+_tag+']':''), query);
                         connection.query(query, function (err, rows, fields){
-                            after && after(err, rows, fields, _self);
+                            var _after = after && after(err, rows, fields, _self);
                             if(err){
                                 _self.rollback(err);
                             }else {
-                                task.done(connection, rows, fields);
+                                if(_after === false){
+                                    _self._queue.destroy();
+                                } else {
+                                    task.done(connection, rows, fields);
+                                }
                             }
                         });
                     }
