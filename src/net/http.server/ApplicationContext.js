@@ -39,16 +39,18 @@ zn.define([
                     _router,
                     _self = this;
                 ApplicationController._methods_.forEach(function (method, index){
-                    _member = ApplicationController.member(method);
-                    if(_member.meta.router!==null){
-                        _router = _member.meta.router || _member.name;
-                        _router = node_path.normalize(zn.SLASH + (_self._deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
-                        _self._routers[_router] = {
-                            controller: _controller,
-                            action: method,
-                            handler: _member,
-                            appContext: _self
-                        };
+                    if(method!=='init'){
+                        _member = ApplicationController.member(method);
+                        if(_member.meta.router!==null){
+                            _router = _member.meta.router || _member.name;
+                            _router = node_path.normalize(zn.SLASH + (_self._deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
+                            _self._routers[_router] = {
+                                controller: _controller,
+                                action: method,
+                                handler: _member,
+                                appContext: _self
+                            };
+                        }
                     }
                 });
             },
@@ -107,17 +109,19 @@ zn.define([
                     _validate = (controller.getMeta('validate') !== undefined) ? controller.getMeta('validate') : false;
                     _controller = new controller(_self, _stores);
                     controller._methods_.forEach(function (method, index){
-                        _member = controller.member(method);
-                        if(_member.meta.router!==null){
-                            _router = _member.meta.router || _member.name;
-                            _router = node_path.normalize(zn.SLASH + (_config.deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
-                            _routers[_router] = {
-                                controller: _controller,
-                                action: method,
-                                handler: _member,
-                                appContext: _self,
-                                validate: (_member.meta.validate !== undefined) ? _member.meta.validate : _validate
-                            };
+                        if(method!="init"){
+                            _member = controller.member(method);
+                            if(_member.meta.router!==null){
+                                _router = _member.meta.router || _member.name;
+                                _router = node_path.normalize(zn.SLASH + (_config.deploy||'') + zn.SLASH + _key + zn.SLASH + _router);
+                                _routers[_router] = {
+                                    controller: _controller,
+                                    action: method,
+                                    handler: _member,
+                                    appContext: _self,
+                                    validate: (_member.meta.validate !== undefined) ? _member.meta.validate : _validate
+                                };
+                            }
                         }
                     });
                 });

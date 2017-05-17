@@ -6,7 +6,7 @@ zn.define([
     './config/mime',
     'node:fs',
     'node:path'
-], function (html, mime, fs, path) {
+], function (html, mime, fs, node_path) {
 
     var CONTENT_TYPE = {
         'DEFAULT': 'text/plain;charset=UTF-8',
@@ -19,6 +19,7 @@ zn.define([
     var _slice = Array.prototype.slice;
 
     var _htmlRender = new html.Render();
+    var _package = require("../../../package.json");
 
     return zn.Class({
         events: ['end', 'finish', 'timeout'],
@@ -75,14 +76,18 @@ zn.define([
                     'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
                     "Access-Control-Allow-Credentials": true,
                     'Access-Control-Max-Age': '3600',//一个小时时间
-                    'X-Powered-By': 'zeanium-node@1.2.0',
+                    'X-Powered-By': _package.name + '@' + _package.version,
                     'Content-Type': 'application/json;charset=utf-8'
                 };
 
                 _args = zn.overwrite(_args, {
                     'Server-Version': _self.__getServerVersion(),
                     'Content-Type': _self.__getContentType()
-                }, _crossSetting);
+                });
+
+                if(this._context._config.CORS){
+                    _args = zn.overwrite(_args, _crossSetting);
+                }
 
                 if(_session){
                     if(_session.hasItem()){
@@ -140,7 +145,7 @@ zn.define([
                 this.end();
             },
             writePath: function (_path, _encoding){
-                _path = path.normalize(_path).split('?')[0];
+                _path = node_path.normalize(_path).split('?')[0];
                 if(fs.existsSync(_path)){
                     fs.readFile(_path, _encoding, function(err, content){
                         var _ext = _path.split('.').pop();
@@ -155,13 +160,18 @@ zn.define([
                         }
                     }.bind(this));
                 } else {
-                    this.doIndex();
+                    zn.error("Can't Open Path: ", _path);
+                    this.viewModel('_error', {
+                        code: 404,
+                        msg: '未找到资源文件: ',
+                        detail: ''
+                    }, true);
                 }
             },
             writeURL: function (url, encoding){
                 this.writePath(this.__fixBasePath() + url, encoding || 'binary');
             },
-            doIndex: function (){
+            doIndex: function (path){
                 var _basePath = this.__fixBasePath();
                     _mode = null,
                     _path = null;
@@ -172,36 +182,43 @@ zn.define([
                 } else {
                     _basePath = _basePath + this._request.url;
                 }
-                _basePath = path.normalize(_basePath);
+                _basePath = node_path.normalize(_basePath);
                 if(!_mode){
                     _mode = this._context._config.mode;
                 }
-
-                if(_mode=='catalog'){
-                    this.doCatalog(_basePath);
-                } else {
-                    zn.each(this._context._config.indexs || [], function (index){
-                        if(fs.existsSync(_basePath + index)){
-                            _path = _basePath + index;
-                            return false;
+                //release, debug, view, catalog
+                switch (_mode) {
+                    case 'release':
+                        zn.each(this._context._config.indexs || [], function (index){
+                            if(fs.existsSync(_basePath + index)){
+                                _path = _basePath + index;
+                                return false;
+                            }
+                        });
+                        if(_path){
+                            this.writePath(_path);
+                        } else {
+                            if(!this._context._config.debug){
+                                _basePath = this._request.url;
+                            }
+                            this.viewModel('_error', {
+                                code: 404,
+                                msg: '未找到资源文件: ' + _basePath,
+                                detail: ''
+                            }, true);
                         }
-                    });
-                    if(_path){
-                        this.writePath(_path);
-                    } else {
-                        if(!this._context._config.debug){
-                            _basePath = this._request.url;
-                        }
-                        this.viewModel('_error', {
-                            code: 404,
-                            msg: '未找到资源文件: ' + _basePath,
-                            detail: ''
-                        }, true);
-                    }
+                        break;
+                    case 'debug':
+                        this.success('正在完善中...');
+                        break;
+                    case 'view':
+                    case 'catalog':
+                        this.doCatalog(_basePath);
+                        break;
                 }
             },
             doCatalog: function (src){
-                var _baseURL = path.normalize(this.request._pathname + zn.SLASH);
+                var _baseURL = node_path.normalize(this.request._pathname + zn.SLASH);
                 var _dirPath = src || this.__fixBasePath();
                 if(!fs.statSync(_dirPath).isDirectory()){
                     if(fs.existsSync(_dirPath)){
@@ -224,10 +241,10 @@ zn.define([
                         }, true);
                     }else {
                         files = files.map(function(file){
-                            if(fs.statSync(path.join(src, file)).isDirectory()){
-                                file = path.basename(file) + zn.SLASH;
+                            if(fs.statSync(node_path.join(src, file)).isDirectory()){
+                                file = node_path.basename(file) + zn.SLASH;
                             }else{
-                                file = path.basename(file);
+                                file = node_path.basename(file);
                             }
                             return {
                                 href: _baseURL + file,
@@ -276,7 +293,7 @@ zn.define([
                 if(isInternal!==false && this.applicationContext){
                     url = zn.SLASH + this.applicationContext.deploy + zn.SLASH + url;
                 }
-                _serverRequest.url = path.normalize(url);
+                _serverRequest.url = node_path.normalize(url);
                 this._context.accept(_serverRequest, _serverResponse);
             },
             redirect: function (url){
@@ -328,7 +345,7 @@ zn.define([
                 return CONTENT_TYPE[type||this.contentType];
             },
             __getServerVersion: function (){
-                return 'Zeanium-Server V1.0.0';
+                return _package.name + ' V' + _package.version;
             },
             __fixBasePath: function (){
                 var _basePath = null;

@@ -20,18 +20,32 @@ zn.define([
             scanWebRoot: function (path, callback){
                 var _defer = zn.async.defer(),
                     _self = this,
+                    _config = this._context._config,
+                    _modules = _config.modules,
                     _apps = [];
                 zn.info('[ Begin ] Scanning Path:' + path);
                 fs.readdir(path, function(err, files){
                     if(err){ zn.error(err); return; }
                     var _queue = zn.queue();
                     files.forEach(function(file){
+                        if((_modules && _modules.indexOf(file)!=-1) || !_modules){
+                            _queue.push(function (task){
+                                _self.scanApplication.call(_self, path, file, function (appContext){
+                                    task.done(appContext);
+                                });
+                            }, _self);
+                        }
+                    });
+
+                    _config.node_modules && _config.node_modules.forEach(function (name, index){
+                        var _paths = require.resolve(name).split(name);
                         _queue.push(function (task){
-                            this.scanApplication.call(this, path, file, function (appContext){
+                            _self.scanApplication.call(_self, _paths[0], name, function (appContext){
                                 task.done(appContext);
                             });
                         }, _self);
                     });
+
                     _queue.every(function (appContext){
                         if(appContext){
                             _apps.push(appContext);
@@ -46,9 +60,11 @@ zn.define([
             },
             scanApplication: function (path, file, callback, applicationContext){
                 var _defer = zn.async.defer(),
+                    _queue = zn.queue(),
+                    _apps = [],
                     _self = this,
                     _appPath = path + file,
-                    _appContext = null;
+                    _appContext = null,
                     _serverContext = this._context,
                     _configPath = _appPath + zn.SLASH + CONFIG.APP;
 
@@ -78,15 +94,39 @@ zn.define([
                     }
 
                     _appContext = new ApplicationContext(zn.overwrite(appConfig, { deploy: _deploy }), _serverContext);
-                    _self.scanPackage(_appPath, appConfig.models, appConfig.controllers, _appContext, function (applicationContext){
-                        if(appConfig.plugin){
-                            _self.scanPlugin(appConfig.root + appConfig.plugin, applicationContext, callback);
-                        } else {
-                            callback && callback(applicationContext);
-                        }
-                    }).then(function (applicationContext){
-                        _defer.resolve(applicationContext);
+
+                    _queue.push(function (task){
+                        _self.scanPackage(_appPath, appConfig.models, appConfig.controllers, _appContext, function (applicationContext){
+                            if(appConfig.plugin){
+                                _self.scanPlugin(appConfig.root + appConfig.plugin, applicationContext, callback);
+                            } else {
+                                callback && callback(applicationContext);
+                            }
+                        }).then(function (applicationContext){
+                            task.done(applicationContext);
+                        });
+                    }, _self);
+
+                    /** ---- load node ---- **/
+                    appConfig.node_modules && appConfig.node_modules.forEach(function (name, index){
+                        var _paths = require.resolve(name).split(name);
+                        _queue.push(function (task){
+                            _self.scanApplication.call(_self, _paths[0], name, function (appContext){
+                                callback && callback(appContext);
+                                task.done(appContext);
+                            });
+                        }, _self);
                     });
+
+                    _queue.every(function (appContext){
+                        if(appContext){
+                            _apps.push(appContext);
+                        }
+                    }).finally(function(){
+                        _defer.resolve(_apps);
+                    }).start();
+                    /****   ----    ----    ***/
+
                 });
 
                 return _defer.promise;

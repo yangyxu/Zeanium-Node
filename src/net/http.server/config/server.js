@@ -57,12 +57,15 @@ zn.define([
 
 
     return {
-        host: '127.0.0.1',
+        host: '0.0.0.0',
         port: 8888,
-        catalog: '/webapps/',
+        catalog: '/znapps/',
         watchCwd: '/src/',
+        modules: null,
         timeout: 12000,
-        mode: 'debug',     //release, debug, view,
+        reDeployDelay: 3000,
+        CORS: true,
+        mode: 'release',     //release, debug, view,
         indexs: ['index.html', 'index.htm', 'default.html', 'default.htm'],
         session: {
             name: 'ZNSESSIONID',
@@ -86,9 +89,12 @@ zn.define([
                 max: 200,
                 handlerClass: RestfulRequestHandler,
                 mapping: function (url, context, handler){
-                    var _routers = context._routers,
+                    var _routers = context.getRouters(),
                         _chain = new RequestHandlerChain(),
                         _handler = null;
+
+                    console.log('Routers: ', Object.keys(_routers));
+
                     for(var key in _routers) {
                         _handler = zn.extend({}, _routers[key]);
                         if(_util.test(key, url)){

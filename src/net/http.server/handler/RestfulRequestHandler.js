@@ -10,7 +10,10 @@ zn.define(['node:url'], function (node_url) {
                     var _url = request.url,
                         _context = this._context,
                         _chain = request.chain;
-                    response.upon('finish', ()=>this.__onRequestFinish(request, response));
+
+                    response.upon('finish', function(){
+                        this.__onRequestFinish(request, response);
+                    }.bind(this));
                     if(_chain && _chain.size>0){
                         response.applicationContext = _chain.applicationContext;
                         request.parse(function (data){

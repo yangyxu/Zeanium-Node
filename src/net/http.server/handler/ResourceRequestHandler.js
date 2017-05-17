@@ -17,6 +17,7 @@ zn.define(function () {
                 }
 
                 var _app = _context._apps[_project];
+
                 if(!_app){
                     return response.writeURL(request.url), false;
                 }
@@ -30,6 +31,7 @@ zn.define(function () {
                 if(!_paths.length){
                     return response.doIndex(), false;
                 }
+
                 return response.writePath(_app._config.root + zn.SLASH + _paths.join(zn.SLASH)), false;
             },
             __200: function (){

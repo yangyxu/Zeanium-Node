@@ -34,9 +34,8 @@ zn.define([
             },
             getConfig: function (){
                 return {
-                    host: '0.0.0.0',
+                    host: this._argv.host || '0.0.0.0',
                     port: this._argv.port || 8080,
-                    catalog: '/',
                     onLoaded: function (){
                         zn.info('You can press [ control + c ] to stop current zeanium server.');
                     }

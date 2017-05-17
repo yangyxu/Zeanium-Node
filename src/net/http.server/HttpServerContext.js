@@ -8,8 +8,9 @@ zn.define([
     'node:path',
     './Scanner',
     './RequestAcceptor',
+    './controller/HttpServerController',
     '../../session/MemorySessionManager'
-], function (chokidar, fs, os, path, Scanner, RequestAcceptor, MemorySessionManager) {
+], function (chokidar, fs, os, node_path, Scanner, RequestAcceptor, HttpServerController, MemorySessionManager) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -34,6 +35,12 @@ zn.define([
         },
         methods: {
             init: function (args){
+                var _main = '',
+                    _modules = args.config.modules;
+                if(_modules && _modules[0]){
+                    _main = _modules[0];
+                }
+                args.config.watchCwd = node_path.normalize(args.config.catalog + _main + args.config.watchCwd);
                 var _config = args.config;
                 this.sets(args);
                 zn.SERVER_PATH = this._serverPath;
@@ -52,13 +59,45 @@ zn.define([
                 this._scanner = new Scanner(this);
                 this._requestAcceptor = new RequestAcceptor(this);
                 this.__scanWebPath();
+                this._baseRouters = this.__registerHttpServerController();
+            },
+            getRouters: function (){
+                return zn.extend(this._baseRouters, this._routers);
+            },
+            __registerHttpServerController: function (){
+                var _key = HttpServerController.getMeta('controller') || '';
+                var _controller = new HttpServerController(this);
+                var _member,
+                    _router,
+                    _routers = {},
+                    _self = this;
+                HttpServerController._methods_.forEach(function (method, index){
+                    if(method!=='init'){
+                        _member = HttpServerController.member(method);
+                        if(_member.meta.router!==null){
+                            _router = _member.meta.router || _member.name;
+                            _router = node_path.normalize(zn.SLASH + _key + zn.SLASH + _router);
+                            _routers[_router] = {
+                                controller: _controller,
+                                action: method,
+                                handler: _member,
+                                appContext: _self
+                            };
+                        }
+                    }
+                });
+
+                return _routers;
             },
             accept: function (serverRequest, serverResponse){
-                serverRequest.url = path.normalize(serverRequest.url);
+                serverRequest.url = node_path.normalize(serverRequest.url);
                 this._requestAcceptor.accept(serverRequest, serverResponse);
             },
             matchRouter: function (url){
 
+            },
+            registerRouters: function (routers){
+                return zn.extend(this._routers, routers), this;
             },
             registerApplication: function (app){
                 if(!app){ return }
@@ -79,10 +118,10 @@ zn.define([
             __scanWebPath: function (isRedeploy){
                 var _config = this._config,
                     _webPath = this._webPath;
-
                 if(fs.existsSync(_webPath + CONFIG.APP)){
                     this._scanner.scanApplication(_webPath, '', function (app){
                         this.registerApplication(app);
+                    }.bind(this)).then(function (){
                         this.__onLoaded(_webPath);
                     }.bind(this));
                 } else {
@@ -132,7 +171,7 @@ zn.define([
                         if(this._changedFiles.indexOf(_path)==-1 && event!=='unknown'){
                             this._changedFiles.push(_path);
                             zn.debug(event + ': ' + _path);
-                            this._deployDelay = 3000;
+                            this._deployDelay = this._config.reDeployDelay || 3000;
                             this.__doFileChange(_path);
                         }
                     }
@@ -145,7 +184,7 @@ zn.define([
                 }
                 zn.info('Redeploying......');
                 this._changedFiles = [];
-                this.__scanWebPath(true);
+                return this.__scanWebPath(true);
             },
             __doFileChange: function (path){
                 var _self = this;

@@ -11,6 +11,8 @@ zn.define([
     http
 ) {
 
+    var _package = require("../../../package.json");
+
     return zn.Class('HttpServer', {
         statics: {
             createServer: function (inArgs) {
@@ -46,17 +48,18 @@ zn.define([
                 try{
                     this.fire('request',request, response);
                     if('OPTIONS' == request.method){
+                        var _name = _package.name + '@' + _package.version;
                         response.writeHead(200, {
                             'Access-Control-Allow-Origin': request.headers.origin,
                             'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
                             'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
                             "Access-Control-Allow-Credentials": true,
                             'Access-Control-Max-Age': '3600',//一个小时时间
-                            'X-Powered-By': 'zeanium-node@1.2.0',
+                            'X-Powered-By': _name,
                             'Content-Type': 'text/html;charset=utf-8',
                             'Trailer': 'Content-MD5'
                         });
-                        response.write('<a href="https://github.com/yangyxu/Zeanium-Node">zeanium-node@1.2.0</a>');
+                        response.write('<a href="https://github.com/yangyxu/Zeanium-Node">'+_name+'</a>');
                         response.addTrailers({'Content-MD5': zn.uuid()});
                         response.end();
                     }else {

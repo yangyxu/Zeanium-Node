@@ -25,6 +25,7 @@ zn.define([
                 if(serverRequest.url === zn.SLASH + 'favicon.ico'){
                     return serverResponse.end();
                 }
+
                 var _url = node_url.parse(serverRequest.url, true).pathname,
                     _handlerManager = null,
                     _result = null,
@@ -36,8 +37,8 @@ zn.define([
                 for(var key in this._handlerManagers){
                     _handlerManager = this._handlerManagers[key];
                     _chain = _handlerManager.match(_url);
-                    //zn.info('Do [' + key + '] request handler : ' + _match);
                     if(_chain){
+                        zn.debug('[' + key + ']: ' + _url);
                         return _handlerManager.accept(serverRequest, serverResponse, _chain);
                     }
                 }
