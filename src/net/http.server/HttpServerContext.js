@@ -130,7 +130,9 @@ zn.define([
                             this.__onLoaded(_webPath);
                         }.bind(this));
                     } else {
+                        //第一次扫描系统的项目
                         this.__scanWebRoot(this._serverPath + zn.SLASH + 'www' + zn.SLASH, function (){
+                            //第二次扫描用户的项目
                             this.__scanWebRoot(_webPath, function (){
                                 this.__onLoaded(_webPath);
                             }.bind(this));

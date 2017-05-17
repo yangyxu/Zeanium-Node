@@ -93,7 +93,7 @@ zn.define([
                         _chain = new RequestHandlerChain(),
                         _handler = null;
 
-                    console.log('Routers: ', Object.keys(_routers));
+                    //console.log('Routers: ', Object.keys(_routers));
 
                     for(var key in _routers) {
                         _handler = zn.extend({}, _routers[key]);
