@@ -31,7 +31,7 @@ Node.js >= 5.0.0 required.
 ## Docs & Community
 
 - [Website && Documentations](https://www.zeanium.com)
-- [plugins](https://github.com/search?q=topic%3Azeanium-node-plugin&type=Repositories)
+- [plugins](https://github.com/search?q=zn-plugin&type=Repositories)
 
 ## Getting Started
 

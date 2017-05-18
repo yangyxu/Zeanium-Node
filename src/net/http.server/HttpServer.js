@@ -4,11 +4,13 @@
 zn.define([
     './config/server',
     './HttpServerContext',
-    'node:http'
+    'node:http',
+    'node:path'
 ],function (
     config,
     HttpServerContext,
-    http
+    node_http,
+    node_path
 ) {
 
     var _package = require("../../../package.json");
@@ -26,11 +28,35 @@ zn.define([
         methods: {
             init: function (args){
                 var _config = zn.overwrite(args, config);
+                this.__initNodePaths(_config);
                 this.__createHttpServer(_config.port, _config.host);
                 this.__createHttpServerContext(_config);
             },
+            __initNodePaths: function (config){
+                var paths = config.node_paths;
+                if(!paths || !paths.forEach){
+                    return false;
+                }
+                /*Add current path to NODE_PATH*/
+                var _cwd = process.cwd(),
+                    _path = null,
+                    _parentPaths = [];
+                paths.forEach(function (path){
+                    _path = node_path.normalize(_cwd + node_path.sep + path);
+                    _parentPaths = _parentPaths.concat([_path]);
+                    if(config.includeParentPath){
+                        _parentPaths = _parentPaths.concat(module.constructor._nodeModulePaths(_path));
+                    }
+                });
+
+                if(_parentPaths.length){
+                    process.env.NODE_PATH = process.env.NODE_PATH + node_path.delimiter + _parentPaths.join(node_path.delimiter);
+                    module.constructor._initPaths();
+                    zn.NODE_PATHS = process.env.NODE_PATH.split(node_path.delimiter);
+                }
+            },
             __createHttpServer: function (port, host){
-                var _httpServer = new http.Server();
+                var _httpServer = new node_http.Server();
                 _httpServer.addListener('request', this.__onRequest.bind(this));
                 _httpServer.addListener("connection", this.__onConnection.bind(this));
                 _httpServer.addListener("close", this.__onClose.bind(this));

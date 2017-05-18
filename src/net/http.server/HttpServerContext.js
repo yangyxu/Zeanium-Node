@@ -10,7 +10,7 @@ zn.define([
     './RequestAcceptor',
     './controller/HttpServerController',
     '../../session/MemorySessionManager'
-], function (chokidar, fs, os, node_path, Scanner, RequestAcceptor, HttpServerController, MemorySessionManager) {
+], function (chokidar, node_fs, node_os, node_path, Scanner, RequestAcceptor, HttpServerController, MemorySessionManager) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -35,12 +35,6 @@ zn.define([
         },
         methods: {
             init: function (args){
-                var _main = '',
-                    _modules = args.config.modules;
-                if(_modules && _modules[0]){
-                    _main = _modules[0];
-                }
-                args.config.watchCwd = node_path.normalize(args.config.catalog + _main + args.config.watchCwd);
                 var _config = args.config;
                 this.sets(args);
                 zn.SERVER_PATH = this._serverPath;
@@ -48,6 +42,7 @@ zn.define([
                 this.on('init', _config.onInit || zn.idle);
                 this.on('loading', _config.onLoading || zn.idle);
                 this.on('loaded', _config.onLoaded || zn.idle);
+                this.__resetWatchCwd();
                 this._apps = {};
                 this._routers = {};
                 this._changedFiles = [];
@@ -58,8 +53,18 @@ zn.define([
                 this._sessionManager = new MemorySessionManager(_config.session);
                 this._scanner = new Scanner(this);
                 this._requestAcceptor = new RequestAcceptor(this);
-                this.__scanWebPath();
                 this._baseRouters = this.__registerHttpServerController();
+                this.__scanWebPath();
+            },
+            __resetWatchCwd: function () {
+                var _main = '',
+                    _config = this._config,
+                    _catalog = _config.catalog,
+                    _modules = _config.modules;
+                if(_modules && _modules[0]){
+                    _main = _modules[0];
+                }
+                this._config.watchCwd = node_path.normalize(_catalog + _main + this._config.watchCwd);
             },
             getRouters: function (){
                 return zn.extend(this._baseRouters, this._routers);
@@ -117,13 +122,33 @@ zn.define([
             },
             __scanWebPath: function (isRedeploy){
                 var _config = this._config,
-                    _webPath = this._webPath;
-                if(fs.existsSync(_webPath + CONFIG.APP)){
-                    this._scanner.scanApplication(_webPath, '', function (app){
-                        this.registerApplication(app);
-                    }.bind(this)).then(function (){
-                        this.__onLoaded(_webPath);
-                    }.bind(this));
+                    _webPath = this._webPath,
+                    _self = this;
+                if(node_fs.existsSync(_webPath + CONFIG.APP)){
+                    var _queue = zn.queue();
+                    _queue.push(function (task){
+                        this._scanner.scanApplication(_webPath, '', function (app){
+                            _self.registerApplication(app);
+                        }).then(function (){
+                            task.done();
+                        });
+                    }, _self);
+
+                    _config.node_modules && _config.node_modules.forEach(function (name, index){
+                        var _paths = require.resolve(name).split(name);
+                        _queue.push(function (task){
+                            _self._scanner.scanApplication(_paths[0], name, function (app){
+                                _self.registerApplication(app);
+                            }).then(function (){
+                                task.done();
+                            });
+                        }, _self);
+                    });
+
+                    _queue.finally(function(){
+                        _self.__onLoaded(_webPath);
+                    }).start();
+
                 } else {
                     if(isRedeploy){
                         this.__scanWebRoot(_webPath, function (){
@@ -159,10 +184,11 @@ zn.define([
                 if(this._watching){
                     return false;
                 }
+                var _path = process.cwd() + (this._config.watchCwd||'');
                 this._watching = true;
                 chokidar.watch('.', {
                     ignored: /[\/\\]\./,
-                    cwd: process.cwd() + (this._config.watchCwd||''),
+                    cwd: _path,
                     interval: 100,
                     binaryInterval: 300,
                     depth: 99,
@@ -178,6 +204,8 @@ zn.define([
                         }
                     }
                 }.bind(this));
+
+                zn.info('Watching: ', _path);
             },
             __delayDeploy: function (){
                 if(this._interval){
@@ -190,7 +218,7 @@ zn.define([
             },
             __doFileChange: function (path){
                 var _self = this;
-                if(fs.existsSync(path)){
+                if(node_fs.existsSync(path)){
                     zn.module.unloadModule(path);
                 }
                 if(this._deployDelay>0){
@@ -212,7 +240,7 @@ zn.define([
                 if(path){
                     this.__watch(path);
                 }
-                var _interfaces = os.networkInterfaces(),
+                var _interfaces = node_os.networkInterfaces(),
                     _interface = null,
                     _config = this._config;
                 for(var key in _interfaces){
