@@ -6,7 +6,7 @@ zn.define([
     './config/mime',
     'node:fs',
     'node:path'
-], function (html, mime, fs, node_path) {
+], function (html, mime, node_fs, node_path) {
 
     var CONTENT_TYPE = {
         'DEFAULT': 'text/plain;charset=UTF-8',
@@ -69,9 +69,11 @@ zn.define([
             writeHead: function (httpStatus, inArgs){
                 var _self = this,
                     _args = inArgs || {},
-                    _session = this._request._session;
+                    _session = this._request._session,
+                    _origin = this._request._serverRequest.headers.origin || this._request._serverRequest.headers.Host;
+
                 var _crossSetting = {
-                    'Access-Control-Allow-Origin': this._request._serverRequest.headers.origin,
+                    'Access-Control-Allow-Origin': _origin,
                     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
                     'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
                     "Access-Control-Allow-Credentials": true,
@@ -137,18 +139,30 @@ zn.define([
             writeContent: function (status, content, contentType){
                 contentType = (contentType||'.html').toLowerCase();
                 var _encode = (contentType=='.html'||contentType=='.htm') ? 'utf8' : 'binary';
+                var _contentType = mime[contentType] || CONTENT_TYPE.HTML;
+                if(_contentType.indexOf(';') === -1){
+                    _contentType = [_contentType, "charset="+_encode].join(';');
+                }
                 this.writeHead(status, {
-                    "Content-Type": mime[contentType]||'text/plain',
+                    "Content-Type": _contentType,
                     "Content-Length": Buffer.byteLength(content, _encode)
                 });
                 this._serverResponse.write(content, _encode);
                 this.end();
             },
-            writePath: function (_path, _encoding){
-                _path = node_path.normalize(_path).split('?')[0];
-                if(fs.existsSync(_path)){
-                    fs.readFile(_path, _encoding, function(err, content){
-                        var _ext = _path.split('.').pop();
+            writePath: function (path, encoding){
+                path = node_path.normalize(path).split('?')[0];
+                if(node_fs.existsSync(path)){
+                    var _encoding = 'binary',
+                        _extname = node_path.extname(path);
+                    switch (_extname) {
+                        case ".htm":
+                        case ".html":
+                            _encoding = "utf-8";
+                            break;
+                    }
+
+                    node_fs.readFile(path, encoding||_encoding, function(err, content){
                         if(err){
                             this.viewModel('_error', {
                                 code: 500,
@@ -156,20 +170,20 @@ zn.define([
                                 detail: ''
                             }, true);
                         }else {
-                            this.writeContent(200, content, '.' + _ext);
+                            this.writeContent(200, content, _extname);
                         }
                     }.bind(this));
                 } else {
-                    zn.error("Can't Open Path: ", _path);
+                    zn.error("Can't Open Path: ", path);
                     this.viewModel('_error', {
                         code: 404,
-                        msg: '未找到资源文件: ',
+                        msg: '未找到资源文件',
                         detail: ''
                     }, true);
                 }
             },
             writeURL: function (url, encoding){
-                this.writePath(this.__fixBasePath() + url, encoding || 'binary');
+                this.writePath(this.__fixBasePath() + url, encoding);
             },
             doIndex: function (path){
                 var _basePath = this.__fixBasePath();
@@ -190,7 +204,7 @@ zn.define([
                 switch (_mode) {
                     case 'release':
                         zn.each(this._context._config.indexs || [], function (index){
-                            if(fs.existsSync(_basePath + index)){
+                            if(node_fs.existsSync(_basePath + index)){
                                 _path = _basePath + index;
                                 return false;
                             }
@@ -220,8 +234,8 @@ zn.define([
             doCatalog: function (src){
                 var _baseURL = node_path.normalize(this.request._pathname + zn.SLASH);
                 var _dirPath = src || this.__fixBasePath();
-                if(!fs.statSync(_dirPath).isDirectory()){
-                    if(fs.existsSync(_dirPath)){
+                if(!node_fs.statSync(_dirPath).isDirectory()){
+                    if(node_fs.existsSync(_dirPath)){
                         this.writePath(_dirPath);
                     }else {
                         this.viewModel('_error', {
@@ -232,7 +246,7 @@ zn.define([
                     }
                     return;
                 }
-                fs.readdir(_dirPath, function(err, files){
+                node_fs.readdir(_dirPath, function(err, files){
                     if(err){
                         this.viewModel('_error', {
                             code: 500,
@@ -241,7 +255,7 @@ zn.define([
                         }, true);
                     }else {
                         files = files.map(function(file){
-                            if(fs.statSync(node_path.join(src, file)).isDirectory()){
+                            if(node_fs.statSync(node_path.join(src, file)).isDirectory()){
                                 file = node_path.basename(file) + zn.SLASH;
                             }else{
                                 file = node_path.basename(file);
@@ -345,7 +359,7 @@ zn.define([
                 return CONTENT_TYPE[type||this.contentType];
             },
             __getServerVersion: function (){
-                return _package.name + ' V' + _package.version;
+                return _package.name + ' V ' + _package.version;
             },
             __fixBasePath: function (){
                 var _basePath = null;
