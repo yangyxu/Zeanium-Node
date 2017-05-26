@@ -99,13 +99,18 @@ zn.define(function () {
             },
             rollback: function (error, callback){
                 var _self = this;
+                zn.error(error);
                 _self._queue.clear();
                 _self.fire('rollback');
                 _self.__finally(error);
                 if(!this._connection){
                     return _self._queue.destroy(), this;
                 }
+                zn.debug('Transaction Query SQL: ROLLBACK');
                 this._connection.query('ROLLBACK', function (err, rows, fields){
+                    if(err){
+                        zn.error(err);
+                    }
                     callback && callback(err, rows, fields);
                     _self._queue.destroy();
                 });

@@ -1,7 +1,7 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define(function () {
+zn.define(['node:path'],function (node_path) {
 
     return zn.RequestHandler('ResourceRequestHandler', {
         methods: {
@@ -17,7 +17,6 @@ zn.define(function () {
                 }
 
                 var _app = _context._apps[_project];
-
                 if(!_app){
                     return response.writeURL(request.url), false;
                 }
