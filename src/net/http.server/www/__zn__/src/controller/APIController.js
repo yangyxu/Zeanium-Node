@@ -1,9 +1,6 @@
 zn.define(function () {
 
     return zn.Controller('api',{
-        properties: {
-
-        },
         methods: {
             list: function (request, response) {
                 /*

@@ -3,7 +3,7 @@
  */
 zn.define([
     '../../templete/html/exports.js',
-    './config/mime',
+    './config/zn.mime.config.js',
     'node:fs',
     'node:path'
 ], function (html, mime, node_fs, node_path) {

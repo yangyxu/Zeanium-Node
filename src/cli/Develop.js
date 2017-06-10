@@ -7,7 +7,7 @@ zn.define([
     'node:child_process'
 ], function (fs, path, child_process) {
 
-    return zn.Class('Develop', {
+    return zn.Class({
         properties: {
             env: null,
             argv: null

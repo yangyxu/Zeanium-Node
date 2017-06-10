@@ -61,6 +61,10 @@ zn.define([
         port: 8888,
         catalog: '/znapps/',
         watchCwd: '/src/',
+        views: {
+            path: '/src/view/',
+            suffix: 'html'
+        },
         modules: null,
         timeout: 12000,
         reDeployDelay: 3000,

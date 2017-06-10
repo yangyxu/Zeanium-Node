@@ -1,6 +1,6 @@
 zn.define(function () {
 
-    var Controller = zn.Class('Controller', {
+    var Controller = zn.Class({
         methods: {
             init: {
                 router: null,

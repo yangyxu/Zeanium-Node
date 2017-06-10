@@ -7,7 +7,7 @@ zn.define([
     'io'
 ], function (fs, path, io) {
 
-    return zn.Class('Install', {
+    return zn.Class({
         properties: {
             env: null,
             argv: null

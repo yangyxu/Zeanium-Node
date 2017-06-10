@@ -1,7 +1,9 @@
 /**
  * Created by yangyxu on 8/20/14.
  */
-zn.define(['node:url'], function (node_url) {
+zn.define([
+    'node:url'
+], function (node_url) {
 
     return zn.RequestHandler('RestfulRequestHandler', {
         methods: {

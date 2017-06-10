@@ -7,7 +7,7 @@ zn.define([
     'node:fs'
 ], function (net, os, fs) {
 
-    return zn.Class('Run', {
+    return zn.Class({
         properties: {
             env: null,
             argv: null

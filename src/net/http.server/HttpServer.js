@@ -2,7 +2,7 @@
  * Created by yangyxu on 8/20/14.
  */
 zn.define([
-    './config/server',
+    './config/zn.server.config.js',
     './HttpServerContext',
     'node:http',
     'node:path'
