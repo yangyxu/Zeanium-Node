@@ -132,7 +132,7 @@ zn.define(function () {
                                     task.done(connection, rows, fields);
                                 }
                             }
-                        });
+                        }.bind(this));
                     }
                 }.bind(this);
             },
@@ -144,7 +144,6 @@ zn.define(function () {
                 }else {
                     this._queue.push(_task);
                 }
-
 
                 return this;
             },
