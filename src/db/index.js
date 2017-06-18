@@ -3,7 +3,7 @@ zn.define([
     './common/',
     './sql/',
     './mysql/ZNSql'
-], function (data, common, ZNSql) {
+], function (data, common, sql, ZNSql) {
 
     return {
         data: data,
