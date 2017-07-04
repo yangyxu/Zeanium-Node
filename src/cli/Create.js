@@ -3,9 +3,8 @@
  */
 zn.define([
     'node:fs',
-    'node:path',
-    'io'
-], function (fs, path, io) {
+    'node:path'
+], function (fs, path) {
 
     return zn.Class({
         properties: {
@@ -26,10 +25,7 @@ zn.define([
                 if(_name){
                     _source = _source + zn.SLASH + _name;
                 }
-                zn.info('Creating ' + _type + ': ' + _name + '.');
-                io.FileUtil.copyDir(path.normalize(_target), path.normalize(_source), function (){
-                    zn.info('Creating end.');
-                });
+                
             }
         }
     });

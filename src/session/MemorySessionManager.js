@@ -4,9 +4,6 @@
 zn.define(['./SessionManager'],function (SessionManager) {
 
     return zn.Class('MemorySessionManager', SessionManager, {
-        properties: {
-
-        },
         methods: {
             init: function (config){
                 this._sessions = {};

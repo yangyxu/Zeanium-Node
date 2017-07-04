@@ -3,9 +3,8 @@
  */
 zn.define([
     'node:fs',
-    'node:path',
-    'io'
-], function (fs, path, io) {
+    'node:path'
+], function (fs, path) {
 
     return zn.Class({
         properties: {
@@ -29,9 +28,6 @@ zn.define([
                     var _pluginsDir = __dirname + '/../src/net/http.server/inits/plugins';
                     var _target =  _pluginsDir + '/' + _name;
                     fs.mkdirSync(_pluginsDir);
-                    io.FileUtil.copyDir(path.normalize(_target), path.normalize(process.cwd() + zn.SLASH + 'plugins' + zn.SLASH + _name), function (){
-                        zn.info('Creating end.');
-                    });
                 } else {
                     zn.error('The current directory is not an zn app, the file “zn.app.config.js” is required.');
                 }

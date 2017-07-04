@@ -173,7 +173,7 @@ zn.define([
 
                 var _splitIndex = _controllers.length,
                     __models = {},
-                    __actions = {},
+                    __collections = {},
                     __controllers= {};
 
                 zn.define(_controllers.concat(_models), function (){
@@ -181,7 +181,7 @@ zn.define([
                         if(index > (_splitIndex - 1)){
                             var _item = null,
                                 _items = {},
-                                _action = null,
+                                _collection = null,
                                 _table = null,
                                 _name = null;
 
@@ -192,12 +192,12 @@ zn.define([
                                     continue;
                                 }
                                 _name = _item.$path.split(zn.SLASH).pop().split('.').shift();
-                                _action = _self.getAction(_item);
-                                _table = _item.getTable();
-                                __actions[key] = __actions[_name] = _action;
+                                _collection = _self.getCollection(_item);
+                                _table = _item.getMeta('table');
+                                __collections[key] = __collections[_name] = _collection;
                                 _items[_name] = _item;
                                 if(_table){
-                                    __actions[_table] = _action;
+                                    __collections[_table] = _collection;
                                 }
                             }
 
@@ -207,7 +207,7 @@ zn.define([
                         }
                     });
                     applicationContext.registerModels(__models);
-                    applicationContext.registerActions(__actions);
+                    applicationContext.registerCollections(__collections);
                     applicationContext.registerControllers(__controllers);
                     applicationContext.doLoaded();
                     callback && callback(applicationContext);
@@ -216,24 +216,24 @@ zn.define([
 
                 return _defer.promise;
             },
-            getAction: function (ModelClass) {
-                var _actions = [];
-                this.__getModelActions(ModelClass, _actions);
-                return zn.Action({
+            getCollection: function (ModelClass) {
+                var _collections = [];
+                this.__getModelCollections(ModelClass, _collections);
+                return zn.Collection({
                     model: ModelClass,
-                    mixins: _actions
+                    mixins: _collections
                 });
             },
-            __getModelActions: function (ModelClass, actions){
+            __getModelCollections: function (ModelClass, collections){
                 var _mixin = null,
-                    _action = ModelClass.getMeta('action'),
+                    _collection = ModelClass.getMeta('collection'),
                     _mixins_ = ModelClass._mixins_;
 
-                if(_action){
-                    actions.push(_action);
+                if(_collection){
+                    collections.push(_collection);
                 }
                 for(var _i = 0, _len = _mixins_.length; _i < _len; _i++){
-                    this.__getModelActions(_mixins_[_i], actions);
+                    this.__getModelCollections(_mixins_[_i], collections);
                 }
             }
         }

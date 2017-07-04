@@ -25,7 +25,7 @@ zn.define([
                         return response.writeURL(_url), false;
                     }
                 }catch(e){
-                    zn.error(e.message);
+                    zn.error('RestfulRequestHandler doRequest error: ', e.message);
                     console.log(e.stack);
                     return response.forword('__zn__/error/__404');
                 }

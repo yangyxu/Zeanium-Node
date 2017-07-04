@@ -45,6 +45,7 @@ zn.define([
                 this.__resetWatchCwd();
                 this._apps = {};
                 this._routers = {};
+                this._collections = {};
                 this._changedFiles = [];
                 this._uuid = zn.uuid();
                 this._deployDelay = 0;
@@ -115,7 +116,9 @@ zn.define([
                     this._apps[_deploy] = app;
                 }
 
+                app.parentContext = this;
                 zn.extend(this._routers, app._routers);
+                zn.extend(this._collections, app._collections);
                 //console.log(Object.keys(this._routers));
                 //app.fire('register', this);
                 zn.info('Register Project(Application): ' + _deploy);

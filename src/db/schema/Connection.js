@@ -1,10 +1,10 @@
 /**
- * Created by yangyxu on 9/17/14.
+ * Created by yangyxu on 8/20/14.
  */
 zn.define(function () {
 
     return zn.Class({
-        static: true,
+        events: ['connect', 'disconnect', 'error', 'close'],
         methods: {
 
         }

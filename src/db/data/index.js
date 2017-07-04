@@ -1,6 +1,6 @@
 zn.define([
     './Model',
-    './Action',
+    './ModelSql',
     './Collection',
     './Store'
 ]);

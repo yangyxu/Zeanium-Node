@@ -3,61 +3,75 @@
  */
 zn.define(function () {
 
+    var SQLS = {
+        desc: 'desc {table};',
+        drop: 'drop table {table};',
+        show: 'show tables;',
+        addField: 'alter table {table} add {field};',
+        modifyField: 'alter table {table} modify {field};',
+        dropField: 'alter table {table} drop {field};',
+    };
+
     var Collection = zn.Class('zn.db.data.Collection', {
+        properties: {
+            store: {
+                readonly: true,
+                get: function (){
+                    return this._store;
+                }
+            },
+            Model: {
+                readonly: true,
+                get: function (){
+                    return this._Model;
+                }
+            }
+        },
         methods: {
             init: {
                 auto: true,
-                value: function (store, ModelClass){
+                value: function (store, Model){
                     this._store = store;
-                    this._ModelClass = ModelClass;
+                    this._Model = Model;
                 }
             },
-            __getCreateSql: function (table, fields) {
-                var _table = table, _fieldsSql = [], _field = null;
-                for(var i = 0, _len = fields.length; i < _len; i++){
-                    _field = fields[i];
-                    _fieldsSql.push(_field);
-                }
-                var _sql = "DROP TABLE IF EXISTS "+_table+";";
-                var _sql = "";
-                _sql += "CREATE TABLE "+_table+" (";
-                _sql += _fieldsSql.join(',');
-                _sql += ") ENGINE=innodb DEFAULT CHARSET=utf8;";
-                return _sql;
+            beginTransaction: function (){
+                return this._store.beginTransaction();
             },
-            create: function (table, fields){
-                return this._store.execCommand(this.__getCreateSql(table, fields));
+            insert: function (values){
+                return this._store.query(this._Model.getInsertSql({ values: values }));
             },
-            desc: function (table){
-                return this._store.execCommand('DESC ' + table);
+            select: function (argv){
+                return this._store.query(this._Model.getSelectSql(argv));
             },
-            drop: function (table){
-                return this._store.execCommand('DROP TABLE ' + table);
+            selectOne: function (argv){
+                var _defer = zn.async.defer();
+                this.select(argv)
+                    .then(function (rows){
+                        _defer.resolve(rows[0]);
+                    }, function (error){
+                        _defer.reject(error);
+                    });
+
+                return _defer.promise;
             },
-            show: function (){
-                return this._store.execCommand('SHOW TABLES;');
+            paging: function (argv){
+                return this._store.query(this._Model.getPagingSql(argv));
             },
-            addField: function (table, field){
-                return this._store.execCommand('ALTER TABLE ' + table + ' ADD ' + field + ';');
+            update: function (updates, where){
+                return this._store.query(this._Model.getUpdateSql({ updates: updates, where: where }));
             },
-            modifyField: function (table, field) {
-                return this._store.execCommand('ALTER TABLE ' + table + ' MODIFY ' + field + ';');
-            },
-            dropField: function (table, field){
-                this._store.execCommand('ALTER TABLE ' + table + ' DROP ' + field + ';');
-            },
-            usedb: function (db) {
-                this._store.setDataBase(db);
+            delete: function (where){
+                return this._store.query(this._Model.getDeleteSql({ where : where }));
             }
         }
     });
 
     zn.Collection = function (){
         var _args = arguments,
-            _name = _args[0],
-            _meta = _args[1];
+            _meta = _args[0];
 
-        return zn.Class(_name, Collection, _meta);
+        return zn.Class(Collection, _meta);
     }
 
     return Collection;

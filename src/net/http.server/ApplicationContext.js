@@ -25,7 +25,7 @@ zn.define([
                 this._deploy = appConfig.deploy||'';
                 this._routers = {};
                 this._models = {};
-                this._actions = {};
+                this._collections = {};
                 this._controllers = {};
                 this._appContexts= {};
                 this._appRoot = this._root = serverContext._root + zn.SLASH + this._deploy;
@@ -63,14 +63,14 @@ zn.define([
 
                 return _models;
             },
-            getActions: function (){
-                var _actions = {};
-                zn.extend(_actions, this._actions);
+            getCollections: function (){
+                var _collections = {};
+                zn.extend(_collections, this._collections);
                 zn.each(this._appContexts, function (appContext, index){
-                    zn.extend(_actions, appContext.getActions());
+                    zn.extend(_collections, appContext.getCollections());
                 });
 
-                return _actions;
+                return _collections;
             },
             registerApplicationContext: function (appContext){
                 if(appContext){
@@ -81,8 +81,8 @@ zn.define([
             registerModels: function (models){
                 return zn.extend(this._models, models), this;
             },
-            registerActions: function (actions){
-                return zn.extend(this._actions, actions), this;
+            registerCollections: function (collections){
+                return zn.extend(this._collections, collections), this;
             },
             registerControllers: function (controllers){
                 zn.extend(this._controllers, controllers);
@@ -133,7 +133,7 @@ zn.define([
                     _store = null,
                     _self = this;
                 zn.each((databaseSetting || []), function (config, index){
-                    _store = zn.Store.getStore(config);
+                    _store = zn.db.data.Store.getStore(config);
                     _stores[index] = _store;
                     if(config.default){
                         _self._store = _store;

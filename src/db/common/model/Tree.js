@@ -1,7 +1,7 @@
-zn.define('../action/Tree',function (TreeAction) {
+zn.define('../collection/Tree',function (Tree) {
 
     return zn.Class("zn.db.common.model.Tree", zn.db.data.Model, {
-        action: TreeAction,
+        collection: Tree,
         properties: {
             type: {
                 value: null,

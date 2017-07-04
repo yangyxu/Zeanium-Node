@@ -1,7 +1,7 @@
-zn.define('../action/Rights',function (RightsAction) {
+zn.define('../collection/Rights',function (Rights) {
 
     return zn.Class("zn.db.common.model.Rights", zn.db.data.Model, {
-        action: RightsAction,
+        collection: Rights,
         properties: {
             ownerId: {
                 value: null,

@@ -3,9 +3,8 @@
  */
 zn.define([
     'node:fs',
-    'node:path',
-    'io'
-], function (fs, path, io) {
+    'node:path'
+], function (fs, path) {
 
     return zn.Class({
         properties: {

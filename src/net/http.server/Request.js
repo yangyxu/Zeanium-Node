@@ -20,7 +20,11 @@ zn.define([
             context: null,
             applicationContext: null,
             chain: null,
-            session: null,
+            session: {
+                get: function (){
+                    return this._session;
+                }
+            },
             serverRequest: {
                 value: null,
                 get: function (){
@@ -48,6 +52,19 @@ zn.define([
                 this._$get = {};
                 this._$files = {};
                 this._errors = [];
+            },
+            getSessionKeyValue: function (sessionKey, key){
+                var _session = this._session,
+                    _sessionKey = sessionKey || '@AdminUser';
+                if(_session.hasItem()){
+                    if(_session.getItem(_sessionKey)){
+                        return _session.getItem(_sessionKey)[key]||0;
+                    }else {
+                        return 0;
+                    }
+                }else {
+                    return 0;
+                }
             },
             getJSON: function (inName){
                 var _value = this.getValue(inName);

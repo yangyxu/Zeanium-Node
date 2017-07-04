@@ -5,12 +5,9 @@ zn.define([
     'node:fs'
 ],function (fs) {
 
-    return zn.Class('FileUtil', {
+    zn.util.file = zn.Class({
         static: true,
         methods: {
-            init: function (){
-
-            },
             copyDir: function (src, dist, callback){
                 fs.access(dist, function(err){
                     if(err){

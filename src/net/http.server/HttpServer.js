@@ -50,7 +50,7 @@ zn.define([
                 });
 
                 if(_parentPaths.length){
-                    process.env.NODE_PATH = process.env.NODE_PATH + node_path.delimiter + _parentPaths.join(node_path.delimiter);
+                    process.env.NODE_PATH = _parentPaths.join(node_path.delimiter) + node_path.delimiter + process.env.NODE_PATH;
                     module.constructor._initPaths();
                     zn.NODE_PATHS = process.env.NODE_PATH.split(node_path.delimiter);
                 }
@@ -101,7 +101,7 @@ zn.define([
             },
             __onClose: function(){
                 this.fire('close', this);
-                Logger.info("close zeanium-server");
+                zn.info("zeanium-server has closed.");
             }
         }
     });

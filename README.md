@@ -95,10 +95,6 @@ zn.define(function () {
     //define controller name
     return zn.Controller('user',{
         methods: {
-            init: function (args){
-                //init
-                this._action = this.action('zn_rights_user');
-            },
             //define login action
             login: {
                 method: 'GET/POST',     //action method
@@ -107,35 +103,22 @@ zn.define(function () {
                     password: null
                 },
                 value: function (request, response, chain){
-                    this._action.selectOne(request.getValue()).then(function (user){
-                        if(user){
-                            request.session.user = user;
-                            response.success(user);
-                        } else {
-                            response.error('Username or password is incorrect.');
-                        }
-                    }, function (error){
-                        response.error(error.message);
-                    });
+                    this.collection('zn_rights_user')
+                        .selectOne(request.getValue())
+                        .then(function (user){
+                            if(user){
+                                request.session.user = user;
+                                response.success(user);
+                            } else {
+                                response.error('Username or password is incorrect.');
+                            }
+                        }, function (error){
+                            response.error(error.message);
+                        });
                 }
             }
         }
     });
-});
-```
-
-```js
-//define user Action
-zn.define(function () {
-
-    return zn.Action({
-        methods: {
-            getLoginInfo: function (userId){
-
-            }
-        }
-    });
-
 });
 ```
 

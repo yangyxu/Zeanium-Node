@@ -22,28 +22,35 @@ zn.define(function () {
                 var _self = this;
                 this._queue.push(function (task){
                     _self._pool.getConnection(function (err, connection){
-                        before&&before.call(_self, err, connection);
+                        var _before = before&&before.call(_self, err, connection);
                         if(err){
                             _self.__finally(err);
                         } else {
-                            _self._connection = connection;
-                            task.done(connection);
+                            if(_before === false){
+                                _self._queue.destroy();
+                            } else {
+                                _self._connection = connection;
+                                task.done(connection);
+                            }
                         }
                     });
                 }).push(function (task, connection){
                     connection.query('START TRANSACTION', function (err, rows, fields) {
-                        after && after.call(_self, err, rows, fields);
+                        var _after = after && after.call(_self, err, rows, fields);
                         if(err){
                             _self.rollback(err);
                         } else {
-                            task.done(connection, rows, fields);
+                            if(_after === false){
+                                _self._queue.destroy();
+                            } else {
+                                task.done(connection, (_after || rows), fields);
+                            }
                         }
                     });
                 });
 
                 return this;
             },
-
             block: function (block, after){
                 var _self = this;
                 if(zn.is(block, 'function')){
@@ -129,7 +136,7 @@ zn.define(function () {
                                 if(_after === false){
                                     this._queue.destroy();
                                 } else {
-                                    task.done(connection, rows, fields);
+                                    task.done(connection, (_after || rows), fields);
                                 }
                             }
                         }.bind(this));

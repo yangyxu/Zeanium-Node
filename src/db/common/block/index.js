@@ -3,7 +3,7 @@ zn.define([
 ], function (Tree) {
 
     return {
-        Tree: Tree
+        tree: Tree
     }
 
 });
