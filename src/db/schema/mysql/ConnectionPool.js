@@ -39,7 +39,11 @@ zn.define([
             query: function (){
                 var _argv = Array.prototype.slice.call(arguments),
                     _sql = _argv.shift();
-                return this.__query(_sql.format(_argv));
+                if(_argv.length){
+                    _sql = _sql.format(_argv);
+                }
+                
+                return this.__query(_sql);
             },
             __query: function (sql, config){
                 var _defer = zn.async.defer(),

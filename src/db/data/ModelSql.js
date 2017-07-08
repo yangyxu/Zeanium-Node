@@ -64,6 +64,10 @@ zn.define(function () {
                     _format = null,
                     _convert = null;
                 zn.each(fields, function (field, index){
+                    if((field).toString().indexOf(' as ')!=-1){
+                        _fields.push(field);
+                        return -1;
+                    }
                     if(typeof index == 'string'){
                         _fields.push(field + ' as ' + index);
                     }else {
@@ -93,7 +97,12 @@ zn.define(function () {
             },
             getSelectSql: function (argv){
                 argv.table = this.getMeta('table');
-                argv.fields = this.getSelectFields(argv.fields);
+                if(typeof argv.fields == 'string' && argv.fields.indexOf(' as ')!=-1){
+
+                }else {
+                    argv.fields = this.getSelectFields(argv.fields);
+                }
+
                 return zn.sql.select(argv);
             },
             getDeleteSql: function (argv){

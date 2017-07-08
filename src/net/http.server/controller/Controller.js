@@ -30,14 +30,14 @@ zn.define(function () {
             },
             beginTransaction: {
                 router: null,
-                value: function (model, store){
-                    return this._store.beginTransaction();
+                value: function (){
+                    return this._store.beginTransaction.apply(this._store, arguments);
                 }
             },
             query: {
                 router: null,
                 value: function (){
-                    return this._store.query.call(this, arguments);
+                    return this._store.query.apply(this._store, arguments);
                 }
             },
             store: {

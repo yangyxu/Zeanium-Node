@@ -10,7 +10,10 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
         delete: "delete from {table} {where};",
         select : "select {fields} from {table} {where} {order} {group} {limit};",
         paging: "select {fields} from {table} {where} {order} {group} {limit};select count(*) as count from {table} {where};"
-    }
+    }, SQLS_DEFAULT = {
+        fields: '*'
+    };
+
 
     return zn.sql = zn.Class({
         static: true,
@@ -56,6 +59,7 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
                 }.bind(this)).join('');
             },
             __format: function (sql, data){
+                data.fields = data.fields || '*';
                 return sql.format(SchemaSqlParser.parse(data)).replace(/\s+/g, ' ');
                 //return sql.format(SchemaSqlParser.parse(data)).replace(/\s+/g, ' ').replace(/(^s*)|(s*$)/g, '');
             }
