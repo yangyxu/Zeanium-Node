@@ -70,7 +70,7 @@ zn.define([
                 var _self = this,
                     _args = inArgs || {},
                     _session = this._request._session,
-                    _origin = this._request._serverRequest.headers.origin || this._request._serverRequest.headers.Host;
+                    _origin = this._request._serverRequest.headers.origin || this._request._serverRequest.headers.host || this._request._serverRequest.headers.Host || '';
 
                 var _crossSetting = {
                     'Access-Control-Allow-Origin': _origin,

@@ -74,9 +74,10 @@ zn.define([
                 try{
                     this.fire('request',request, response);
                     if('OPTIONS' == request.method){
-                        var _name = _package.name + '@' + _package.version;
+                        var _name = _package.name + '@' + _package.version,
+                            _origin = this._request._serverRequest.headers.origin || this._request._serverRequest.headers.host || this._request._serverRequest.headers.Host || '';
                         response.writeHead(200, {
-                            'Access-Control-Allow-Origin': request.headers.origin,
+                            'Access-Control-Allow-Origin': _origin,
                             'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
                             'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
                             "Access-Control-Allow-Credentials": true,
