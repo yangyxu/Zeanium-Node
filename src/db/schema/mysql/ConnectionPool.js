@@ -42,20 +42,24 @@ zn.define([
                 if(_argv.length){
                     _sql = _sql.format(_argv);
                 }
-                
+
                 return this.__query(_sql);
             },
-            __query: function (sql, config){
-                var _defer = zn.async.defer(),
-                    _config = config || this._config;
-                zn.debug('ConnectionPool query: ' + sql);
-                require('mysql').createConnection(_config).query(sql, function (err, rows){
-                    if(err){
-                        zn.error(err.stack);
-                        _defer.reject(err);
-                    }else {
-                        _defer.resolve(rows);
-                    }
+            __query: function (sql){
+                var _defer = zn.async.defer();
+                this.__getNativeConnection(function (connection){
+                    zn.debug('ConnectionPool query: ' + sql);
+                    connection.query(sql, function (err, rows){
+                        if(err){
+                            zn.error('ConnectionPool connection query error: ', err.stack);
+                            console.log(err.stack);
+                            _defer.reject(err);
+                        }else {
+                            _defer.resolve(rows);
+                        }
+                    });
+                }, function (err){
+                    _defer.reject(err);
                 });
 
                 return _defer.promise;
@@ -63,7 +67,8 @@ zn.define([
             __getNativeConnection: function (success, error){
                 this._pool.getConnection(function (err, connection){
                     if (err){
-                        zn.error(err.message);
+                        zn.error('ConnectionPool getConnection error: ', err.message);
+                        console.log(err.stack);
                         error && error(err);
                     }else {
                         success && success(connection);
