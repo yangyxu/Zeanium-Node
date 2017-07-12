@@ -57,6 +57,8 @@ zn.define([
                         }else {
                             _defer.resolve(rows);
                         }
+
+                        connection.release();
                     });
                 }, function (err){
                     _defer.reject(err);
