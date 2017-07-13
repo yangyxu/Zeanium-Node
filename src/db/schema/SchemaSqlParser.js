@@ -245,9 +245,9 @@ zn.define(function () {
                                 _values.push(key + ' = ' + _value);
                             }else {
                                 if(key.indexOf('&') != -1){
-                                    _values.push(key.replace('&', '') + _value);
+                                    _values.push(key.replace('&', '') + value);
                                 }else if (key.indexOf('|') != -1) {
-                                    _ors.push(key.replace('|', '') + _value);
+                                    _ors.push(key.replace('|', '') + value);
                                 }
                             }
                         });
