@@ -194,6 +194,7 @@ zn.define(function () {
                     where = where.call(this._context);
                 }
                 var _values = [],
+                    _value = null,
                     _return = '';
                 switch (zn.type(where)){
                     case 'string':
@@ -237,11 +238,24 @@ zn.define(function () {
                         _return = _values.join(' ');
                         break;
                     case 'object':
+                        var _ors = [];
                         zn.each(where, function (value, key){
-                            _values.push(key + ' = ' + __formatSqlValue(value));
+                            _value = __formatSqlValue(value);
+                            if(key.indexOf('&') == -1 && key.indexOf('|') == -1){
+                                _values.push(key + ' = ' + _value);
+                            }else {
+                                if(key.indexOf('&') != -1){
+                                    _values.push(key.replace('&', '') + _value);
+                                }else if (key.indexOf('|') != -1) {
+                                    _ors.push(key.replace('|', '') + _value);
+                                }
+                            }
                         });
 
                         _return = _values.join(' and ');
+                        if(_ors.length){
+                            _return = _return + ' or ' + _ors.join(' or ');
+                        }
                         break;
                 }
 
