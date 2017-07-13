@@ -194,7 +194,6 @@ zn.define(function () {
                     where = where.call(this._context);
                 }
                 var _values = [],
-                    _value = null,
                     _return = '';
                 switch (zn.type(where)){
                     case 'string':
@@ -240,9 +239,8 @@ zn.define(function () {
                     case 'object':
                         var _ors = [];
                         zn.each(where, function (value, key){
-                            _value = __formatSqlValue(value);
                             if(key.indexOf('&') == -1 && key.indexOf('|') == -1){
-                                _values.push(key + ' = ' + _value);
+                                _values.push(key + ' = ' + __formatSqlValue(value));
                             }else {
                                 if(key.indexOf('&') != -1){
                                     _values.push(key.replace('&', '') + value);
