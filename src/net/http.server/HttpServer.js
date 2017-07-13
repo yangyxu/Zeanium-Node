@@ -74,15 +74,13 @@ zn.define([
                 try{
                     this.fire('request',request, response);
                     if('OPTIONS' == request.method){
-                        var _name = _package.name + '@' + _package.version,
-                            _origin = this._request._serverRequest.headers.origin || this._request._serverRequest.headers.host || this._request._serverRequest.headers.Host || '';
                         response.writeHead(200, {
-                            'Access-Control-Allow-Origin': _origin,
+                            'Access-Control-Allow-Origin': (request.headers.origin || request.headers.host || request.headers.Host || ''),
                             'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE, PUT',
                             'Access-Control-Allow-Headers': 'Accept,Accept-Charset,Accept-Encoding,Accept-Language,Connection,Content-Type,Cookie,DNT,Host,Keep-Alive,Origin,Referer,User-Agent,X-CSRF-Token,X-Requested-With',
                             "Access-Control-Allow-Credentials": true,
                             'Access-Control-Max-Age': '3600',//一个小时时间
-                            'X-Powered-By': _name,
+                            'X-Powered-By': (_package.name + '@' + _package.version),
                             'Content-Type': 'text/html;charset=utf-8',
                             'Trailer': 'Content-MD5'
                         });
@@ -93,7 +91,7 @@ zn.define([
                         this._context.accept(request, response);
                     }
                 } catch (e){
-                    zn.error('HttpServer.js  Line - 61 ' + e.message);
+                    zn.error('HttpServer.js __onRequest error: ' + e.message);
                     console.log(e.stack);
                 }
             },

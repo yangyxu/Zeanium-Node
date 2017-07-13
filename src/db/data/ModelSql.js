@@ -45,8 +45,8 @@ zn.define(function () {
 
                 return _updates;
             },
-            getSelectFields: function (fields){
-                fields = fields;
+            getSelectFields: function (inFields){
+                var fields = inFields||[];
                 var _props = this.getProperties();
                 if(typeof fields == 'function'){
                     fields = fields.call(this);
@@ -64,6 +64,7 @@ zn.define(function () {
                     _format = null,
                     _convert = null;
                 zn.each(fields, function (field, index){
+                    field = field.trim();
                     if((field).toString().indexOf(' as ')!=-1){
                         _fields.push(field);
                         return -1;
@@ -73,7 +74,7 @@ zn.define(function () {
                     }else {
                         _prop = _props[field];
                         if(!_prop){
-                            return false;
+                            return -1;
                         }
                         _format = _prop.format;
                         _convert = _prop.convert;
