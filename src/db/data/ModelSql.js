@@ -17,11 +17,26 @@ zn.define(function () {
                     if(_value == null){
                         _value = prop.get && prop.get.call(this, key, prop, props);
                     }
+                    switch (prop.type[0].toLowerCase()) {
+                        case 'int':
+                        case 'float':
+                            _value = +_value;
+                            if(isNaN(_value)){
+                                return -1;
+                            }
+                            break;
+                        case 'datetime':
+                            _value = _value.trim();
+                            if(!_value){
+                                return -1;
+                            }
+                            break;
+                    }
                     if(_value != null) {
                         _values[key] = _value;
                     }
                 }, this);
-
+                console.log(_values);
                 return _values;
             },
             getUpdates: function (updates){
