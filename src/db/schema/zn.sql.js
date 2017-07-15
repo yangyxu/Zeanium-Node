@@ -59,8 +59,8 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
                 }.bind(this)).join('');
             },
             __format: function (sql, data){
-                data.fields = data.fields || '*';
-                return sql.format(SchemaSqlParser.parse(data)).replace(/\s+/g, ' ');
+                var _data = zn.overwrite({ fields: '*' }, data);
+                return sql.format(SchemaSqlParser.parse(_data)).replace(/\s+/g, ' ');
                 //return sql.format(SchemaSqlParser.parse(data)).replace(/\s+/g, ' ').replace(/(^s*)|(s*$)/g, '');
             }
         }

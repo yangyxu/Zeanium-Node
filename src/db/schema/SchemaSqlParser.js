@@ -41,18 +41,19 @@ zn.define(function () {
         methods: {
             parse: function (data){
                 var _key = null,
-                    _value = '';
+                    _value = '',
+                    _data = {};
                 zn.each(data || {}, function (value, key){
                     key = key.toLowerCase();
                     key = PARSE_EXTS[key] || key;
                     _key = __firstCharUpperCase(key);
                     _value = (this["parse" + _key] && this["parse" + _key].call(this, value)) || '';
                     if(_value){
-                        data[key] = " " + _value + " ";
+                        _data[key] = " " + _value + " ";
                     }
                 }.bind(this));
 
-                return zn.overwrite(data, DEFAULTS);
+                return zn.overwrite(_data, DEFAULTS);
             },
             parseIfRights: function (value){
                 if(value){
