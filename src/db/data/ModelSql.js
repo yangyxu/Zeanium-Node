@@ -36,7 +36,7 @@ zn.define(function () {
                         _values[key] = _value;
                     }
                 }, this);
-                console.log(_values);
+
                 return _values;
             },
             getUpdates: function (updates){
@@ -114,7 +114,7 @@ zn.define(function () {
             getSelectSql: function (argv){
                 argv.table = this.getMeta('table');
                 if(typeof argv.fields == 'string' && argv.fields.indexOf(' as ')!=-1){
-
+                    //console.log(argv.fields);
                 }else {
                     argv.fields = this.getSelectFields(argv.fields);
                 }
