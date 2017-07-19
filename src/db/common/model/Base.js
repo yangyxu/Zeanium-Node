@@ -35,6 +35,7 @@ zn.define(function () {
                 value: null,
                 type: ['int', 11],
                 convert: 'zn_convert_user({})',
+                hidden: true,
                 get: function (){
                     return zn._request.getSessionKeyValue('@AdminUser', 'id');
                 },
@@ -46,6 +47,7 @@ zn.define(function () {
                 ignore: true,
                 auto_update: '{now()}',
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
+                hidden: true,
                 default: null
             },
             modifyPerson: {
@@ -53,6 +55,7 @@ zn.define(function () {
                 type: ['int', 11],
                 convert: 'zn_convert_user({})',
                 ignore: true,
+                hidden: true,
                 auto_update: function (){
                     return zn._request.getSessionKeyValue('@AdminUser', 'id');
                 },
@@ -62,6 +65,7 @@ zn.define(function () {
                 value: null,
                 type: ['int', 4],
                 ignore: true,
+                hidden: true,
                 default: 0
             },
             note: {

@@ -61,8 +61,9 @@ zn.define(function () {
                 return _updates;
             },
             getSelectFields: function (inFields){
-                var fields = inFields||[];
                 var _props = this.getProperties();
+                var fields = inFields||Object.keys(_props);
+
                 if(typeof fields == 'function'){
                     fields = fields.call(this);
                 }
@@ -88,7 +89,7 @@ zn.define(function () {
                         _fields.push(field + ' as ' + index);
                     }else {
                         _prop = _props[field];
-                        if(!_prop){
+                        if(!_prop || _prop.hidden){
                             return -1;
                         }
                         _format = _prop.format;
