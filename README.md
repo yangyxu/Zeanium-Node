@@ -6,13 +6,15 @@
 
 zeanium-node是基于[zeanium](https://github.com/yangyxu/zeanium), 是专门为nodejs开发的后端框架，提供了基础的`cache`、`cli`、`database`、`io`、`net`、`parser`、`session`、`template`. 基本的OOP使用语法请访问https://github.com/yangyxu/zeanium.
 
+## 官方QQ群: 627104335
+
+有任务问题可以添加qq群进行咨询
+
 ## 相关产品
 
 - [zeanium](https://github.com/yangyxu/zeanium): 面向对象的JavaScript底层框架
 - [zeanium-react-web](https://github.com/yangyxu/zeanium-react-web): 基于zeanium和react同时支持web和wap端的前端UI框架
 - [zeanium-react-native](https://github.com/yangyxu/zeanium-react-native): 基于zeanium和react native的Android/ios应用原生开发框架
-
-有任务问题可以添加`官方QQ群：627104335`进行咨询
 
 ## 基础模块列表
 - `cache`：有`数据库缓存`、`内存缓存`、`redis缓存`等三种cache的实现.

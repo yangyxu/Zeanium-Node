@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <title>Test</title>
+        <script type="text/javascript" src="../src/core/zn.js"></script>
+        <script type="text/javascript" src="../src/core/builtin.js"></script>
+        <script type="text/javascript" src="../src/core/fix.js"></script>
+        <script type="text/javascript" src="../src/core/class.js"></script>
+        <script type="text/javascript" src="../src/core/require.js"></script>
+        <script type="text/javascript" src="../src/util/Logger.js"></script>
+        <script type="text/javascript" src="../src/util/Queue.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            (function(){
+                zn.queue({}).push(function (task){
+                    zn.debug('1');
+                    setTimeout(function (){
+                        task.done('1');
+                    }, 2000);
+                }).push(function (task){
+                    zn.debug('dont 1');
+                    zn.debug('2');
+                    setTimeout(function (){
+                        task.done('2');
+                    }, 2000);
+                }).push(function (task){
+                    zn.debug('dont 2');
+                    zn.debug('3');
+                    setTimeout(function (){
+                        task.done('3');
+                    }, 2000);
+                }).push(function (task){
+                    zn.debug('dont 3');
+                    zn.debug('4');
+                    setTimeout(function (){
+                        task.done('4');
+                    }, 2000);
+                }).push(function (task){
+                    zn.debug('dont 4');
+                    zn.debug('5');
+                    setTimeout(function (){
+                        task.done('5');
+                    }, 2000);
+                }).push(function (task){
+                    zn.debug('dont 5');
+                    zn.debug('6');
+                    setTimeout(function (){
+                        task.done('6');
+                    }, 2000);
+                }).finally(function (){
+                    console.log('finally');
+                }).start();
+            })(zn);
+        </script>
+    </body>
+</html>
