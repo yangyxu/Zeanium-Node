@@ -1,6 +1,6 @@
 # zeanium-node
 
-[English Document](https://github.com/yangyxu/Zeanium-Node/blob/master/README.md)
+[English Document](https://github.com/yangyxu/Zeanium-Node/blob/master/README_EN.md)
 
 ## 介绍
 
