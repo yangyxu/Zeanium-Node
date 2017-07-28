@@ -60,8 +60,9 @@ zn.define(function () {
 
                 return _updates;
             },
-            getSelectFields: function (inFields){
-                var _props = this.getProperties();
+            getSelectFields: function (inFields, hidden){
+                var _props = this.getProperties(),
+                    _hidden = hidden || [];
                 var fields = inFields||Object.keys(_props);
 
                 if(typeof fields == 'function'){
@@ -85,9 +86,13 @@ zn.define(function () {
                         _fields.push(field);
                         return -1;
                     }
+                    if(_hidden.indexOf(field)!=-1){
+                        return -1;
+                    }
+
                     if(typeof index == 'string'){
                         _fields.push(field + ' as ' + index);
-                    }else {
+                    } else {
                         _prop = _props[field];
                         if(!_prop || _prop.hidden){
                             return -1;
@@ -117,7 +122,7 @@ zn.define(function () {
                 if(typeof argv.fields == 'string' && argv.fields.indexOf(' as ')!=-1){
                     //console.log(argv.fields);
                 }else {
-                    argv.fields = this.getSelectFields(argv.fields);
+                    argv.fields = this.getSelectFields(argv.fields, argv.hidden);
                 }
 
                 return zn.sql.select(argv);
