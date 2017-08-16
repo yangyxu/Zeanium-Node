@@ -43,12 +43,8 @@ zn.define([
                 this.on('loading', _config.onLoading || zn.idle);
                 this.on('loaded', _config.onLoaded || zn.idle);
                 this.__resetWatchCwd();
-                this._apps = {};
-                this._routers = {};
-                this._collections = {};
-                this._changedFiles = [];
+                this.__init();
                 this._uuid = zn.uuid();
-                this._deployDelay = 0;
                 this._prefix = _config.prefix || '@';
                 this._root = 'http://' + _config.host + ":" + _config.port;
                 this._sessionManager = new MemorySessionManager(_config.session);
@@ -56,6 +52,13 @@ zn.define([
                 this._requestAcceptor = new RequestAcceptor(this);
                 this._baseRouters = this.__registerHttpServerController();
                 this.__scanWebPath();
+            },
+            __init: function (){
+                this._apps = {};
+                this._routers = {};
+                this._collections = {};
+                this._changedFiles = [];
+                this._deployDelay = 0;
             },
             __resetWatchCwd: function () {
                 var _main = '',
@@ -109,7 +112,6 @@ zn.define([
                 if(!app){ return }
                 var _deploy = app._deploy;
                 var _app = this._apps[_deploy];
-
                 if(_app){
                     zn.extend(app._routers, _app._routers);
                 } else {
@@ -153,26 +155,27 @@ zn.define([
                     }).start();
 
                 } else {
+                    //第一次扫描系统的项目
+                    this.__scanWebRoot(this._serverPath + zn.SLASH + 'www' + zn.SLASH, function (){
+                        //第二次扫描用户的项目
+                        this.__scanWebRoot(_webPath, function (){
+                            this.__onLoaded(_webPath);
+                        }.bind(this));
+                    }.bind(this));
+
+                    /*
                     if(isRedeploy){
                         this.__scanWebRoot(_webPath, function (){
                             this.__onLoaded(_webPath);
                         }.bind(this));
                     } else {
-                        //第一次扫描系统的项目
-                        this.__scanWebRoot(this._serverPath + zn.SLASH + 'www' + zn.SLASH, function (){
-                            //第二次扫描用户的项目
-                            this.__scanWebRoot(_webPath, function (){
-                                this.__onLoaded(_webPath);
-                            }.bind(this));
-                        }.bind(this));
-                    }
+
+                    }*/
                 }
             },
             __scanWebRoot: function (path, callback){
                 var _defer = zn.async.defer(),
                     _self = this;
-                this._apps = {};
-                this._routers = {};
                 this._scanner.scanWebRoot(path, function (appContext){
                     _self.registerApplication(appContext);
                 }).then(function (apps){
@@ -216,7 +219,7 @@ zn.define([
                     this._interval = null;
                 }
                 zn.info('Redeploying......');
-                this._changedFiles = [];
+                this.__init();
                 return this.__scanWebPath(true);
             },
             __doFileChange: function (path){

@@ -1,6 +1,6 @@
 {
   "name": "zeanium-node",
-  "version": "0.6.17",
+  "version": "0.6.18",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yangyxu/Zeanium-Node.git"
+    "url": "https://github.com/yangyxu/zeanium-node.git"
   },
   "keywords": [
     "cli",
@@ -33,7 +33,7 @@
     "chokidar": "^1.7.0",
     "formidable": "^1.1.1",
     "mysql": "^2.13.0",
-    "zeanium": "^1.1.22"
+    "zeanium": "^1.1.23"
   },
   "preferGlobal": "true",
   "bin": {
