@@ -63,16 +63,17 @@ zn.define(function () {
                     block.each(function (task, index){
                         switch (task[0]) {
                             case 'query':
-                                _task = _self.__parseQueryTask(task[1], task[2], task[3]);
+                                _task = this.__parseQueryTask(task[1], task[2], task[3]);
                                 break;
                             case 'insert':
-                                _task = _self.__parseInsertTask(task[1], task[2], task[3]);
+                                _task = this.__parseInsertTask(task[1], task[2], task[3]);
                                 break;
                         }
 
-                        _tasks.push(_task);
-                    });
-                    this._queue.inserts(_tasks, this, 0);
+                        //_tasks.push(_task);
+                        this._queue.push(_task);
+                    }, this);
+                    //this._queue.inserts(_tasks, this, 0);
                 }
 
                 return this;

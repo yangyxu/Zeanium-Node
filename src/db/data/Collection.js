@@ -20,6 +20,12 @@ zn.define(function () {
                     return this._store;
                 }
             },
+            table: {
+                readonly: true,
+                get: function (){
+                    return this._table;
+                }
+            },
             Model: {
                 readonly: true,
                 get: function (){
@@ -32,6 +38,7 @@ zn.define(function () {
                 auto: true,
                 value: function (store, Model){
                     this._store = store;
+                    this._table = Model.getMeta('table');
                     this._Model = Model;
                 }
             },

@@ -29,11 +29,12 @@ zn.define(function () {
                             _pid = _pidModel ? _pidModel.id: 0,
                             _depth = (_pidModel?_pidModel.depth:0) + 1,
                             _parentPath = (_pidModel?_pidModel.parentPath:'') + (_pid === 0 ? '' : _pid) + ',';
-
+                        if(typeof model == 'string'){
+                            model = JSON.parse(model);
+                        }
                         model.parentPath = _parentPath;
                         model.treeOrder = _treeOrder;
                         model.depth = _depth;
-
                         return zn.sql.insert({
                             table: table,
                             values: model

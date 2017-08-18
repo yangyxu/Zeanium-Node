@@ -20,6 +20,14 @@ zn.define(function () {
                 });
 
                 return this;
+            },
+            reverseEach: function (handler, context){
+                var _len = this._tasks.length;
+                for(var i = _len - 1; i > -1; i--){
+                    handler && handler.call(context, this._tasks[i], i);
+                }
+
+                return this;
             }
         }
     });
