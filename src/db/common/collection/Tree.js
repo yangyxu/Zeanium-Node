@@ -8,7 +8,7 @@ zn.define(function () {
             insert: function (values){
                 var _defer = zn.async.defer();
                 this.beginTransaction()
-                    .block(zn.block.tree.addTreeNode(this._table, values))
+                    .block(zn.block.tree.addNode(this._table, values))
                     .on('error', function (sender, error){
                         _defer.reject(error);
                     })
@@ -22,7 +22,7 @@ zn.define(function () {
             delete: function (where){
                 var _defer = zn.async.defer();
                 this.beginTransaction()
-                    .block(zn.block.tree.deleteTreeNode(this._table, where))
+                    .block(zn.block.tree.deleteNode(this._table, where))
                     .on('error', function (sender, error){
                         _defer.reject(error);
                     })
@@ -36,7 +36,7 @@ zn.define(function () {
             order: function (id, order){
                 var _defer = zn.async.defer();
                 this.beginTransaction()
-                    .block(zn.block.tree.orderTreeNode(this._table, id, order))
+                    .block(zn.block.tree.orderNode(this._table, id, order))
                     .on('error', function (sender, error){
                         _defer.reject(error);
                     })
