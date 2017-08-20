@@ -1,34 +1,40 @@
 #!/usr/bin/env node
 
 'use strict';
-var zn = require('../index.js');
+
+var path = require('path');
+var argv = process.argv;
+var _env = {
+    $bin: argv[0],
+    $path: argv[1],
+    $command: argv[2]
+}, _argv = {};
+
+argv.slice(3).forEach(function (value, index){
+    var _temps = value.split(':'),
+        _value = _temps[1];
+    if(_value===undefined){
+        _value = true;
+    }
+    _argv[_temps[0]] = _value;
+});
+
+var _zn_path = '../';
+if(_argv.zn_path){
+    _zn_path = path.resolve(process.cwd(), _argv.zn_path);
+}
+
+var zn = require(_zn_path + 'index.js');
 
 zn.define([
-    'cli',
-    'node:path'
-], function (cli, path) {
+    'cli'
+], function (cli) {
 
     /*Add current path to NODE_PATH*/
     var _curr = process.cwd() + path.sep + 'node_modules';
     var _parents = module.constructor._nodeModulePaths(_curr);
     process.env.NODE_PATH = process.env.NODE_PATH + path.delimiter + _parents.join(path.delimiter);
     module.constructor._initPaths();
-
-    var argv = process.argv;
-    var _env = {
-        $bin: argv[0],
-        $path: argv[1],
-        $command: argv[2]
-    }, _argv = {};
-
-    argv.slice(3).forEach(function (value, index){
-        var _temps = value.split(':'),
-            _value = _temps[1];
-        if(_value===undefined){
-            _value = true;
-        }
-        _argv[_temps[0]] = _value;
-    });
 
     switch (_env.$command) {
         case 'create':
@@ -38,7 +44,7 @@ zn.define([
             new cli.Develop(_env, _argv);
             break;
         case 'info':
-            zn.info(require('../package.json'));
+            zn.info(require(_zn_path + 'package.json'));
             break;
         case 'install':
             new cli.Install(_env, _argv);
