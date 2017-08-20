@@ -3,7 +3,8 @@
 'use strict';
 
 var path = require('path');
-var argv = process.argv;
+var argv = process.argv,
+    zn = null;
 var _env = {
     $bin: argv[0],
     $path: argv[1],
@@ -19,12 +20,11 @@ argv.slice(3).forEach(function (value, index){
     _argv[_temps[0]] = _value;
 });
 
-var _zn_path = '../';
 if(_argv.zn_path){
-    _zn_path = path.resolve(process.cwd(), _argv.zn_path);
+    zn = require(path.resolve(process.cwd(), _argv.zn_path, 'index.js'));
+}else {
+    zn = require('../index.js');
 }
-
-var zn = require(path.resolve(_zn_path, 'index.js'));
 
 zn.define([
     'cli'
@@ -44,7 +44,7 @@ zn.define([
             new cli.Develop(_env, _argv);
             break;
         case 'info':
-            zn.info(require(_zn_path + 'package.json'));
+            zn.info(require('../package.json'));
             break;
         case 'install':
             new cli.Install(_env, _argv);
