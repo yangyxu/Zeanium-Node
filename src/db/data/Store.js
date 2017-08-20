@@ -9,11 +9,20 @@ zn.define(['../schema/ConnectionPool'], function (ConnectionPool) {
                 return new this(config);
             }
         },
+        properties: {
+            config: {
+                readonly: true,
+                get: function (){
+                    return this._config;
+                }
+            }
+        },
         methods: {
             init: {
                 auto: true,
                 value: function (inConfig){
-                    this._pool = ConnectionPool.getPool(inConfig || {});
+                    this._config = zn.extend({}, inConfig);
+                    this._pool = ConnectionPool.getPool(this._config);
                 }
             },
             beginTransaction: function (){
@@ -21,6 +30,9 @@ zn.define(['../schema/ConnectionPool'], function (ConnectionPool) {
             },
             query: function (){
                 return this._pool.query.apply(this._pool, arguments);
+            },
+            createDataBase: function () {
+                return this._pool.createDataBase(this._config.database);
             },
             createModel: function (ModelClass) {
                 return this._pool.query(ModelClass.getCreateSql());

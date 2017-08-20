@@ -12,7 +12,6 @@ zn.define([
     node_http,
     node_path
 ) {
-
     var _package = require("../../../package.json");
 
     return zn.Class('HttpServer', {

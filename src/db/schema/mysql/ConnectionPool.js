@@ -27,14 +27,24 @@ zn.define([
                 return this;
             },
             createDataBase: function (database){
+                var _defer = zn.async.defer();
                 var _config = zn.extend({}, this._config),
                     _database = database || _config.database,
                     _sql = 'drop database if exists {0};create database if not exists {0};'.format(_database);
                 _config.database = null;
                 delete _config.database;
+                require('mysql').createConnection(_config)
+                    .query(_sql, function (err, rows, fields){
+                        if(err){
+                            zn.error('mysql.createConnection query error: ', err.stack);
+                            console.log(err.stack);
+                            _defer.reject(err);
+                        }else {
+                            _defer.resolve(rows);
+                        }
+                    });
 
-                return this.__query(_sql, _config);
-
+                return _defer.promise;
             },
             query: function (){
                 var _argv = Array.prototype.slice.call(arguments),

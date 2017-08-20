@@ -19,7 +19,7 @@ zn.define([
             initDataBase: {
                 method: 'GET/POST',
                 value: function (request, response, chain){
-                    this.store().setup().then(function (data){
+                    this.store().createDataBase().then(function (data){
                         response.success(data);
                     }, function (error){
                         response.error(error);
