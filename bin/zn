@@ -24,7 +24,7 @@ if(_argv.zn_path){
     _zn_path = path.resolve(process.cwd(), _argv.zn_path);
 }
 
-var zn = require(_zn_path + 'index.js');
+var zn = require(path.resolve(_zn_path, 'index.js'));
 
 zn.define([
     'cli'
