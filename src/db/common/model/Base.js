@@ -24,7 +24,7 @@ zn.define(function () {
                 type: ['timestamp'],
                 ignore: true,
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
-                default: '{now()}'
+                default: 'now()'
             },
             zn_create_user: {
                 value: null,

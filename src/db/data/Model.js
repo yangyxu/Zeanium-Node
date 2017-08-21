@@ -16,7 +16,7 @@ zn.define(function () {
             getCreateSql: function (){
                 var _fields = [];
                 this.getProperties(function (prop, key){
-                    if(prop.hidden){
+                    if(!prop.type){
                         return -1;
                     }
                     prop.name = key;
@@ -39,8 +39,8 @@ zn.define(function () {
                 var _values = {},
                     _value = null;
                 this.getProperties(function (prop, key, props){
-                    if(prop.ignore){
-                        return false;
+                    if(!prop.type || prop.ignore){
+                        return -1;
                     }
                     _value = values[key];
                     if(_value == null){
@@ -72,6 +72,9 @@ zn.define(function () {
                 var _updates = {},
                     _value = null;
                 this.getProperties(function (prop, key, props){
+                    if(!prop.type){
+                        return -1;
+                    }
                     var _auto_update = prop.auto_update;
                     if(_auto_update){
                         if(typeof _auto_update == 'function'){
@@ -123,7 +126,7 @@ zn.define(function () {
                         _fields.push(field + ' as ' + index);
                     } else {
                         _prop = _props[field];
-                        if(!_prop || _prop.hidden){
+                        if(!_prop || !_prop.type || _prop.hidden){
                             return -1;
                         }
                         _format = _prop.format;
@@ -234,20 +237,6 @@ zn.define(function () {
                     return 'DEFAULT '+_value;
                 }
 
-            }
-        },
-        properties: {
-            table: {
-                hidden: true,
-                get: function (){
-                    return this._table;
-                }
-            },
-            props: {
-                hidden: true,
-                get: function (){
-                    return this._props;
-                }
             }
         },
         methods: {
