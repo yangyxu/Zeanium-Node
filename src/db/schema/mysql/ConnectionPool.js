@@ -10,6 +10,8 @@ zn.define([
         methods: {
             init: function (config){
                 this._config = zn.extend({
+                    acquireTimeout: 20000,
+                    connectionLimit: 50,
                     dateStrings: true,
                     multipleStatements: true
                 }, config);

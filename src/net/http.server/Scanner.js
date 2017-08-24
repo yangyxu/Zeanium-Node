@@ -3,8 +3,9 @@
  */
 zn.define([
     'node:fs',
+    'node:path',
     './ApplicationContext'
-],function (fs, ApplicationContext) {
+],function (fs, node_path, ApplicationContext) {
 
     var CONFIG = {
         PLUGIN: 'zn.plugin.config.js',
@@ -19,10 +20,10 @@ zn.define([
             },
             scanWebRoot: function (path, callback){
                 var _defer = zn.async.defer(),
-                    _self = this,
                     _config = this._context._config,
                     _modules = _config.modules,
-                    _apps = [];
+                    _apps = [],
+                    _self = this;
                 zn.info('[ Begin ] Scanning Path:' + path);
                 fs.readdir(path, function(err, files){
                     if(err){ zn.error(err); return; }
@@ -66,7 +67,7 @@ zn.define([
                     _appPath = path + file,
                     _appContext = null,
                     _serverContext = this._context,
-                    _configPath = _appPath + zn.SLASH + CONFIG.APP;
+                    _configPath = node_path.join(_appPath, CONFIG.APP);
 
                 if(!fs.statSync(_appPath).isDirectory()||!fs.existsSync(_configPath)){
                     _defer.reject('Path: '+_appPath+' is invalid!');
@@ -79,9 +80,17 @@ zn.define([
                 }else {
                     zn.info('Loading Application: '+ _appPath);
                 }
-
                 zn.load(_configPath, function (appConfig){
                     var _deploy = appConfig.deploy || file;
+                    if(!_deploy){
+                        var _temp = path.split(zn.SLASH),
+                            _len = _temp.length;
+                        while (!_deploy) {
+                            _len = _len -1;
+                            _deploy = _temp[_len];
+                        }
+                    }
+
                     appConfig.root = appConfig.APP_PATH = _appPath;
                     if(appConfig.view){
                         appConfig.view.absolutePath = _appPath;
@@ -90,7 +99,7 @@ zn.define([
                         if(!appConfig.databases){
                             appConfig.databases = applicationContext._appConfig.databases;
                         }
-                        _deploy = applicationContext._deploy+ zn.SLASH + 'plugins' + zn.SLASH + _deploy;
+                        _deploy = node_path.join(applicationContext._deploy, 'plugins', _deploy);
                     }
 
                     _appContext = new ApplicationContext(zn.overwrite(appConfig, { deploy: _deploy }), _serverContext);
@@ -175,7 +184,6 @@ zn.define([
                     __models = {},
                     __collections = {},
                     __controllers= {};
-
                 zn.define(_controllers.concat(_models), function (){
                     zn.each(arguments, function (items, index){
                         if(index > (_splitIndex - 1)){

@@ -11,12 +11,12 @@ zn.define([
     return zn.Class({
         events: [ 'data', 'end', 'close' ],
         properties: {
-            paths: null,
             $data: null,
             $post: null,
             $get: null,
             $files: null,
             $uploadConfig: null,
+            paths: null,
             context: null,
             applicationContext: null,
             chain: null,
@@ -76,7 +76,7 @@ zn.define([
                     try {
                         return JSON.parse(_value);
                     } catch (e) {
-                        console.error(e);
+                        console.error(e.stack || e);
                     }
                 }else {
                     //throw new Error('The parameter is not exist!');
@@ -214,8 +214,8 @@ zn.define([
                         _incomingForm.uploadDir = _uploadDir;
                         _incomingForm.parse(_request,function(error, fields, files){
                             if(error){
-                                console.log(error);
                                 zn.error('Request.js:  formidable.IncomingForm parse error, ' + error.toString());
+                                console.log(error.stack || error);
                             } else {
                                 _data = _request.data = {
                                     fields: fields,

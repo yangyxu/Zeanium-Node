@@ -5,7 +5,7 @@ zn.define(function () {
             zn_file_type: {
                 value: null,
                 type: ['int', 11],
-                default: '0'    //0: 分类、目录, 1: 文件
+                default: 0    //0: 分类、目录, 1: 文件
             },
             zn_file_path: {
                 value: null,

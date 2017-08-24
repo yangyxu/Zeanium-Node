@@ -103,7 +103,7 @@ zn.define([
                 this._serverResponse.writeHead(httpStatus, _args);
             },
             setTimeout: function (timeout){
-                var _timeout = timeout || this._context._config.timeout || 12000;
+                var _timeout = timeout || this._context._config.timeout || 20000;
                 this._serverResponse.setTimeout(_timeout, function (){
                     this.error('Error: Request handler timeout.');
                 }.bind(this));

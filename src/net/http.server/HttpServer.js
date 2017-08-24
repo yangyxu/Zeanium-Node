@@ -65,7 +65,7 @@ zn.define([
             __createHttpServerContext: function (config){
                 this._context = new HttpServerContext({
                     config: config,
-                    webPath: process.cwd() + (config.catalog||''),
+                    webPath: node_path.join(process.cwd(), (config.catalog||'')),
                     serverPath: __dirname
                 });
             },

@@ -11,13 +11,15 @@ zn.define(function () {
             zn_id: {
                 value: null,
                 type: ['char', 36],
+                default: 0,
                 get: function (){
                     return zn.uuid();
                 }
             },
             zn_title: {
                 value: null,
-                type: ['varchar', 100]
+                type: ['varchar', 100],
+                default: ''
             },
             zn_create_time: {
                 value: null,
@@ -29,8 +31,9 @@ zn.define(function () {
             zn_create_user: {
                 value: null,
                 type: ['int', 11],
-                convert: 'zn_convert_user({})',
+                convert: 'zn_plugin_admin_convert_user({})',
                 hidden: true,
+                default: 0,
                 get: function (){
                     return zn._request.getSessionKeyValue('@AdminUser', 'id');
                 },
@@ -48,9 +51,10 @@ zn.define(function () {
             zn_modify_user: {
                 value: null,
                 type: ['int', 11],
-                convert: 'zn_convert_user({})',
+                convert: 'zn_plugin_admin_convert_user({})',
                 ignore: true,
                 hidden: true,
+                default: 0,
                 auto_update: function (){
                     return zn._request.getSessionKeyValue('@AdminUser', 'id');
                 },

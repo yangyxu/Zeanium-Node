@@ -55,7 +55,7 @@ zn.define([
                             _file = node_path.parse(node_path.join(_dataPath, file));
                             switch (_file.ext.toLowerCase()) {
                                 case '.sql':
-                                    if(file.indexOf('fn')!=-1){
+                                    if(file.indexOf('zn_function_')!=-1){
                                         _fns = _fns.concat(_content.split('----'));
                                     }else {
                                         _sql += _content;

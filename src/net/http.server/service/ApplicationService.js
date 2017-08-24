@@ -19,19 +19,19 @@ zn.define([
                     _keys = [],
                     _values = [],
                     _dnode = {
-                        depth: 1,
-                        treeOrder: 1,
-                        sons: 0,
-                        parentPath: ','
+                        zn_tree_depth: 1,
+                        zn_tree_order: 1,
+                        zn_tree_son_count: 0,
+                        zn_tree_parent_path: ','
                     },
                     _pnode = null;
                 data.forEach(function (item, index){
-                    if(item.pid){
-                        _pnode = zn.overwrite(data[item.pid-1], _dnode);
-                        _pnode.sons = _pnode.sons + 1;
-                        item.treeOrder = _pnode.sons;
-                        item.depth = _pnode.depth + 1;
-                        item.parentPath = _pnode.parentPath + item.pid + ',';
+                    if(item.zn_tree_pid){
+                        _pnode = zn.overwrite(data[item.zn_tree_pid-1], _dnode);
+                        _pnode.zn_tree_son_count = _pnode.zn_tree_son_count + 1;
+                        item.zn_tree_order = _pnode.zn_tree_son_count;
+                        item.zn_tree_depth = _pnode.zn_tree_depth + 1;
+                        item.zn_tree_parent_path = _pnode.zn_tree_parent_path + item.zn_tree_pid + ',';
                     }
                 });
 

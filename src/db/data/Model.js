@@ -180,6 +180,10 @@ zn.define(function () {
                     _t2 = _type[1],
                     _keys = [_key];
 
+                if(Object.prototype.toString.call(_t2) == '[object Array]'){
+                    _t2 = _t2.join(',');
+                }
+
                 _keys.push(_t1+(_t2?'('+_t2+')':''));
 
                 if(property.primary){
