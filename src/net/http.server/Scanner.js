@@ -102,7 +102,9 @@ zn.define([
                         _deploy = node_path.join(applicationContext._deploy, 'plugins', _deploy);
                     }
 
-                    _appContext = new ApplicationContext(zn.overwrite(appConfig, { deploy: _deploy }), _serverContext);
+                    _appContext = new ApplicationContext(zn.overwrite(appConfig, {
+                        deploy: _deploy
+                    }), _serverContext);
 
                     _queue.push(function (task){
                         _self.scanPackage(_appPath, appConfig.models, appConfig.controllers, _appContext, function (applicationContext){

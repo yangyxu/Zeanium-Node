@@ -45,6 +45,7 @@ zn.define([
                     return this._serverResponse;
                 },
                 set: function (value){
+                    this.reset();
                     if(!value){ return; }
                     this._serverResponse = value;
                     this._beginTimestamp = (new Date()).getTime();
@@ -62,6 +63,9 @@ zn.define([
             init: function (context, request){
                 this._context = context;
                 this._request = request;
+            },
+            reset: function (){
+                this._applicationContext = null;
             },
             getTimestamp: function (){
                 return this._endTimestamp - this._beginTimestamp;

@@ -22,6 +22,7 @@ zn.define([
                     this._request = new Request(context);
                     this._response = new Response(context, this._request);
                     this._response.on('end', this.__onFinish.bind(this), this);
+
                     this.fire('init');
                 }
             },

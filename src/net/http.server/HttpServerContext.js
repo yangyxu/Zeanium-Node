@@ -26,10 +26,7 @@ zn.define([
             }
         },
         properties: {
-            uuid: null,
             config: null,
-            root: null,
-            prefix: null,
             webPath: null,
             serverPath: null
         },
@@ -44,9 +41,7 @@ zn.define([
                 this.on('loaded', _config.onLoaded || zn.idle);
                 this.__resetWatchCwd();
                 this.__init();
-                this._uuid = zn.uuid();
-                this._prefix = _config.prefix || '@';
-                this._root = 'http://' + _config.host + ":" + _config.port;
+                this._root = this.__getURL(_config.host, _config.port);
                 this._sessionManager = new MemorySessionManager(_config.session);
                 this._scanner = new Scanner(this);
                 this._requestAcceptor = new RequestAcceptor(this);
@@ -85,7 +80,7 @@ zn.define([
                         _member = HttpServerController.member(method);
                         if(_member.meta.router!==null){
                             _router = _member.meta.router || _member.name;
-                            _router = node_path.normalize(zn.SLASH + _key + zn.SLASH + _router);
+                            _router = node_path.normalize('/' + _key + '/' + _router);
                             _routers[_router] = {
                                 controller: _controller,
                                 action: method,
@@ -182,6 +177,8 @@ zn.define([
                     zn.info('[ End ] Scanning Path(Application:' + apps.length + '):' + path);
                     callback && callback(apps);
                     _defer.resolve(apps);
+                }, function (error){
+                    _defer.reject(error);
                 });
 
                 return _defer.promise;
@@ -190,7 +187,7 @@ zn.define([
                 if(this._watching){
                     return false;
                 }
-                var _path = process.cwd() + (this._config.watchCwd||'');
+                var _path = node_path.join(process.cwd(), (this._config.watchCwd||''));
                 this._watching = true;
                 chokidar.watch('.', {
                     ignored: /[\/\\]\./,
@@ -253,13 +250,16 @@ zn.define([
                     _interface = _interfaces[key];
                     _interface.forEach(function (value, index){
                         if(value.family == 'IPv4'){
-                            zn.info('http://' + value.address + ":" + _config.port);
+                            zn.info(this.__getURL(value.address, _config.port));
                         }
-                    });
+                    }.bind(this));
                 }
 
                 zn.info(this._root);
                 this.fire('loaded');
+            },
+            __getURL: function (host, port){
+                return 'http://' + host + ":" + port;
             }
         }
     });

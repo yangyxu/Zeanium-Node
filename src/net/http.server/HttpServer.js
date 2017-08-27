@@ -83,7 +83,7 @@ zn.define([
                             'Content-Type': 'text/html;charset=utf-8',
                             'Trailer': 'Content-MD5'
                         });
-                        response.write('<a href="https://github.com/yangyxu/Zeanium-Node">' + _package.name + '</a>');
+                        response.write('<a href="https://github.com/yangyxu/zeanium-node">' + _package.name + '</a>');
                         response.addTrailers({'Content-MD5': zn.uuid()});
                         response.end();
                     }else {

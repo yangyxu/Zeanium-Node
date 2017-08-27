@@ -15,7 +15,6 @@ zn.define([
             $post: null,
             $get: null,
             $files: null,
-            $uploadConfig: null,
             paths: null,
             context: null,
             applicationContext: null,
@@ -31,8 +30,8 @@ zn.define([
                     return this._serverRequest;
                 },
                 set: function (value){
-                    if(!value){ return false; }
                     this.reset();
+                    if(!value){ return false; }
                     this._serverRequest = value;
                     this.__doSession();
                     this.__parseUrlData();
@@ -42,7 +41,6 @@ zn.define([
         },
         methods: {
             init: function (context, serverRequest){
-                this.reset();
                 this._context = context;
                 this.serverRequest = serverRequest;
             },
@@ -170,19 +168,6 @@ zn.define([
                 this._session.cookie.maxAge = this._session.cookie.maxAge || 3600000;
                 this._session.cookie.expires = new Date(Date.now() + this._session.cookie.maxAge);
             },
-            __getUploadInfo: function (){
-                var _config = this.applicationContext._config,
-                    _upload = _config.upload || {},
-                    _root = (_config.root || __dirname) + zn.SLASH + 'uploads' + zn.SLASH;
-
-                return zn.extend(_upload, {
-                    root: _root,
-                    temp: 'temp' + zn.SLASH,
-                    catalog: 'catalog' + zn.SLASH,
-                    forward: '',
-                    fileServer: null
-                });
-            },
             __parseFormData: function (callback){
                 var _request = this._serverRequest,
                     _data = _request.data;
@@ -190,7 +175,6 @@ zn.define([
                 if(_data){
                     this._$post = _data.fields;
                     this._$files = _data.files;
-                    this._$uploadConfig = _data.uploadConfig;
                     callback(_data);
                 } else {
                     var _ct = _request.headers['content-type']||'';
@@ -198,20 +182,9 @@ zn.define([
                         this._$post = {};
                         callback(this._$post);
                     }else {
-                        var _upload = this.__getUploadInfo(),
-                            _incomingForm = new formidable.IncomingForm(),
-                            _uploadDir = _upload.root + _upload.temp;  //文件上传 临时文件存放路径;
-
-                        if(!fs.existsSync(_upload.root)){
-                            fs.mkdirSync(_upload.root);
-                        }
-
-                        if(!fs.existsSync(_uploadDir)){
-                            fs.mkdirSync(_uploadDir);
-                        }
-
+                        var _incomingForm = new formidable.IncomingForm();
                         //_incomingForm.keepExtensions = true;        //使用文件的原扩展名
-                        _incomingForm.uploadDir = _uploadDir;
+                        _incomingForm.uploadDir = this.applicationContext.uploadConfig.tempDir;
                         _incomingForm.parse(_request,function(error, fields, files){
                             if(error){
                                 zn.error('Request.js:  formidable.IncomingForm parse error, ' + error.toString());
@@ -219,40 +192,36 @@ zn.define([
                             } else {
                                 _data = _request.data = {
                                     fields: fields,
-                                    files: files,
-                                    uploadConfig: _upload
+                                    files: files
                                 };
                                 this._$post = fields;
                                 this._$files = files;
-                                this._$uploadConfig = _upload;
                                 callback(_data);
                             }
                         }.bind(this));
                     }
                 }
             },
-            uploadFile: function (file, upload){
+            uploadFile: function (file, uploadConfig){
                 var _name = file.path.split(path.sep).pop(),
                     _ext = file.name.split('.').pop(),
                     _file = _name + '.' + _ext,
-                    _upload = upload || this._$uploadConfig,
-                    _root = _upload.root,
-                    _sourceFile = _root + _upload.temp + _name,
-                    _targetDir = _root + _upload.catalog;
+                    _uploadConfig = uploadConfig || this.applicationContext.uploadConfig,
+                    _sourceFile = path.join(_uploadConfig.tempDir, _name),
+                    _targetDir = path.join(_uploadConfig.root, _uploadConfig.catalog);
 
                 if(!fs.existsSync(_targetDir)){
                     fs.mkdirSync(_targetDir);
                 }
 
-                if(_upload.keepOriginName){
+                if(_uploadConfig.keepOriginName){
                     _file = file.name;
                 }
 
-                var _targetFile = _targetDir + _file;
+                var _targetFile = path.join(_targetDir, _file);
                 _targetFile = _targetFile.replace(/\\/g, '/');
                 _sourceFile = _sourceFile.replace(/\\/g, '/');
                 fs.renameSync(_sourceFile, _targetFile);
-                var _url = [zn.SLASH, this._applicationContext._deploy].concat(['uploads', _upload.catalog, _file]).join(zn.SLASH);
                 return {
                     name: file.name,
                     size: file.size,
@@ -260,14 +229,13 @@ zn.define([
                     file: _file,
                     ext: _ext,
                     path: _targetFile,
-                    url: path.normalize(_url),
+                    url: _targetFile.replace(_uploadConfig.root, ''),
                     lastModifiedDate: file.lastModifiedDate.toISOString().slice(0, 19)
                 };
             },
-            uploadFiles: function (files, upload){
-                var _upload = upload || this._upload,
-                    _catalog = _upload.root + _upload.catalog,
-                    _self = this;
+            uploadFiles: function (files, uploadConfig){
+                var _uploadConfig = uploadConfig || this.applicationContext.uploadConfig,
+                    _catalog = _uploadConfig.root + _uploadConfig.catalog;
 
                 if(!fs.existsSync(_catalog)){
                     fs.mkdirSync(_catalog, 0766);
@@ -290,6 +258,7 @@ zn.define([
                 zn.each(files, function (file){
                     _paths.push(this.uploadFile(file));
                 }, this);
+
                 return _paths;
             },
             __parseCookie: function (cookie){

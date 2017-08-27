@@ -3,34 +3,64 @@
  */
 zn.define([
     'node:path',
+    'node:fs',
     './controller/ApplicationController'
-], function (node_path, ApplicationController) {
+], function (node_path, node_fs, ApplicationController) {
 
     return zn.Class({
         events: ['register'],
         properties: {
+            config: null,
+            serverContext: null,
             deploy: null,
             root: null,
-            appRoot: null,
-            appConfig: null,
-            routers: null,
-            serverContext: null,
-            APP_PATH: null
+            uploadConfig: null,
+            APP_PATH: null,
+            routers: null
         },
         methods: {
-            init: function (appConfig, serverContext){
-                this._config = this._appConfig = appConfig;
-                this._serverContext = serverContext;
-                this._APP_PATH = appConfig.APP_PATH;
-                this._deploy = appConfig.deploy||'';
+            init: function (config, serverContext){
                 this._routers = {};
                 this._models = {};
                 this._collections = {};
                 this._controllers = {};
                 this._appContexts= {};
-                this._appRoot = this._root = serverContext._root + zn.SLASH + this._deploy;
-                this.__initDBStore(appConfig.databases||serverContext.config.databases);
+
+
+                this._config = config;
+                this._serverContext = serverContext;
+                this._deploy = config.deploy;
+                this._root = node_path.join(serverContext._root, this._deploy);
+                this._uploadConfig = this.__getUploadInfo();
+                this._APP_PATH = config.APP_PATH;
+                this.__initDBStore(config.databases||serverContext.config.databases);
                 this.__registerApplicationController();
+            },
+            __makeDir: function (dir){
+                var _paths = dir.split('/');
+            },
+            __getUploadInfo: function (){
+                var _uploadConfig = zn.extend({
+                        root: this.config.root,
+                        temp: node_path.join('uploads', 'temp'),
+                        catalog: node_path.join('uploads', 'catalog'),
+                        forward: '',
+                        fileServer: null
+                    }, this.config.upload, this.serverContext.config.upload),
+                    _temp = node_path.join(_uploadConfig.root, _uploadConfig.temp),
+                    _catalog = node_path.join(_uploadConfig.root, _uploadConfig.catalog);
+
+                if(!node_fs.existsSync(_temp)){
+                    node_fs.mkdirSync(_temp);
+                }
+                if(!node_fs.existsSync(_catalog)){
+                    node_fs.mkdirSync(_catalog);
+                }
+
+                _uploadConfig.tempDir = _temp;
+                _uploadConfig.catalogDir = _catalog;
+
+                return _uploadConfig;
             },
             __registerApplicationController: function (){
                 var _key = ApplicationController.getMeta('controller') || '';
@@ -94,7 +124,7 @@ zn.define([
 
             },
             __convertControllers: function (controllers) {
-                var _config = this._appConfig,
+                var _config = this._config,
                     _stores = this._stores,
                     _self = this,
                     _key,
