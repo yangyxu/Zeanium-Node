@@ -48,14 +48,22 @@ zn.define([
                         fileServer: null
                     }, this.config.upload, this.serverContext.config.upload),
                     _temp = node_path.join(_uploadConfig.root, _uploadConfig.temp),
-                    _catalog = node_path.join(_uploadConfig.root, _uploadConfig.catalog);
+                    _catalog = node_path.join(_uploadConfig.root, _uploadConfig.catalog),
+                    _path = null;
 
-                if(!node_fs.existsSync(_temp)){
-                    node_fs.mkdirSync(_temp);
-                }
-                if(!node_fs.existsSync(_catalog)){
-                    node_fs.mkdirSync(_catalog);
-                }
+                _uploadConfig.temp.split('/').map(function (value){
+                    _path = node_path.join(_uploadConfig.root, value);
+                    if(value && !node_fs.existsSync(_path)){
+                        node_fs.mkdirSync(_path);
+                    }
+                });
+
+                _uploadConfig.catalog.split('/').map(function (value){
+                    _path = node_path.join(_uploadConfig.root, value);
+                    if(value && !node_fs.existsSync(_path)){
+                        node_fs.mkdirSync(_path);
+                    }
+                });
 
                 _uploadConfig.tempDir = _temp;
                 _uploadConfig.catalogDir = _catalog;

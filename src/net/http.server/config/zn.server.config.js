@@ -59,7 +59,7 @@ zn.define([
     return {
         host: '0.0.0.0',
         port: 8888,
-        catalog: '/znapps/',
+        catalog: '/',
         watchCwd: '/src/',
         views: {
             path: '/src/view/',
