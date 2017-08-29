@@ -40,6 +40,10 @@ zn.define([
                 var _paths = dir.split('/');
             },
             __getUploadInfo: function (){
+                if(!this.config.upload && !this.serverContext.config.upload){
+                    return;
+                }
+
                 var _uploadConfig = zn.extend({
                         root: this.config.root,
                         temp: node_path.join('uploads', 'temp'),
@@ -49,19 +53,20 @@ zn.define([
                     }, this.config.upload, this.serverContext.config.upload),
                     _temp = node_path.join(_uploadConfig.root, _uploadConfig.temp),
                     _catalog = node_path.join(_uploadConfig.root, _uploadConfig.catalog),
-                    _path = null;
+                    _path = _uploadConfig.root;
 
                 _uploadConfig.temp.split('/').map(function (value){
-                    _path = node_path.join(_uploadConfig.root, value);
+                    _path = node_path.join(_path, value);
                     if(value && !node_fs.existsSync(_path)){
-                        node_fs.mkdirSync(_path);
+                        node_fs.mkdirSync(_path, 0766);
                     }
                 });
 
+                _path = _uploadConfig.root;
                 _uploadConfig.catalog.split('/').map(function (value){
-                    _path = node_path.join(_uploadConfig.root, value);
+                    _path = node_path.join(_path, value);
                     if(value && !node_fs.existsSync(_path)){
-                        node_fs.mkdirSync(_path);
+                        node_fs.mkdirSync(_path, 0766);
                     }
                 });
 

@@ -124,15 +124,13 @@ zn.define([
                                 _reg = _defaultValue.regexp;
 
                             if(_reg && !_reg.test(_value)){
-                                response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
-                                return false;
+                                return response.error('Value of http request parameter(\'' + _key + '\') is Invalid.'), false;
                             }
                             break;
                         case 'function':
-                            var _temp = _defaultValue(this.getValue(_key), this);
-                            if(_temp===false){
-                                response.error('Value of http request parameter(\'' + _key + '\') is Invalid.');
-                                return false;
+                            var _temp = _defaultValue(_newValue, this);
+                            if(typeof _temp == 'string'){
+                                return response.error(_temp), false;
                             }
 
                             break;
@@ -183,8 +181,10 @@ zn.define([
                         callback(this._$post);
                     }else {
                         var _incomingForm = new formidable.IncomingForm();
-                        //_incomingForm.keepExtensions = true;        //使用文件的原扩展名
-                        _incomingForm.uploadDir = this.applicationContext.uploadConfig.tempDir;
+                        if(this.applicationContext && this.applicationContext.uploadConfig){
+                            _incomingForm.keepExtensions = this.applicationContext.uploadConfig.keepExtensions;  //使用文件的原扩展名
+                            _incomingForm.uploadDir = this.applicationContext.uploadConfig.tempDir;
+                        }
                         _incomingForm.parse(_request,function(error, fields, files){
                             if(error){
                                 zn.error('Request.js:  formidable.IncomingForm parse error, ' + error.toString());
@@ -203,16 +203,17 @@ zn.define([
                 }
             },
             uploadFile: function (file, uploadConfig){
+                if(!this.applicationContext || !this.applicationContext.uploadConfig){
+                    throw new Error('applicationContext or applicationContext.uploadConfig is undefined.');
+                    return;
+                }
+
                 var _name = file.path.split(path.sep).pop(),
                     _ext = file.name.split('.').pop(),
                     _file = _name + '.' + _ext,
                     _uploadConfig = uploadConfig || this.applicationContext.uploadConfig,
                     _sourceFile = path.join(_uploadConfig.tempDir, _name),
                     _targetDir = path.join(_uploadConfig.root, _uploadConfig.catalog);
-
-                if(!fs.existsSync(_targetDir)){
-                    fs.mkdirSync(_targetDir);
-                }
 
                 if(_uploadConfig.keepOriginName){
                     _file = file.name;
