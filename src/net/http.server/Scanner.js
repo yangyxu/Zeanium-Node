@@ -228,23 +228,26 @@ zn.define([
             },
             getCollection: function (ModelClass) {
                 var _collections = [];
-                this.__getModelCollections(ModelClass, _collections);
+                var _methods = this.__getModelCollections(ModelClass, _collections);
                 return zn.Collection({
                     model: ModelClass,
-                    mixins: _collections
+                    methods: _methods
                 });
             },
             __getModelCollections: function (ModelClass, collections){
                 var _mixin = null,
+                    _methods = {},
                     _collection = ModelClass.getMeta('collection'),
                     _mixins_ = ModelClass._mixins_;
-
                 if(_collection){
+                    _methods = _collection.getMeta('methods');
                     collections.push(_collection);
                 }
                 for(var _i = 0, _len = _mixins_.length; _i < _len; _i++){
-                    this.__getModelCollections(_mixins_[_i], collections);
+                    zn.extend(_methods, this.__getModelCollections(_mixins_[_i], collections));
                 }
+
+                return _methods;
             }
         }
     });

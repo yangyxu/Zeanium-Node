@@ -7,7 +7,7 @@ zn.define(function () {
         static: true,
         methods: {
             addNode: function (table, model){
-                var _pid = model.pid || 0;
+                var _pid = model.zn_tree_pid || 0;
                 return zn.createTransactionBlock()
                     .query(zn.sql.select({
                         table: table,
@@ -19,8 +19,8 @@ zn.define(function () {
                         table: table,
                         fields: 'max(zn_tree_order)+1 as zn_tree_order',
                         where: {
-                            delFlag: 0,
-                            pid: _pid
+                            zn_deleted: 0,
+                            zn_tree_pid: _pid
                         }
                     }))
                     .query('Insert node && Update parent node', function (sql, rows, fields){

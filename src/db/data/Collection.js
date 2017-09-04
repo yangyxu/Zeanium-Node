@@ -13,6 +13,7 @@ zn.define(function () {
     };
 
     var Collection = zn.Class('zn.db.data.Collection', {
+        cn: 'zn.db.data.Collection',
         properties: {
             store: {
                 readonly: true,

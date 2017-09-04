@@ -230,7 +230,7 @@ zn.define([
                     file: _file,
                     ext: _ext,
                     path: _targetFile,
-                    url: _targetFile.replace(_uploadConfig.root, ''),
+                    url: zn.SLASH + _targetFile.replace(_uploadConfig.root, ''),
                     lastModifiedDate: file.lastModifiedDate.toISOString().slice(0, 19)
                 };
             },
