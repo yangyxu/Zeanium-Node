@@ -55,10 +55,10 @@ zn.define(function () {
                             }
                             break;
                         case 'datetime':
-                            _value = _value.trim();
                             if(!_value){
                                 return -1;
                             }
+                            _value = _value.trim();
                             break;
                     }
                     if(_value != null) {
