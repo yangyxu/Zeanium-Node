@@ -240,6 +240,9 @@ zn.define(function () {
                     case 'object':
                         var _ors = [];
                         zn.each(where, function (value, key){
+                            if(value == null || key == null){
+                                return -1;
+                            }
                             if(key.indexOf('&') == -1 && key.indexOf('|') == -1){
                                 _values.push(key + ' = ' + __formatSqlValue(value));
                             }else {
