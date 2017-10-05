@@ -35,7 +35,7 @@ zn.define(function () {
                 hidden: true,
                 default: 0,
                 get: function (){
-                    return zn._request.getSessionKeyValue('@AdminUser', 'id');
+                    return zn._request.getSessionValueByKey('id');
                 },
                 default: 0
             },
@@ -56,7 +56,7 @@ zn.define(function () {
                 hidden: true,
                 default: 0,
                 auto_update: function (){
-                    return zn._request.getSessionKeyValue('@AdminUser', 'id');
+                    return zn._request.getSessionValueByKey('id');
                 },
                 default: 0
             },

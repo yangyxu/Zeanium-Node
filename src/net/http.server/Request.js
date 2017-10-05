@@ -24,6 +24,7 @@ zn.define([
                     return this._session;
                 }
             },
+            defaultSessionKey: '@ZNPluginAdminUserSession',
             serverRequest: {
                 value: null,
                 get: function (){
@@ -42,6 +43,7 @@ zn.define([
         methods: {
             init: function (context, serverRequest){
                 this._context = context;
+                this.set('defaultSessionKey', context.config.defaultSessionKey || "@ZNPluginAdminUserSession");
                 this.serverRequest = serverRequest;
             },
             reset: function (){
@@ -51,18 +53,24 @@ zn.define([
                 this._$files = {};
                 this._errors = [];
             },
-            getSessionKeyValue: function (sessionKey, key){
+            getSessionValueByKey: function (key, sessionKey){
                 var _session = this._session,
-                    _sessionKey = sessionKey || '@AdminUser';
+                    _sessionKey = sessionKey || this.get('defaultSessionKey');
                 if(_session.hasItem()){
                     if(_session.getItem(_sessionKey)){
-                        return _session.getItem(_sessionKey)[key]||0;
+                        return _session.getItem(_sessionKey)[key] || 0;
                     }else {
                         return 0;
                     }
                 }else {
                     return 0;
                 }
+            },
+            setSession: function (session, sessionKey){
+                return this._session.setItem(sessionKey || this.get('defaultSessionKey'), session), this;
+            },
+            getSession: function (sessionKey){
+                return this._session.getItem(sessionKey || this.get('defaultSessionKey'));
             },
             getJSON: function (inName){
                 var _value = this.getValue(inName);

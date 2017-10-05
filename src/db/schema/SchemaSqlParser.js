@@ -57,7 +57,7 @@ zn.define(function () {
             },
             parseIfRights: function (value){
                 if(value){
-                    return "zn_user_exist({0}, users, roles) <> 0".format(zn._request.getSessionKeyValue('@AdminUser', 'id'));
+                    return "zn_user_exist({0}, users, roles) <> 0".format(zn._request.getSessionValueByKey('id'));
                 }else {
                     return "";
                 }

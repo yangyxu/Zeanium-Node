@@ -7,6 +7,6 @@ zn.define([
     return {
         block: block,
         model: model
-    }
+    };
 
 });

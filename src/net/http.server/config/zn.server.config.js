@@ -61,6 +61,7 @@ zn.define([
         port: 8888,
         catalog: '/',
         watchCwd: '/src/',
+        defaultSessionKey: '@ZNPluginAdminUserSession',
         views: {
             path: '/src/view/',
             suffix: 'html'
