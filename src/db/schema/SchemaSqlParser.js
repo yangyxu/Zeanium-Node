@@ -57,7 +57,8 @@ zn.define(function () {
             },
             parseIfRights: function (value){
                 if(value){
-                    return "zn_user_exist({0}, users, roles) <> 0".format(zn._request.getSessionValueByKey('id'));
+                    //"zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0".format(zn._request.getSessionValueByKey('id'));
+                    return zn.sql.rights();
                 }else {
                     return "";
                 }

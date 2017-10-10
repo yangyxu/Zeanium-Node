@@ -14,10 +14,15 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
         fields: '*'
     };
 
-
     return zn.sql = zn.Class({
         static: true,
         methods: {
+            rights: function (userId){
+                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0)) ".format(userId || zn._request.getSessionValueByKey('id'));
+            },
+            observeRights: function (userId){
+                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_observe_users, zn_rights_observe_roles) <> 0)) ".format(userId || zn._request.getSessionValueByKey('id'));
+            },
             paging: function (){
                 return __slice.call(arguments).map(function (data){
                     var _index = data.pageIndex || 1,
