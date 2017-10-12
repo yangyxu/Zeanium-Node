@@ -83,6 +83,49 @@ zn.define([
                     }
                 }
             },
+            initFunction: {
+                method: 'GET/POST',
+                value: function (request, response, chain){
+                    var _basePath = response._applicationContext._APP_PATH,
+                        _dataPath = node_path.join(_basePath, 'src', 'function'),
+                        _store = this.store(),
+                        _self = this;
+                    if(node_fs.existsSync(_dataPath)){
+                        var _fns = [],
+                            _sql = '',
+                            _data = {},
+                            _file = null,
+                            _content = null;
+                        node_fs.readdirSync(_dataPath).forEach(function (file){
+                            _content = node_fs.readFileSync(node_path.join(_dataPath, file), 'utf-8');
+                            _file = node_path.parse(node_path.join(_dataPath, file));
+
+                            switch (_file.ext.toLowerCase()) {
+                                case '.sql':
+                                case '.txt':
+                                    if(file.indexOf('zn_function_')!=-1){
+                                        _fns = _fns.concat(_content.split('----'));
+                                    }else {
+                                        _sql += _content;
+                                    }
+                                    break;
+                            }
+                        });
+                        var _tran = _store.beginTransaction();
+                        _fns.length && _fns.forEach(function (fn_sql){
+                            fn_sql && _tran.query(fn_sql);
+                        });
+                        _sql && _tran.query(_sql);
+                        _tran.on('error', function (sender, err){
+                            response.error(err);
+                        }).on('finally', function (sender, data){
+                            response.success(data);
+                        }).commit();
+                    }else {
+                        response.error('不存在 ./src/function 路径');
+                    }
+                }
+            },
             initModel: {
                 method: 'GET/POST',
                 argv: {
