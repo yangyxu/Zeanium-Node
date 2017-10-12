@@ -43,7 +43,7 @@ zn.define(function () {
                 value: null,
                 type: ['datetime'],
                 ignore: true,
-                auto_update: '{now()}',
+                auto_update: '{{now()}}',
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
                 hidden: true,
                 default: null

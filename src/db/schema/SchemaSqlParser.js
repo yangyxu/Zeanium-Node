@@ -20,8 +20,8 @@ zn.define(function () {
         },
         __formatSqlValue = function (value){
             if(zn.is(value, 'string') && value!=='now()'){
-                if(value.indexOf('{') === 0 && value.indexOf('}') === (value.length-1)){
-                    value = value.substring(1, value.length-1);
+                if(value.indexOf('{{') === 0 && value.indexOf('}}') === (value.length-2)){
+                    value = value.substring(2, value.length - 2);
                 }else {
                     value = "'" + value + "'";
                 }
@@ -147,6 +147,7 @@ zn.define(function () {
                     case 'object':
                         var _keys = [],
                             _values = [];
+                        data.zn_create_user = data.zn_create_user || zn._request.getSessionValueByKey("id") || 0;
                         zn.each(data, function (value, key){
                             _keys.push(key);
                             _values.push(__formatSqlValue(value));
@@ -164,6 +165,8 @@ zn.define(function () {
                         return data;
                     case 'object':
                         var _updates = [];
+                        data.zn_modify_user = data.zn_modify_user || zn._request.getSessionValueByKey("id") || 0;
+                        data.zn_modify_time = data.zn_modify_time || "{{now()}}";
                         zn.each(data, function (value, key){
                             _updates.push(key + ' = ' + __formatSqlValue(value));
                         });
