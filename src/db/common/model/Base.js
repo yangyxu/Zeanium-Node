@@ -32,7 +32,7 @@ zn.define(function () {
                 value: null,
                 type: ['int', 11],
                 convert: 'zn_plugin_admin_convert_user({})',
-                hidden: true,
+                //hidden: true,
                 default: 0,
                 get: function (){
                     return zn._request.getSessionValueByKey('id');
@@ -53,7 +53,7 @@ zn.define(function () {
                 type: ['int', 11],
                 convert: 'zn_plugin_admin_convert_user({})',
                 ignore: true,
-                hidden: true,
+                //hidden: true,
                 default: 0,
                 auto_update: function (){
                     return zn._request.getSessionValueByKey('id');
