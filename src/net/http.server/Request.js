@@ -231,6 +231,10 @@ zn.define([
                 _targetFile = _targetFile.replace(/\\/g, '/');
                 _sourceFile = _sourceFile.replace(/\\/g, '/');
                 fs.renameSync(_sourceFile, _targetFile);
+                var _url = _targetFile.replace(_uploadConfig.root, '');
+                if(_url.indexOf(zn.SLASH)!=0){
+                    _url = zn.SLASH + _url;
+                }
                 return {
                     name: file.name,
                     size: file.size,
@@ -238,7 +242,7 @@ zn.define([
                     file: _file,
                     ext: _ext,
                     path: _targetFile,
-                    url: zn.SLASH + _targetFile.replace(_uploadConfig.root, ''),
+                    url: _url,
                     lastModifiedDate: file.lastModifiedDate.toISOString().slice(0, 19)
                 };
             },

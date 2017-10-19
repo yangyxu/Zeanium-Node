@@ -45,7 +45,7 @@ zn.define(function () {
                 ignore: true,
                 auto_update: '{{now()}}',
                 format: "date_format({},'%Y-%c-%d %h:%i:%s')",
-                hidden: true,
+                //hidden: true,
                 default: null
             },
             zn_modify_user: {

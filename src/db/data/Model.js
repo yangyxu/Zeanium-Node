@@ -44,7 +44,7 @@ zn.define(function () {
                     }
                     _value = values[key];
                     if(_value == null){
-                        _value = prop.get && prop.get.call(this, key, prop, props);
+                        _value = prop.get && prop.get.call(this, key, prop, values);
                     }
                     switch (prop.type[0].toLowerCase()) {
                         case 'int':
