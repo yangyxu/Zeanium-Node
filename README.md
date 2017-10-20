@@ -2,9 +2,6 @@
 
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Dependency Status][daviddm-image]][daviddm-url]
-[![Coverage percentage][coveralls-image]][coveralls-url]
 
 [English Document](https://github.com/yangyxu/Zeanium-Node/blob/master/README_EN.md)
 
@@ -218,6 +215,10 @@ zn run || zn run config:xxx.config.js
 
 [http://www.zeanium.com](http://www.zeanium.com)
 
-## License
+## The MIT License (MIT)
 
-[MIT](https://github.com/yangyxu/zeanium-node/blob/master/LICENSE)
+[MIT](https://github.com/yangyxu/Zeanium-Node/blob/master/LICENSE)
+
+[downloads-image]: http://img.shields.io/npm/dm/zeanium-node.svg
+[npm-image]: https://img.shields.io/npm/v/zeanium-node.svg
+[npm-url]: https://www.npmjs.com/package/zeanium-node

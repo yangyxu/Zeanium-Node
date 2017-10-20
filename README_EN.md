@@ -2,9 +2,6 @@
 
 [![NPM version][npm-image]][npm-url]
 [![Downloads][downloads-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Dependency Status][daviddm-image]][daviddm-url]
-[![Coverage percentage][coveralls-image]][coveralls-url]
 
 [简体中文文档](https://github.com/yangyxu/Zeanium-Node/blob/master/README.md)
 
@@ -180,6 +177,10 @@ If you start server you will see the detail on console:
 
 [http://www.zeanium.com](http://www.zeanium.com)
 
-## License
+## The MIT License (MIT)
 
 [MIT](https://github.com/yangyxu/Zeanium-Node/blob/master/LICENSE)
+
+[downloads-image]: http://img.shields.io/npm/dm/zeanium-node.svg
+[npm-image]: https://img.shields.io/npm/v/zeanium-node.svg
+[npm-url]: https://www.npmjs.com/package/zeanium-node
