@@ -1,5 +1,11 @@
 # Zeanium-Node
 
+[![NPM version][npm-image]][npm-url]
+[![Downloads][downloads-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Dependency Status][daviddm-image]][daviddm-url]
+[![Coverage percentage][coveralls-image]][coveralls-url]
+
 [简体中文文档](https://github.com/yangyxu/Zeanium-Node/blob/master/README.md)
 
 ## Installation
