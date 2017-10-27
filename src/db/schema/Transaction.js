@@ -87,63 +87,6 @@ zn.define(function () {
             insert: function (handler, before, after, index) {
                 return this._queue.insert(this.__parseInsertTask(handler, before, after), this, index), this;
             },
-            __parseInsertTask: function (handler, before, after){
-                return function (task, connection, rows, fields){
-                    var _callback = null;
-                    if(before){
-                        _callback = before.call(this, handler, rows, fields);
-                        if(typeof _callback == 'function'){
-                            handler = _callback;
-                        }
-                    }
-                    if(_callback === false){
-                        this._queue.destroy();
-                    } else if(_callback === -1){
-                        task.done(connection, rows, fields);
-                    } else {
-                        _callback = handler.call(this, task, connection, rows, fields);
-                        if(_callback === false){
-                            this.rollback(err);
-                        } else {
-                            var _after = after && after.call(this, err, rows, fields);
-                            if(_after === false){
-                                this._queue.destroy();
-                            }
-                        }
-                    }
-                }.bind(this);
-            },
-            __parseQueryTask: function (query, before, after){
-                return function (task, connection, rows, fields){
-                    var _callback = null,
-                        _tag = query;
-                    if(before){
-                        _callback = before.call(this, query, rows, fields);
-                        if(typeof _callback == 'string'){
-                            query = _callback;
-                        }
-                    }
-                    if(_callback === false){
-                        this._queue.destroy();
-                    } else if(_callback === -1){
-                        task.done(connection, rows, fields);
-                    } else {
-                        zn.debug('Transaction Query SQL {0} : '.format(_tag!=query?'['+_tag+']':''), query);
-                        connection.query(query, function (err, rows, fields){
-                            var _after = after && after.call(this, err, rows, fields);
-                            if(err){
-                                this.rollback(err);
-                            }else {
-                                if(_after === false){
-                                    this._queue.destroy();
-                                } else {
-                                    task.done(connection, (_after || rows), fields);
-                                }
-                            }
-                        }.bind(this));
-                    }
-                }.bind(this);
-            },
             query: function(query, before, after, index){
                 if(!query&&!before){ return this; }
                 var _task = this.__parseQueryTask(query, before, after);
@@ -193,6 +136,76 @@ zn.define(function () {
                 });
 
                 return this;
+            },
+            __parseInsertTask: function (handler, before, after){
+                return function (task, connection, rows, fields){
+                    var _callback = null;
+                    if(before){
+                        _callback = before.call(this, handler, rows, fields);
+                        if(typeof _callback == 'function'){
+                            handler = _callback;
+                        }
+                    }
+                    if(_callback === false){
+                        this._queue.destroy();
+                    } else if(_callback === -1){
+                        task.done(connection, rows, fields);
+                    } else {
+                        _callback = handler.call(this, task, connection, rows, fields);
+                        if(_callback === false){
+                            this.rollback(err);
+                        } else {
+                            var _after = after && after.call(this, err, rows, fields);
+                            if(_after === false){
+                                this._queue.destroy();
+                            }
+                        }
+                    }
+                }.bind(this);
+            },
+            __parseQueryTask: function (query, before, after){
+                return function (task, connection, rows, fields){
+                    var _callback = null,
+                        _tag = query;
+                    if(before){
+                        _callback = before.call(this, query, rows, fields);
+                        if(typeof _callback == 'string'){
+                            query = _callback;
+                        }
+                    }
+                    if(_callback === false){
+                        this._queue.destroy();
+                    } else if(_callback === -1){
+                        task.done(connection, rows, fields);
+                    } else {
+                        if(_callback && _callback.then) {
+                            _callback.then(function (data){
+                                var _after = after && after.call(this, data);
+                                if(_after === false){
+                                    this._queue.destroy();
+                                } else {
+                                    task.done(connection, (_after || data));
+                                }
+                            }.bind(this), function (err){
+                                this.rollback(err);
+                            }.bind(this));
+                        }else {
+                            zn.debug('Transaction Query SQL {0} : '.format(_tag!=query?'['+_tag+']':''), query);
+                            connection.query(query, function (err, rows, fields){
+                                var _after = after && after.call(this, err, rows, fields);
+                                if(err){
+                                    this.rollback(err);
+                                }else {
+                                    if(_after === false){
+                                        this._queue.destroy();
+                                    } else {
+                                        task.done(connection, (_after || rows), fields);
+                                    }
+                                }
+                            }.bind(this));
+                        }
+                    }
+                }.bind(this);
             },
             __finally: function (error){
                 if(error) {

@@ -34,8 +34,6 @@ zn.define([
             init: function (args){
                 var _config = args.config;
                 this.sets(args);
-                zn.SERVER_PATH = this._serverPath;
-                zn.WEB_PATH = this._webPath;
                 this.on('init', _config.onInit || zn.idle);
                 this.on('loading', _config.onLoading || zn.idle);
                 this.on('loaded', _config.onLoaded || zn.idle);
@@ -47,6 +45,9 @@ zn.define([
                 this._requestAcceptor = new RequestAcceptor(this);
                 this._baseRouters = this.__registerHttpServerController();
                 this.__scanWebPath();
+                zn.SERVER_PATH = this._serverPath;
+                zn.SERVER_URL = this._root;
+                zn.WEB_PATH = this._webPath;
             },
             __init: function (){
                 this._apps = {};
