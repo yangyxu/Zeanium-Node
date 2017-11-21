@@ -12,16 +12,24 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
         paging: "select {fields} from {table} {where} {order} {group} {limit};select count(*) as count from {table} {where};"
     }, SQLS_DEFAULT = {
         fields: '*'
+    }, __getSessionId = function (){
+        if(zn._request){
+            return zn._request.getSessionValueByKey('id');
+        }else if(zn._oldRequest) {
+            return zn._oldRequest.getSessionValueByKey('id');
+        }else {
+            return 0;
+        }
     };
 
     return zn.sql = zn.Class({
         static: true,
         methods: {
             rights: function (userId){
-                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0)) ".format(userId || zn._request.getSessionValueByKey('id'));
+                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0)) ".format(userId || __getSessionId());
             },
             observeRights: function (userId){
-                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_observe_users, zn_rights_observe_roles) <> 0)) ".format(userId || zn._request.getSessionValueByKey('id'));
+                return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_observe_users, zn_rights_observe_roles) <> 0)) ".format(userId || __getSessionId());
             },
             paging: function (){
                 return __slice.call(arguments).map(function (data){

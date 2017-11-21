@@ -134,10 +134,15 @@ zn.define([
                         'Content-Type': CONTENT_TYPE[this.contentType]
                     });
                     this._serverResponse.write(_data, inEncode);
-                    zn._oldRequest = zn._request;
-                    zn._oldResponse = zn._response;
-                    zn._request = null;
-                    zn._response = null;
+                    if(zn._request){
+                        zn._oldRequest = zn._request;
+                        zn._request = null;
+                    }
+
+                    if(zn._response){
+                        zn._oldResponse = zn._response;
+                        zn._response = null;
+                    }
                 } catch (err) {
                     zn.error('Response write error: ' + JSON.stringify(err));
                 }

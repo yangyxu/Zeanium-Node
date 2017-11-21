@@ -29,6 +29,15 @@ zn.define(function () {
 
             return value;
             //return isNaN(value) ? ("'"+value+"'") : value;
+        },
+        __getSessionId = function (){
+            if(zn._request){
+                return zn._request.getSessionValueByKey('id');
+            }else if(zn._oldRequest) {
+                return zn._oldRequest.getSessionValueByKey('id');
+            }else {
+                return 0;
+            }
         };
 
     var PARSE_EXTS = {
@@ -57,7 +66,7 @@ zn.define(function () {
             },
             parseIfRights: function (value){
                 if(value){
-                    //"zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0".format(zn._request.getSessionValueByKey('id'));
+                    //"zn_plugin_admin_user_exist({0}, zn_rights_users, zn_rights_roles) <> 0".format(__getSessionId());
                     return zn.sql.rights();
                 }else {
                     return "";
@@ -147,7 +156,7 @@ zn.define(function () {
                     case 'object':
                         var _keys = [],
                             _values = [];
-                        data.zn_create_user = data.zn_create_user || zn._request.getSessionValueByKey("id") || 0;
+                        data.zn_create_user = data.zn_create_user || __getSessionId();
                         zn.each(data, function (value, key){
                             _keys.push(key);
                             _values.push(__formatSqlValue(value));
@@ -165,7 +174,7 @@ zn.define(function () {
                         return data;
                     case 'object':
                         var _updates = [];
-                        data.zn_modify_user = data.zn_modify_user || zn._request.getSessionValueByKey("id") || 0;
+                        data.zn_modify_user = data.zn_modify_user || __getSessionId();
                         data.zn_modify_time = data.zn_modify_time || "{{now()}}";
                         zn.each(data, function (value, key){
                             _updates.push(key + ' = ' + __formatSqlValue(value));
