@@ -134,6 +134,8 @@ zn.define([
                         'Content-Type': CONTENT_TYPE[this.contentType]
                     });
                     this._serverResponse.write(_data, inEncode);
+                    zn._oldRequest = zn._request;
+                    zn._oldResponse = zn._response;
                     zn._request = null;
                     zn._response = null;
                 } catch (err) {
