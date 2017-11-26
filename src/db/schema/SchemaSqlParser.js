@@ -203,7 +203,7 @@ zn.define(function () {
                         return _fields.join(',');
                 }
             },
-            parseWhere: function (where){
+            parseWhere: function (where, addKeyWord){
                 if(zn.is(where, 'function')){
                     where = where.call(this._context);
                 }
@@ -260,12 +260,36 @@ zn.define(function () {
                                 _values.push(key + ' = ' + __formatSqlValue(value));
                             }else {
                                 if(key.indexOf('&') != -1){
-                                    _values.push(key.replace('&', '') + value);
+                                    switch (key.split('&')[1]) {
+                                        case 'like':
+                                            value = this.__like(value);
+                                            break;
+                                        case 'in':
+                                        case 'not in':
+                                            value = this.__in(value);
+                                        case 'between':
+                                        case 'not between':
+                                            value = this.__betweenAnd(value);
+                                            break;
+                                    }
+                                    _values.push(key.replace('&', ' ') + ' ' + value);
                                 }else if (key.indexOf('|') != -1) {
-                                    _ors.push(key.replace('|', '') + value);
+                                    switch (key.split('|')[1]) {
+                                        case 'like':
+                                            value = this.__like(value);
+                                            break;
+                                        case 'in':
+                                        case 'not in':
+                                            value = this.__in(value);
+                                        case 'between':
+                                        case 'not between':
+                                            value = this.__betweenAnd(value);
+                                            break;
+                                    }
+                                    _ors.push(key.replace('|', ' ') + ' ' + value);
                                 }
                             }
-                        });
+                        }.bind(this));
 
                         _return = _values.join(' and ');
                         if(_ors.length){
@@ -282,7 +306,7 @@ zn.define(function () {
                     _return = _return.substring(3);
                 }
 
-                if(_return){
+                if(_return && addKeyWord !== false){
                     _return = 'where ' + _return;
                 }
 
