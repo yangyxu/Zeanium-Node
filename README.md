@@ -177,9 +177,10 @@ zn.define(function () {
 
 ```sh
 npm install zeanium-node -g
-git clone https://github.com/yangyxu/zeanium-node-demo.git
-cd zeanium-node-demo
-zn run config:zn.workspace.config.js
+git clone https://github.com/yangyxu/zn-app-demo.git
+cd zn-app-demo
+npm install
+zn run
 ```
 The terminal will show the message for http server.
 
