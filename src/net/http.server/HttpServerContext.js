@@ -198,7 +198,7 @@ zn.define([
                     depth: 99,
                     persistent: true
                 }).on('raw', function(event, path, details) {
-                    var _path = details.path || details.watchedPath;
+                    var _path = path || details.path || details.watchedPath;
                     if(_path.substr(-3, 3)=='.js'){
                         if(this._changedFiles.indexOf(_path)==-1 && event!=='unknown'){
                             this._changedFiles.push(_path);
