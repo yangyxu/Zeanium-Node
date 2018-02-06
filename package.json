@@ -33,7 +33,7 @@
     "chokidar": "^1.7.0",
     "formidable": "^1.1.1",
     "mysql": "^2.13.0",
-    "zeanium": "^1.1.28"
+    "zeanium": "^1.1.29"
   },
   "preferGlobal": "true",
   "bin": {
