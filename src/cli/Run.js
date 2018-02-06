@@ -57,7 +57,7 @@ zn.define([
             },
             createHttpServer: function (config){
                 if(this._argv.debug){
-                    zn.debug('Config: ', _config);
+                    zn.debug('Config: ', config);
                 }else {
                     process.on('uncaughtException', function (err) {
                         zn.error(err);
