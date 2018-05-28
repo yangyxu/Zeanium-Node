@@ -101,6 +101,77 @@ zn.define(function () {
                             return this.rollback('The node is not exist!'), false;
                         }
                     });
+            },
+            moveNode: function (table, source, target){
+                var _fields = "id, zn_tree_pid, zn_tree_depth, zn_tree_order, zn_tree_son_count, zn_tree_max_son_count, zn_tree_parent_path";
+                return zn.createTransactionBlock()
+                    .query(zn.sql.select({
+                        table: table,
+                        fields: _fields,
+                        where: { id: source }
+                    }) + zn.sql.select({
+                        table: table,
+                        fields: _fields,
+                        where: { id: target }
+                    })+"select max(zn_tree_order) as target_zn_tree_order from "+table+" where zn_tree_pid=" + target)
+                    .query('order', function (sql, rows, fields){
+                        var _source = rows[0][0],
+                            _target = rows[1][0],
+                            _target_zn_tree_order = rows[2][0].target_zn_tree_order;
+
+                        if(_source.zn_tree_parent_path == _target.zn_tree_parent_path + _source.id + ','){
+                            return this.rollback('The source has in target node!'), false;
+                        }
+                        if(!_target || !_source){
+                            return this.rollback('The target or source is not exist!'), false;
+                        }
+
+                        var _sqls = [];
+                        _sqls.push(zn.sql.update({
+                            table: table,
+                            updates: "zn_tree_son_count=zn_tree_son_count-1",
+                            where: {
+                                id: _source.zn_tree_pid
+                            }
+                        }));
+
+                        _sqls.push(zn.sql.update({
+                            table: table,
+                            updates: {
+                                zn_tree_pid: _target.id,
+                                zn_tree_depth: _target.zn_tree_depth + 1,
+                                zn_tree_order: _target_zn_tree_order + 1,
+                                zn_tree_parent_path: _target.zn_tree_parent_path + _target.id + ','
+                            },
+                            where: {
+                                id: _source.id
+                            }
+                        }));
+
+                        _sqls.push(zn.sql.update({
+                            table: table,
+                            updates: {
+                                zn_tree_son_count: _target.zn_tree_son_count + 1
+                            },
+                            where: {
+                                id: _target.id
+                            }
+                        }));
+
+                        _sqls.push(zn.sql.update({
+                            table: table,
+                            updates: "zn_tree_order=zn_tree_order-1",
+                            where: "zn_tree_pid=" + _source.id + " and zn_tree_order>" + _source.zn_tree_order
+                        }));
+
+                        _sqls.push(zn.sql.update({
+                            table: table,
+                            updates: "zn_tree_parent_path=replace(zn_tree_parent_path, '"+_source.zn_tree_parent_path+"', '"+_target.zn_tree_parent_path + _target.id + ",')",
+                            where: "locate('"+_source.zn_tree_parent_path + _source.id +"', zn_tree_parent_path)<>0"
+                        }));
+
+                        return _sqls.join('');
+                    });
             }
         }
     });

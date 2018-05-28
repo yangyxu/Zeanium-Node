@@ -20,6 +20,20 @@ zn.define(function () {
 
                 return _defer.promise;
             },
+            moveTreeNode: function (source, target){
+                var _defer = zn.async.defer();
+                this.beginTransaction()
+                    .block(zn.block.tree.moveNode(this._table, source, target))
+                    .on('error', function (sender, error){
+                        _defer.reject(error);
+                    })
+                    .on('finally', function (sender, data){
+                        _defer.resolve(data);
+                    })
+                    .commit();
+
+                return _defer.promise;
+            },
             insert: function (values){
                 var _defer = zn.async.defer();
                 this.beginTransaction()

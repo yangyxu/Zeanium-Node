@@ -178,7 +178,7 @@ zn.define(function () {
                     } else if(_callback === -1){
                         task.done(connection, rows, fields);
                     } else {
-                        if(_callback && _callback.then) {
+                        if(_callback && _callback.then && typeof _callback.then == 'function') {
                             _callback.then(function (data){
                                 var _after = after && after.call(this, data);
                                 if(_after === false){
