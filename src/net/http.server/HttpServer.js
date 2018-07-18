@@ -5,11 +5,13 @@ zn.define([
     './config/zn.server.config.js',
     './HttpServerContext',
     'node:http',
+    'node:https',
     'node:path'
 ],function (
     config,
     HttpServerContext,
     node_http,
+    node_https,
     node_path
 ) {
     var _package = require("../../../package.json");
@@ -28,7 +30,7 @@ zn.define([
             init: function (args){
                 var _config = zn.overwrite(args, config);
                 this.__initNodePaths(_config);
-                this.__createHttpServer(_config.port, _config.host);
+                this.__createHttpServer(_config);
                 this.__createHttpServerContext(_config);
             },
             __initNodePaths: function (config){
@@ -54,13 +56,18 @@ zn.define([
                     zn.NODE_PATHS = process.env.NODE_PATH.split(node_path.delimiter);
                 }
             },
-            __createHttpServer: function (port, host){
-                var _httpServer = new node_http.Server();
-                _httpServer.addListener('request', this.__onRequest.bind(this));
-                _httpServer.addListener("connection", this.__onConnection.bind(this));
-                _httpServer.addListener("close", this.__onClose.bind(this));
-                _httpServer.listen(port, host);
-                return _httpServer;
+            __createHttpServer: function (config){
+                var _server = null;
+                if(config.https){
+                    _server = new node_https.Server(config.https);
+                }else {
+                    _server = new node_http.Server(config.http||{});
+                }
+                _server.addListener('request', this.__onRequest.bind(this));
+                _server.addListener("connection", this.__onConnection.bind(this));
+                _server.addListener("close", this.__onClose.bind(this));
+                _server.listen(config.port, config.host);
+                return _server;
             },
             __createHttpServerContext: function (config){
                 this._context = new HttpServerContext({

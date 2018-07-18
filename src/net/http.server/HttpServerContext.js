@@ -260,7 +260,7 @@ zn.define([
                 this.fire('loaded');
             },
             __getURL: function (host, port){
-                return 'http://' + host + ":" + port;
+                return (this._config.https?'https':'http') + '://' + host + ":" + port;
             }
         }
     });
