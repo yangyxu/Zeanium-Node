@@ -61,7 +61,7 @@ zn.define([
                 if(config.https){
                     _server = new node_https.Server(config.https);
                 }else {
-                    _server = new node_http.Server(config.http||{});
+                    _server = new node_http.Server();
                 }
                 _server.addListener('request', this.__onRequest.bind(this));
                 _server.addListener("connection", this.__onConnection.bind(this));
