@@ -4,12 +4,14 @@
 zn.define([
     './config/zn.server.config.js',
     './HttpServerContext',
+    'node:os',
     'node:http',
     'node:https',
     'node:path'
 ],function (
     config,
     HttpServerContext,
+    node_os,
     node_http,
     node_https,
     node_path
@@ -30,7 +32,7 @@ zn.define([
             init: function (args){
                 var _config = zn.overwrite(args, config);
                 this.__initNodePaths(_config);
-                this.__createHttpServer(_config);
+                this.__initConfig(_config);
                 this.__createHttpServerContext(_config);
             },
             __initNodePaths: function (config){
@@ -56,7 +58,44 @@ zn.define([
                     zn.NODE_PATHS = process.env.NODE_PATH.split(node_path.delimiter);
                 }
             },
-            __createHttpServer: function (config){
+            __createClusterServer: function (config){
+                if(node_cluster.isMaster){
+                    zn.info("主进程 "+ process.pid + " 正在运行中...");
+                    var _cpus = node_os.cpus().length;
+                    for(var i = 0; i < _cpus; i++){
+                        node_cluster.fork();
+                    }
+                    node_cluster.on('exit', function (worker, code, signal){
+                        zn.error("工作进程 "+worker.process.pid + " 已退出");
+                    })
+                }else{
+                    zn.info("服务启动...");
+                    this.__createHttpServer2(config);
+                }
+            },
+            __initConfig: function (config){
+                var _port = config.port;
+                if(zn.is(_port, 'number')){
+                    if(config.clusters){
+                        var _min = _port, 
+                            _count = zn.is(config.clusters, 'number')?config.clusters:node_os.cpus().length,
+                            _max = _min + _count;
+                        _port = [_min];
+                        while(_min<_max-1){
+                            _min++;
+                            _port.push(_min);
+                        }
+                    }else{
+                        _port = [_port];
+                    }
+                }
+                
+                if(zn.is(_port, 'array')){
+                    config.port = _port;
+                    return _port.forEach((port)=>this.__createHttpServer(config, port));
+                }
+            },
+            __createHttpServer: function (config, port){
                 var _server = null;
                 if(config.https){
                     _server = new node_https.Server(config.https);
@@ -66,7 +105,7 @@ zn.define([
                 _server.addListener('request', this.__onRequest.bind(this));
                 _server.addListener("connection", this.__onConnection.bind(this));
                 _server.addListener("close", this.__onClose.bind(this));
-                _server.listen(config.port, config.host);
+                _server.listen(port||config.port, config.host);
                 return _server;
             },
             __createHttpServerContext: function (config){
