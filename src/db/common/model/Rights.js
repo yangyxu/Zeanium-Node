@@ -15,6 +15,12 @@ zn.define('../collection/Rights', function (Rights) {
                 default: 0,
                 ignore: true
             },
+            zn_rights_groups: {
+                value: null,
+                type: ['varchar', 250],
+                convert: 'zn_plugin_admin_convert_groups({})',
+                default: ','
+            },
             zn_rights_users: {
                 value: null,
                 type: ['varchar', 250],
@@ -25,6 +31,12 @@ zn.define('../collection/Rights', function (Rights) {
                 value: null,
                 type: ['varchar', 250],
                 convert: 'zn_plugin_admin_convert_roles({})',
+                default: ','
+            },
+            zn_rights_observe_groups: {
+                value: null,
+                type: ['varchar', 250],
+                convert: 'zn_plugin_admin_convert_groups({})',
                 default: ','
             },
             zn_rights_observe_users: {
