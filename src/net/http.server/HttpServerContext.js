@@ -127,14 +127,7 @@ zn.define([
                     _self = this;
                 if(node_fs.existsSync(_webPath + CONFIG.APP)){
                     var _queue = zn.queue();
-                    _queue.push(function (task){
-                        this._scanner.scanApplication(_webPath, '', function (app){
-                            _self.registerApplication(app);
-                        }).then(function (){
-                            task.done();
-                        });
-                    }, _self);
-
+                    
                     _config.node_modules && _config.node_modules.forEach(function (name, index){
                         var _paths = require.resolve(name).split(name);
                         _queue.push(function (task){
@@ -145,6 +138,14 @@ zn.define([
                             });
                         }, _self);
                     });
+
+                    _queue.push(function (task){
+                        this._scanner.scanApplication(_webPath, '', function (app){
+                            _self.registerApplication(app);
+                        }).then(function (){
+                            task.done();
+                        });
+                    }.bind(this), _self);
 
                     _queue.finally(function(){
                         _self.__onLoaded(_webPath);
