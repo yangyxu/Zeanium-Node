@@ -1,6 +1,6 @@
 {
   "name": "zeanium-node",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "scripts": {
@@ -33,6 +33,7 @@
     "chokidar": "^1.7.0",
     "formidable": "^1.1.1",
     "mysql": "^2.13.0",
+    "redis": "^2.8.0",
     "zeanium": "^1.1.29"
   },
   "preferGlobal": true,

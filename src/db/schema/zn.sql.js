@@ -3,16 +3,7 @@
  */
 zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
 
-    var __slice = Array.prototype.slice;
-    var SQLS = {
-        insert: "insert into {table} {values};",
-        update: "update {table} set {updates} {where};",
-        delete: "delete from {table} {where};",
-        select : "select {fields} from {table} {where} {order} {group} {limit};",
-        paging: "select {fields} from {table} {where} {order} {group} {limit};select count(*) as count from {table} {where};"
-    }, SQLS_DEFAULT = {
-        fields: '*'
-    }, __getSessionId = function (){
+    var __getSessionId = function (){
         if(zn._request){
             return zn._request.getSessionValueByKey('id');
         }else if(zn._oldRequest) {
@@ -20,6 +11,25 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
         }else {
             return 0;
         }
+    }, __getSessionGroup = function (){
+        if(zn._request){
+            return zn._request.getSessionValueByKey('zn_plugin_admin_group');
+        }else if(zn._oldRequest) {
+            return zn._oldRequest.getSessionValueByKey('zn_plugin_admin_group');
+        }else {
+            return 0;
+        }
+    };
+
+    var __slice = Array.prototype.slice;
+    var SQLS = {
+        insert: "insert into {table} {values};",
+        update: "update {table} set {updates} {where};",
+        delete: "delete from {table} {where};",
+        select : "select {fields} from {table} {where} {order} {group} {limit};",
+        paging: "select {fields} from {table} {where} {order} {group} {limit};select count(id) as count from {table} {where};"
+    }, SQLS_DEFAULT = {
+        fields: '*'
     };
 
     return zn.sql = zn.Class({
@@ -30,6 +40,9 @@ zn.define(['./SchemaSqlParser'], function (SchemaSqlParser) {
             },
             observeRights: function (userId){
                 return " (zn_rights_enabled = 0 or (zn_rights_enabled <> 0 and zn_plugin_admin_user_exist({0}, zn_rights_observe_users, zn_rights_observe_roles) <> 0)) ".format(userId || __getSessionId());
+            },
+            groupQuerySql: function (_group){
+                return " zn_plugin_admin_group={0} ".format(_group || __getSessionGroup());
             },
             paging: function (){
                 return __slice.call(arguments).map(function (data){

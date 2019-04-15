@@ -38,6 +38,15 @@ zn.define(function () {
             }else {
                 return 0;
             }
+        },
+        __getSessionGroup = function (){
+            if(zn._request){
+                return zn._request.getSessionValueByKey('zn_plugin_admin_group');
+            }else if(zn._oldRequest) {
+                return zn._oldRequest.getSessionValueByKey('zn_plugin_admin_group');
+            }else {
+                return 0;
+            }
         };
 
     var PARSE_EXTS = {
@@ -156,6 +165,7 @@ zn.define(function () {
                     case 'object':
                         var _keys = [],
                             _values = [];
+                        data.zn_plugin_admin_group = data.zn_plugin_admin_group || __getSessionGroup();
                         data.zn_create_user = data.zn_create_user || __getSessionId();
                         zn.each(data, function (value, key){
                             _keys.push(key);
@@ -307,7 +317,7 @@ zn.define(function () {
                 }
 
                 if(_return && addKeyWord !== false){
-                    _return = 'where ' + _return;
+                    _return = "where zn_plugin_admin_group=" + __getSessionGroup() + " and " + _return;
                 }
 
                 return _return;
