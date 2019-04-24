@@ -39,7 +39,7 @@ zn.define([
                     .query(_sql, function (err, rows, fields){
                         if(err){
                             zn.error('mysql.createConnection query error: ', err.stack);
-                            console.error(err.stack);
+                            console.log(err.stack);
                             _defer.reject(err);
                         }else {
                             _defer.resolve(rows);
@@ -64,7 +64,7 @@ zn.define([
                     connection.query(sql, function (err, rows){
                         if(err){
                             zn.error('ConnectionPool connection query error: ', err.stack);
-                            console.error(err.stack);
+                            console.log(err.stack);
                             _defer.reject(err);
                         }else {
                             _defer.resolve(rows);
@@ -82,7 +82,7 @@ zn.define([
                 this._pool.getConnection(function (err, connection){
                     if (err){
                         zn.error('ConnectionPool getConnection error: ', err.message);
-                        console.error(err.stack);
+                        console.log(err.stack);
                         error && error(err);
                     }else {
                         success && success(connection);
