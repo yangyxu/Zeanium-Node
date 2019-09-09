@@ -67,7 +67,7 @@ zn.define([
             suffix: 'html'
         },
         modules: null,
-        timeout: 12000,
+        timeout: 30000,
         reDeployDelay: 3000,
         CORS: true,
         mode: 'release',     //release, debug, view,

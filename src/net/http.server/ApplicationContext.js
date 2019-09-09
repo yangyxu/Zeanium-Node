@@ -16,7 +16,10 @@ zn.define([
             root: null,
             uploadConfig: null,
             APP_PATH: null,
-            routers: null
+            routers: null,
+            models: null,
+            collections: null,
+            controllers: null
         },
         methods: {
             init: function (config, serverContext){
