@@ -189,10 +189,15 @@ zn.define([
                         callback(this._$post);
                     }else {
                         var _incomingForm = new formidable.IncomingForm();
+                        _incomingForm.maxFileSize = 1024 * 1024 * 1024;
+                        _incomingForm.maxFields = 2000;
+                        _incomingForm.multiples = true;
+                        _incomingForm.maxFieldsSize = 200 * 1024 * 1024;
                         if(this.applicationContext && this.applicationContext.uploadConfig){
                             _incomingForm.keepExtensions = this.applicationContext.uploadConfig.keepExtensions;  //使用文件的原扩展名
                             _incomingForm.uploadDir = this.applicationContext.uploadConfig.tempDir;
                         }
+
                         _incomingForm.parse(_request,function(error, fields, files){
                             if(error){
                                 zn.error('Request.js:  formidable.IncomingForm parse error, ' + error.toString());
