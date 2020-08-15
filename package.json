@@ -1,6 +1,6 @@
 {
   "name": "zeanium-node",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "Zeanium for Node.js, simple http server and custome your business.",
   "main": "index.js",
   "scripts": {

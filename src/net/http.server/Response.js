@@ -97,6 +97,7 @@ zn.define([
 
                 if(_session){
                     if(_session.hasItem()){
+                        zn.debug('Set-Cookie: ', this._request._session.serialize());
                         _args['Set-Cookie'] = this._request._session.serialize();
                     } else {
                         this._context._sessionManager.remove(_session.getId());
