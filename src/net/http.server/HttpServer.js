@@ -126,11 +126,10 @@ zn.define([
                             "Access-Control-Allow-Credentials": true,
                             'Access-Control-Max-Age': '3600',//一个小时时间
                             'X-Powered-By': (_package.name + '@' + _package.version),
-                            'Content-Type': 'text/html;charset=utf-8',
-                            'Trailer': 'Content-MD5'
+                            'Content-Type': 'text/html;charset=utf-8'
                         });
                         response.write('<a href="https://github.com/yangyxu/zeanium-node">' + _package.name + '</a>');
-                        response.addTrailers({'Content-MD5': zn.uuid()});
+                        //response.addTrailers({'Content-MD5': zn.uuid()});
                         response.end();
                     }else {
                         this._context.accept(request, response);
